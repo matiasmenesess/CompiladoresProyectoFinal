@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.31)
+project(TESTCOMPI)
+
+set(CMAKE_CXX_STANDARD 20)
+
+include_directories(.)
+
+add_executable(TESTCOMPI main.cpp
+        token.h
+        token.cpp
+        scanner.h
+        scanner.cpp)
