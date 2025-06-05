@@ -9,4 +9,9 @@ add_executable(TESTCOMPI main.cpp
         token.h
         token.cpp
         scanner.h
-        scanner.cpp)
+        scanner.cpp
+        parser.cpp
+        parser.h
+        expression.cpp
+        expression.h
+)
