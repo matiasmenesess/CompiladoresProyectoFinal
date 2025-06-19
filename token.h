@@ -3,7 +3,7 @@
 
 #include <string>
 #include <iostream>
-
+using namespace  std;
 class Token {
 public:
     enum Type {
@@ -83,10 +83,9 @@ public:
     std::string text;
     size_t line;
     size_t column;
-
-    Token(Type type, size_t line = 0, size_t column = 0);
-    Token(Type type, char c, size_t line = 0, size_t column = 0);
-    Token(Type type, const std::string& source, int first, int last, size_t line = 0, size_t column = 0);
+    Token(Type type);
+    Token(Type type, char c);
+    Token(Type type, const string& source, int first, int last);
 
     friend std::ostream& operator<<(std::ostream& outs, const Token& tok);
     friend std::ostream& operator<<(std::ostream& outs, const Token* tok);
