@@ -3,12 +3,13 @@
 
 #include <string>
 #include <iostream>
-using namespace  std;
+using namespace std;
+
 class Token {
 public:
     enum Type {
         IDENTIFIER,
-        INTEGER_CONSTANT,
+        NUMBER,
         CHARACTER_CONSTANT,
         STRING_LITERAL,
         FORMAT_STRING,
@@ -23,9 +24,10 @@ public:
         WHILE,
         FOR,
         RETURN,
-        INCLUDE,
 
-        // Operators
+        INCLUDE,
+        HEADER_NAME,
+
         PLUS,
         MINUS,
         MULTIPLY,
@@ -33,25 +35,29 @@ public:
         MODULO,
         INCREMENT,
         DECREMENT,
+
         ASSIGN,
         PLUS_ASSIGN,
         MINUS_ASSIGN,
         MULTIPLY_ASSIGN,
         DIVIDE_ASSIGN,
         MODULO_ASSIGN,
+
         EQUAL,
         NOT_EQUAL,
         LESS_THAN,
         GREATER_THAN,
         LESS_EQUAL,
         GREATER_EQUAL,
+
         LOGICAL_AND,
         LOGICAL_OR,
         LOGICAL_NOT,
 
-        POINTER,        // *
-        ADDRESS_OF,     // &
-        ARROW,          // ->
+        DEREFERENCE,
+        POINTER_DECL,
+        ADDRESS_OF,
+        ARROW,
 
         LEFT_PAREN,
         RIGHT_PAREN,
@@ -62,34 +68,26 @@ public:
         SEMICOLON,
         COMMA,
         COLON,
-
-        PREPROCESSOR,
-        HEADER_NAME,
+        DOT,
 
         LINE_COMMENT,
+        BLOCK_COMMENT,
 
-        START_COMMENT_BLOCK,
-        END_COMMENT_BLOCK,
-
-        // Special
         MAIN,
         PRINTF,
+
         END_OF_FILE,
         ERROR,
         UNKNOWN
     };
 
     Type type;
-    std::string text;
-    size_t line;
-    size_t column;
+    string text;
+
     Token(Type type);
     Token(Type type, char c);
     Token(Type type, const string& source, int first, int last);
-
-    friend std::ostream& operator<<(std::ostream& outs, const Token& tok);
-    friend std::ostream& operator<<(std::ostream& outs, const Token* tok);
-
+    Token(Type type, const string& source);
     bool isType() const {
         return type == INT || type == CHAR || type == VOID || type == STRUCT;
     }
@@ -100,8 +98,11 @@ public:
     }
 
     bool isPreprocessor() const {
-        return type == INCLUDE || type == PREPROCESSOR || type == HEADER_NAME;
+        return type == INCLUDE || type == HEADER_NAME;
     }
+
+    friend ostream& operator<<(ostream& outs, const Token& tok);
+    friend ostream& operator<<(ostream& outs, const Token* tok);
 };
 
 #endif // TOKEN_H
