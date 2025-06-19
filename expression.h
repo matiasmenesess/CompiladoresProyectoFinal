@@ -6,7 +6,6 @@
 #define EXPRESSION_H
 
 #include <string>
-#include <unordered_map>
 #include <list>
 #include <vector>
 using namespace std;
@@ -257,11 +256,14 @@ public:
     std::vector<ConditionalBlock> blocks;
     int id;
     int counter;
+    Exp* condition;
+    Body* thenBody;
     IfStatement(Exp* cond, Body* thenBody);
     void addBlock(Exp* cond, Body* body);
     void addElse(Body* elseBody);
     ~IfStatement();
 };
+
 class WhileStatement : public Stm {
 public:
     Exp* condition;
