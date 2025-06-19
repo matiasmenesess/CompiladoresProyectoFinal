@@ -248,21 +248,24 @@ public:
 
 class IfStatement : public Stm {
 public:
-    struct ConditionalBlock {
-        Exp* condition;
-        Body* body;
-    };
 
-    std::vector<ConditionalBlock> blocks;
     int id;
     int counter;
     Exp* condition;
-    Body* thenBody;
-    IfStatement(Exp* cond, Body* thenBody);
-    void addBlock(Exp* cond, Body* body);
-    void addElse(Body* elseBody);
+    Body* statements;
+    Stm* elsChain;
+    IfStatement(Exp* cond, Body* statements, Stm* elsChain);
     ~IfStatement();
 };
+
+class ElseIfStatement : public Stm {
+    enum Tipo { ELSE_IF, ELSE };
+    Tipo tipo;
+    Exp* condition;
+    Stm* body;
+    ElseIfStatement(Tipo, Exp* cond, Stm* body);
+};
+
 
 class WhileStatement : public Stm {
 public:

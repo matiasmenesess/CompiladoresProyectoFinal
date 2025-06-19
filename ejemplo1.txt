@@ -32,6 +32,11 @@ int main() {
         printf("%d ", i);
         if (i % 2 == 0) {
             printf("(par)");
+        }else if (i % 2 != 0) {
+            printf("(impar)");
+        }
+        else {
+            printf("(otro)");
         }
     }
 

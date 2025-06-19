@@ -27,6 +27,7 @@ std::ostream& operator<<(std::ostream& outs, const Token& tok) {
 
         case Token::IF: outs << "IF"; break;
         case Token::ELSE: outs << "ELSE"; break;
+        case Token::ELSE_IF: outs << "ELSE_IF"; break;
         case Token::WHILE: outs << "WHILE"; break;
         case Token::FOR: outs << "FOR"; break;
         case Token::RETURN: outs << "RETURN"; break;

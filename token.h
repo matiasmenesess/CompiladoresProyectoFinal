@@ -21,7 +21,7 @@ public:
 
         IF,
         ELSE,
-        ELSE_IF
+        ELSE_IF,
         WHILE,
         FOR,
         RETURN,

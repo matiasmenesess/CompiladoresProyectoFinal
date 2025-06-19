@@ -158,10 +158,15 @@ Token* Scanner::nextToken() {
 
     if (isalpha(c) || c == '_') {
         current++;
+        if (input.substr(first, 8) == "else if ") {
+            current = first + 8;
+            token = new Token(Token::ELSE_IF, "else if");
+            return token;
+        }
         while (current < input.length() && (isalnum(input[current]) || input[current] == '_'))
             current++;
         string word = input.substr(first, current - first);
-
+        cout<< "Palabra: " << word << endl;
         if (word == "int") {
             token = new Token(Token::INT, word);
         } else if (word == "char") {
@@ -170,9 +175,9 @@ Token* Scanner::nextToken() {
             token = new Token(Token::VOID, word);
         } else if (word == "struct") {
             token = new Token(Token::STRUCT, word);
-        } else if (word == "if") {
+        }else if (word == "if") {
             token = new Token(Token::IF, word);
-        } else if (word == "else") {
+        }else if (word == "else") {
             token = new Token(Token::ELSE, word);
         } else if (word == "while") {
             token = new Token(Token::WHILE, word);
