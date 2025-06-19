@@ -55,6 +55,25 @@ public:
     ~IdentifierExp();
 };
 
+class Cabecera {
+public:
+    string nombreArchivo;
+    string extension;
+    bool comoseparador;
+    Cabecera();
+    Cabecera(const string& nombre, const string& ext, bool separador = false);
+    ~Cabecera();
+
+};
+
+class DirPre {
+public:
+    Cabecera* cabecera;
+    DirPre();
+    DirPre(Cabecera* cab);
+    ~DirPre();
+};
+
 class Program {
 public:
 };

@@ -7,18 +7,102 @@
 class Token {
 public:
     enum Type {
-        IDENTIFIER,INTEGER_CONSTANT,FLOATING_CONSTANT,CHARACTER_CONSTANT,STRING_LITERAL,PLUS,MINUS,MULTIPLY,DIVIDE,MODULO,ASSIGN,PLUS_ASSIGN,MINUS_ASSIGN,MULTIPLY_ASSIGN,DIVIDE_ASSIGN,MODULO_ASSIGN,LEFT_SHIFT_ASSIGN,RIGHT_SHIFT_ASSIGN,AND_ASSIGN,XOR_ASSIGN,OR_ASSIGN,LESS_THAN,GREATER_THAN,LESS_EQUAL,GREATER_EQUAL,EQUAL,NOT_EQUAL,LOGICAL_AND,LOGICAL_OR,LOGICAL_NOT,BITWISE_AND,BITWISE_OR,BITWISE_XOR,BITWISE_NOT,LEFT_SHIFT,RIGHT_SHIFT,INCREMENT,DECREMENT,DOT,ARROW,LEFT_PAREN,RIGHT_PAREN,LEFT_BRACE,RIGHT_BRACE,SEMICOLON,COMMA,COLON,QUESTION,VOID,CHAR,SHORT,INT,LONG,FLOAT,DOUBLE,SIGNED,UNSIGNED,IF,ELSE,SWITCH,CASE,DEFAULT,WHILE,DO,FOR,GOTO,BREAK,CONTINUE,RETURN,STRUCT,UNION,CONST,VOLATILE,SIZEOF,INCLUDE,HEADER_NAME,ELLIPSIS,NEWLINE,WHITESPACE,COMMENT,END_OF_FILE,ERROR,UNKNOWN, VARARGS, INITIALIZER, CAST_EXPRESSION, POINTER_CONST, POINTER_VOLATILE, ABSTRACT_DECLARATOR,
+        IDENTIFIER,
+        INTEGER_CONSTANT,
+        CHARACTER_CONSTANT,
+        STRING_LITERAL,
+        FORMAT_STRING,
+
+        INT,
+        CHAR,
+        VOID,
+        STRUCT,
+
+        IF,
+        ELSE,
+        WHILE,
+        FOR,
+        RETURN,
+        INCLUDE,
+
+        // Operators
+        PLUS,
+        MINUS,
+        MULTIPLY,
+        DIVIDE,
+        MODULO,
+        INCREMENT,
+        DECREMENT,
+        ASSIGN,
+        PLUS_ASSIGN,
+        MINUS_ASSIGN,
+        MULTIPLY_ASSIGN,
+        DIVIDE_ASSIGN,
+        MODULO_ASSIGN,
+        EQUAL,
+        NOT_EQUAL,
+        LESS_THAN,
+        GREATER_THAN,
+        LESS_EQUAL,
+        GREATER_EQUAL,
+        LOGICAL_AND,
+        LOGICAL_OR,
+        LOGICAL_NOT,
+
+        POINTER,        // *
+        ADDRESS_OF,     // &
+        ARROW,          // ->
+
+        LEFT_PAREN,
+        RIGHT_PAREN,
+        LEFT_BRACE,
+        RIGHT_BRACE,
+        LEFT_BRACKET,
+        RIGHT_BRACKET,
+        SEMICOLON,
+        COMMA,
+        COLON,
+
+        PREPROCESSOR,
+        HEADER_NAME,
+
+        LINE_COMMENT,
+
+        START_COMMENT_BLOCK,
+        END_COMMENT_BLOCK,
+
+        // Special
+        MAIN,
+        PRINTF,
+        END_OF_FILE,
+        ERROR,
+        UNKNOWN
     };
 
     Type type;
     std::string text;
+    size_t line;
+    size_t column;
 
-    Token(Type type);
-    Token(Type type, char c);
-    Token(Type type, const std::string& source, int first, int last);
+    Token(Type type, size_t line = 0, size_t column = 0);
+    Token(Type type, char c, size_t line = 0, size_t column = 0);
+    Token(Type type, const std::string& source, int first, int last, size_t line = 0, size_t column = 0);
 
     friend std::ostream& operator<<(std::ostream& outs, const Token& tok);
     friend std::ostream& operator<<(std::ostream& outs, const Token* tok);
+
+    bool isType() const {
+        return type == INT || type == CHAR || type == VOID || type == STRUCT;
+    }
+
+    bool isOperator() const {
+        return (type >= PLUS && type <= LOGICAL_NOT) ||
+               (type >= ASSIGN && type <= MODULO_ASSIGN);
+    }
+
+    bool isPreprocessor() const {
+        return type == INCLUDE || type == PREPROCESSOR || type == HEADER_NAME;
+    }
 };
 
 #endif // TOKEN_H
