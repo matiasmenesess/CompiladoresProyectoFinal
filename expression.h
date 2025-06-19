@@ -12,7 +12,30 @@
 #include <vector>
 using namespace std;
 
-enum BinaryOp{PLUS_OP, MINUS_OP, MULT_OP, DIV_OP, MOD_OP, EQUAL_OP, NOT_EQUAL_OP, LESS_THAN_OP, GREATER_THAN_OP, LESS_EQUAL_OP, GREATER_EQUAL_OP};
+enum BinaryOp {
+    PLUS_OP,
+    MINUS_OP,
+    MULT_OP,
+    DIV_OP,
+    MOD_OP,
+    EQUAL_OP,
+    NOT_EQUAL_OP,
+    LESS_THAN_OP,
+    GREATER_THAN_OP,
+    LESS_EQUAL_OP,
+    GREATER_EQUAL_OP,
+    LOGICAL_AND_OP,
+    LOGICAL_OR_OP,
+    PLUS_EQUAL_OP,
+    MINUS_EQUAL_OP,
+    MULTIPLY_EQUAL_OP,
+    DIVIDE_EQUAL_OP,
+    MODULO_EQUAL_OP,
+};
+
+enum type {
+    NEGACION_OP
+};
 
 class Exp {
 public:
