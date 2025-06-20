@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include "scanner.h"
+#include "parser.h"
+#include "expression.h"
 
 using namespace std;
 
@@ -17,7 +19,6 @@ int main(int argc, const char* argv[]) {
         return 1;
     }
 
-    // Leer el archivo completo
     string input;
     string line;
     while (getline(infile, line)) {
@@ -25,7 +26,6 @@ int main(int argc, const char* argv[]) {
     }
     infile.close();
 
-    // Verificar que el archivo no esté vacío
     if (input.empty()) {
         cout << "El archivo está vacío." << endl;
         return 1;
@@ -37,13 +37,36 @@ int main(int argc, const char* argv[]) {
     cout << "----------------------------------------\n\n";
 
     try {
+        cout << "=== FASE 1: ANÁLISIS LÉXICO ===" << endl;
         Scanner scanner(input.c_str());
         test_scanner(&scanner);
-        cout << "\nScanner completado exitosamente" << endl;
+        cout << "Scanner completado exitosamente\n" << endl;
+
+        cout << "=== FASE 2: PARSER ===" << endl;
+
+        Scanner parser_scanner(input.c_str());
+        Parser parser(&parser_scanner);
+
+        cout << "Iniciando parser..." << endl;
+        Program* program = parser.parseProgram();
+
+        cout << "parser completado exitosamente!" << endl;
+        cout << "Programa parseado correctamente." << endl;
+
+        cout << "\n=== INFORMACIÓN DEL PROGRAMA ===" << endl;
+        cout << "✓ Programa parseado exitosamente" << endl;
+        cout << "✓ Estructura del AST creada" << endl;
+
+        delete program;
+
     } catch (const exception& e) {
-        cout << "\nError durante el escaneo: " << e.what() << endl;
+        cout << "\nError durante el analisis: " << e.what() << endl;
+        return 1;
+    } catch (...) {
+        cout << "\nError desconocido durante el análisis" << endl;
         return 1;
     }
 
+    cout << "\n=== ANALISIS COMPLETADO EXITOSAMENTE ===" << endl;
     return 0;
 }
