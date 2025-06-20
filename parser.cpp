@@ -65,6 +65,7 @@ Program* Parser::parseProgram() {
         cout<<previous->text<<endl;
 
     }
+
     GlobalVarDecList* globals = parseGlobalDeclarations();
     StructDeclarationList* structs = parseStructDeclarations();
     FunctionList* functions = parseFunctions();
@@ -201,103 +202,112 @@ StructDeclaration* Parser::parseStructDeclaration() {
 
 FunctionList* Parser::parseFunctions() {
     FunctionList* functions = new FunctionList();
-    // La lógica de lookahead se mantiene
-    while(!isAtEnd() && !check(Token::MAIN)) {
-        if(check(Token::INT) || check(Token::CHAR) || check(Token::VOID)) {
+    bool mainFound = false;
 
-            //BORRAR LUEGO
-            if(check(Token::INT)){
-                cout<<"int ";
+    while(!isAtEnd() && (check(Token::INT) || check(Token::CHAR) || check(Token::VOID))) {
+        // Parseamos el tipo primero
+        Type* return_type = parseType();
+
+        if(check(Token::IDENTIFIER)){
+            string function_name = current->text;
+
+            //BORRAR LUEGO;
+            cout<<" "<<function_name;
+
+            advance();
+
+            Function* func = parseFunction(return_type, function_name);
+            functions->add(func);
+
+        } else if(check(Token::MAIN)){
+            if (return_type->type_name != "int"){
+                throw runtime_error("Se esperaba que el tipo del main sea int");
             }
-            else if(check(Token::CHAR)){
-                cout<<"char ";
-            }
-            else if(check(Token::VOID)){
-                cout<<"void ";
-            }
+            advance();
+            mainFound = true;
+            return functions;
 
-
-            Token* temp_current = current; advance();
-            if(check(Token::IDENTIFIER)){
-                Token* temp_id = current; advance();
-
-                //BORRAR LUEGO
-                cout<<previous->text;
-
-
-                if(check(Token::LEFT_PAREN)) {
-
-                    //BORRAR LUEGO
-                    cout<<"(";
-
-                    current = temp_current;
-                    scanner->reset();
-                    while(current->text != temp_current->text) current = scanner->nextToken();
-                    functions->add(parseFunction());
-                } else {
-                    current = temp_current;
-                    scanner->reset();
-                    while(current->text != temp_current->text) current = scanner->nextToken();
-                    break;
-                }
-            } else {
-                current = temp_current;
-                scanner->reset();
-                while(current->text != temp_current->text) current = scanner->nextToken();
-                break;
-            }
         } else {
-            break;
+            throw runtime_error("Se esperaba un nombre de funcion o 'main'");
         }
     }
-    return functions;
+
+    if (!mainFound) {
+        throw runtime_error("Error: No se encontro la funcion 'main' en el programa.");
+    }
 }
 
-Function* Parser::parseFunction() {
-    Type* return_type = parseType();
-
-    if (!check(Token::IDENTIFIER)) {
-        throw runtime_error("Se esperaba un nombre de funcion.");
-    }
-    string name = current->text;
-
-
-
-    advance();
-
+Function* Parser::parseFunction(Type* return_type, const string& name) {
     if (!match(Token::LEFT_PAREN)) {
-        throw runtime_error("Se esperaba '(' despues del nombre de funcion.");
+        throw runtime_error("Se esperaba '(' despues del nombre de funcion");
     }
+
+    //BORRAR LUEGO
+    cout<<"(";
+
     ParameterList* params = parseParameterList();
+
     if (!match(Token::RIGHT_PAREN)) {
-        throw runtime_error("Se esperaba ')' despues de los parametros de la funcion.");
+        throw runtime_error("Se esperaba ')' despues de los parametros de la funcion");
     }
+
+    //BORRAR LUEGO
+    cout<<")";
+
     if (!match(Token::LEFT_BRACE)) {
-        throw runtime_error("Se esperaba '{' antes del cuerpo de la funcion.");
+        throw runtime_error("Se esperaba '{' antes del cuerpo de la funcion");
     }
+
+    //BORRAR LUEGO
+    cout<<"{\n";
+
     Body* body = parseBody();
+
     if (!match(Token::RIGHT_BRACE)) {
-        throw runtime_error("Se esperaba '}' despues del cuerpo de la funcion.");
+        throw runtime_error("Se esperaba '}' despues del cuerpo de la funcion '");
     }
+
+    //BORRAR LUEGO
+    cout<<"}";
+
     return new Function(return_type, name, params, body);
 }
-
 MainFunction* Parser::parseMainFunction() {
 
+    //BORRAR LUEGO
+    cout<<" main";
 
-    if (match(Token::INT) && match(Token::MAIN) && match(Token::LEFT_PAREN) && match(Token::RIGHT_PAREN)) {
-        if (!match(Token::LEFT_BRACE)) {
-            throw runtime_error("Se esperaba '{' para el cuerpo de main.");
-        }
-        Body* body = parseBody();
-        if (!match(Token::RIGHT_BRACE)) {
-            throw runtime_error("Se esperaba '}' para cerrar main.");
-        }
-        return new MainFunction(body);
+    if (!match(Token::LEFT_PAREN)) {
+        throw runtime_error("Se esperaba '(' despues de 'main'");
     }
-    cout << "Error: No se encontró la función 'int main()'." << endl;
-    exit(1);
-    return nullptr;
+
+    //BORRAR LUEGO
+    cout<<"(";
+
+    if (!match(Token::RIGHT_PAREN)) {
+        throw runtime_error("Se esperaba ')' despues de '(' en la funcion main");
+    }
+
+    //BORRAR LUEGO
+    cout<<")";
+
+    if (!match(Token::LEFT_BRACE)) {
+        throw runtime_error("Se esperaba '{' para el cuerpo de main en linea ");
+    }
+
+    //BORRAR LUEGO
+    cout<<"{\n";
+
+    Body* body = parseBody();
+    if (!match(Token::RIGHT_BRACE)) {
+        throw runtime_error("Se esperaba '}' para cerrar main en linea)");
+    }
+
+    //BORRAR LUEGO
+    cout<<"}";
+
+    return new MainFunction(body);
+
 }
 
 Type* Parser::parseType() {
@@ -372,6 +382,10 @@ Parameter* Parser::parseParameter() {
         throw runtime_error("Se esperaba un nombre para el parametro.");
     }
     string name = current->text;
+
+    //BORRAR LUEGO
+    cout<<" "<<name;
+
     advance();
     return new Parameter(type, name);
 }
