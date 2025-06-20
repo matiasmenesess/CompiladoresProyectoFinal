@@ -214,7 +214,16 @@ FunctionList* Parser::parseFunctions() {
             Token* temp_current = current; advance();
             if(check(Token::IDENTIFIER)){
                 Token* temp_id = current; advance();
+
+                //BORRAR LUEGO
+                cout<<previous->text;
+
+
                 if(check(Token::LEFT_PAREN)) {
+
+                    //BORRAR LUEGO
+                    cout<<"(";
+
                     current = temp_current;
                     scanner->reset();
                     while(current->text != temp_current->text) current = scanner->nextToken();
@@ -245,6 +254,9 @@ Function* Parser::parseFunction() {
         throw runtime_error("Se esperaba un nombre de funcion.");
     }
     string name = current->text;
+
+
+
     advance();
 
     if (!match(Token::LEFT_PAREN)) {
