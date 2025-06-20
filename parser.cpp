@@ -167,8 +167,10 @@ GlobalVarDec* Parser::parseGlobalVarDec() {
 StructDeclarationList* Parser::parseStructDeclarations() {
     StructDeclarationList* structs = new StructDeclarationList();
     while(match(Token::STRUCT)) {
+
         //BORRAR LUEGO
         cout<<"struct ";
+
         structs->add(parseStructDeclaration());
     }
     return structs;
@@ -459,6 +461,7 @@ VarDec* Parser::parseVarDec() {
         }
 
         if (check(Token::COMMA)) {
+
             //BORRAR LUEGO
             cout << ", ";
         }
@@ -517,7 +520,7 @@ Stm* Parser::parseIfStatement() {
     Stm* else_chain = nullptr;
     if (match(Token::ELSE_IF)) {
         //BORRAR LUEGO
-        cout<<" \nelse if";
+        cout<<" \nelse ";
 
         else_chain = parseIfStatement();
     } else if (match(Token::ELSE)) {
@@ -573,6 +576,7 @@ Stm* Parser::parseWhileStatement() {
     return new WhileStatement(cond, body);
 }
 Stm* Parser::parseForStatement() {
+    //BORRAR LUEGO
     cout << "for";
 
     if (!match(Token::LEFT_PAREN)) {
@@ -582,78 +586,57 @@ Stm* Parser::parseForStatement() {
     //BORRAR LUEGO
     cout << " (";
 
-    match(Token::IDENTIFIER);
-    string lex1 = previous->text;
-    if (!match(Token::ASSIGN)) {
-        cout << "Error: se esperaba un '=' después del identificador." << endl;
-        exit(1);
-    }
-    Exp* EAS1 = nullptr;
-    EAS1 = parseCExp();
-    AssignStatement* AS1 = new AssignStatement(lex1, EAS1);
+    VarDec* init = parseVarDec();
 
     if (!match(Token::SEMICOLON)) {
         cout << "Error: se esperaba ';'." << endl;
         exit(1);
     }
-    cout<<"; ";
-    Exp* e = nullptr;
-    e = parseCExp();
+
+    //BORRAR LUEGO
+    cout << ";";
+
+    Exp* e1 = parseExpression();
+
     if (!match(Token::SEMICOLON)) {
         cout << "Error: se esperaba ';'." << endl;
         exit(1);
     }
-    cout << "; ";
-    match(Token::IDENTIFIER);
-    string lex2 = previous->text;
-    if (!match(Token::ASSIGN)) {
-        cout << "Error: se esperaba un '=' después del identificador." << endl;
-        exit(1);
-    }
-    Exp* EAS2 = parseCExp();
-    AssignStatement* AS2 = new AssignStatement(lex2, EAS2);
+
+    //BORRAR LUEGO
+    cout << ";";
+
+    Exp* e2 = parseExpression();
 
     if (!match(Token::RIGHT_PAREN)) {
         cout << "Error: se esperaba ')'." << endl;
         exit(1);
     }
+
     //BORRAR LUEGO
     cout << ")";
 
-    if (!match(Token::LEFT_BRACE)) throw runtime_error("Se esperaba '{' para el cuerpo del for.");
+
+    if (!match(Token::LEFT_BRACE)) {
+        cout << "Error: se esperaba '{'." << endl;
+        exit(1);
+    }
 
     //BORRAR LUEGO
-    cout << " {\n";
+    cout << "{\n";
 
     Body* body = parseBody();
-    if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar el cuerpo del for.");
+
+    if (!match(Token::RIGHT_BRACE)) {
+        cout << "Error: se esperaba '('." << endl;
+        exit(1);
+    }
 
     //BORRAR LUEGO
-    cout << "}\n";
+    cout << "}";
 
-    return new ForStatement(EAS1, e, EAS2, body);
-}
+    return new ForStatement(init,e1,e2,body);}
 
-Exp* Parser::parseCExp() {
-    Exp* left = parseExpression();
-    if (match(Token::LESS_EQUAL) || match(Token::LESS_THAN) || match(Token::EQUAL) || match(Token::GREATER_THAN) || match(Token::GREATER_THAN)) {
-        BinaryOp op;
-        if (previous->type == Token::LESS_THAN) {
-            op = LESS_THAN_OP;
-        } else if (previous->type == Token::LESS_EQUAL) {
-            op = LESS_EQUAL_OP;
-        } else if (previous->type == Token::EQUAL) {
-            op = EQUAL_OP;
-        }else if (previous->type == Token::GREATER_THAN) {
-            op = GREATER_THAN_OP;
-        } else {
-            op = GREATER_EQUAL_OP;
-        }
-        Exp* right = parseExpression();
-        left = new BinaryExp(left, right, op);
-    }
-    return left;
-}
 
 Stm* Parser::parseReturnStatement() {
     //BORRAR LUEGO
@@ -776,6 +759,7 @@ Exp* Parser::parseAssignment() {
 Exp* Parser::parseLogicalOr() {
     Exp* expr = parseLogicalAnd();
     while (match(Token::LOGICAL_OR)) {
+
         //BORRAR LUEGO
         cout<<" || ";
 
@@ -955,34 +939,84 @@ Exp* Parser::parsePostfix() {
     Exp* expr = parsePrimary();
     while (true) {
         if (match(Token::INCREMENT)) {
+
+            //BORRAR
+            cout<<"++";
+
             expr = new UnaryExp(expr, PLUS_PLUS_OP, false);
         } else if (match(Token::DECREMENT)) {
+
+            //BORRAR LUEGO
+            cout<<"--";
+
             expr = new UnaryExp(expr, MINUS_MINUS_OP, false);
         } else if (match(Token::LEFT_BRACKET)) {
+
+            //BORRAR LUEGO
+            cout<<"[";
+
             Exp* index = parseExpression();
             if (!match(Token::RIGHT_BRACKET)) throw runtime_error("Se esperaba ']' despues del indice del array.");
+
+            //BORRAR LUEGO
+            cout<<"]";
+
             expr = new ArrayAccessExp(expr, index);
         } else if (match(Token::LEFT_PAREN)) {
+
+
+
             IdentifierExp* id_exp = dynamic_cast<IdentifierExp*>(expr);
             if (!id_exp) throw runtime_error("La llamada a función debe ser sobre un identificador.");
             FunctionCallExp* call = new FunctionCallExp(id_exp->name);
             if(!check(Token::RIGHT_PAREN)){
+
+                //BORRAR LUEGO
+                cout<<"(";
+
                 list<Exp*> args = parseArguments();
                 for(auto arg: args) call->add_argument(arg);
             }
+
             if (!match(Token::RIGHT_PAREN)) throw runtime_error("Se esperaba ')' despues de los argumentos de la funcion.");
+
             expr = call;
+
+            //BORRAR LUEGO
+            cout<<")";
+
         } else if (match(Token::DOT)) {
+
+            //BORRAR LUEGO
+            cout<<".";
+
             if (!check(Token::IDENTIFIER)) throw runtime_error("Se esperaba el nombre del miembro.");
             string member_name = current->text;
+
+            //BORRAR LUEGO
+            cout<<member_name;
+
             advance();
+
+
+
             expr = new MemberAccessExp(expr, member_name, false);
         } else if (match(Token::ARROW)) {
+
+            //BORRAR LUEGO
+            cout<<"->";
+
             if (!check(Token::IDENTIFIER)) throw runtime_error("Se esperaba el nombre del miembro.");
             string member_name = current->text;
+
+            //BORRAR LUEGO
+            cout<<member_name;
+
             advance();
+
             expr = new MemberAccessExp(expr, member_name, true);
-        } else {
+        }
+        else {
             break;
         }
     }
@@ -1015,8 +1049,16 @@ Exp* Parser::parsePrimary() {
         return new ParenExp(expr);
     }
     if(match(Token::LEFT_BRACE)){
+
+        //BORRAR LUEGO
+        cout<<"{";
+
         list<Exp*> inits = parseInitializerList();
         if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar la lista de inicializadores.");
+
+        //BORRAR LUEGO
+        cout<<"}";
+
         if(!inits.empty()) return inits.front();
         return nullptr;
     }
@@ -1057,19 +1099,33 @@ Exp* Parser::parseNumberExp() {
 
 list<Exp*> Parser::parseArguments() {
     list<Exp*> args;
-    do {
+
+    args.push_back(parseExpression());
+
+    while(match(Token::COMMA)){
+
+        //BORRAR LUEGO
+        cout<<", ";
+
         args.push_back(parseExpression());
-    } while (match(Token::COMMA));
+    }
     return args;
 }
 
 
 list<Exp*> Parser::parseInitializerList() {
     list<Exp*> inits;
-    if (!check(Token::RIGHT_BRACE)) {
-        do {
-            inits.push_back(parseExpression());
-        } while (match(Token::COMMA));
+
+    inits.push_back(parseExpression());
+
+    while (match(Token::COMMA)){
+
+        //BORRAR LUEGO
+        cout<<", ";
+
+        inits.push_back(parseExpression());
+
     }
+
     return inits;
 }

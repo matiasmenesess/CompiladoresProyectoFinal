@@ -10,6 +10,8 @@
 #include <vector>
 using namespace std;
 
+class VarDec;
+
 enum BinaryOp {
     PLUS_OP,
     MINUS_OP,
@@ -279,13 +281,13 @@ public:
 
 class ForStatement : public Stm {
 public:
-    Exp* init;
+    VarDec* init;
     Exp* condition;
     Exp* update;
     Body* b;
     int id;
     int counter;
-    ForStatement(Exp* init, Exp* condition, Exp* update, Body* b);
+    ForStatement(VarDec* init, Exp* condition, Exp* update, Body* b);
     ~ForStatement();
 };
 

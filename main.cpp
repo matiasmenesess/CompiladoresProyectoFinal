@@ -47,15 +47,13 @@ int main(int argc, const char* argv[]) {
         Scanner parser_scanner(input.c_str());
         Parser parser(&parser_scanner);
 
-        cout << "Iniciando parser..." << endl;
+        cout << "Iniciando parser...\n" << endl;
         Program* program = parser.parseProgram();
 
-        cout << "parser completado exitosamente!" << endl;
-        cout << "Programa parseado correctamente." << endl;
+        cout << "\nPrograma parseado correctamente." << endl;
 
-        cout << "\n=== INFORMACIÓN DEL PROGRAMA ===" << endl;
-        cout << "✓ Programa parseado exitosamente" << endl;
-        cout << "✓ Estructura del AST creada" << endl;
+        cout << "\n=== INFORMACION DEL PROGRAMA ===" << endl;
+        cout << "Programa parseado exitosamente" << endl;
 
         delete program;
 

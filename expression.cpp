@@ -167,7 +167,7 @@ WhileStatement::~WhileStatement() {
     delete b;
 }
 
-ForStatement::ForStatement(Exp* init, Exp* condition, Exp* update, Body* b) :
+ForStatement::ForStatement(VarDec* init, Exp* condition, Exp* update, Body* b) :
     init(init), condition(condition), update(update), b(b) {}
 ForStatement::~ForStatement() {
     delete init;
