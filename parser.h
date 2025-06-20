@@ -13,7 +13,8 @@ private:
     bool check(Token::Type ttype);
     bool advance();
     bool isAtEnd();
-    void consume(Token::Type ttype, const string& message);
+
+    Token *consume(Token::Type ttype, const string &message);
     Token* consumeIdent(const string& message);
 
     Exp* parseExpression();
@@ -56,7 +57,7 @@ private:
 public:
     Parser(Scanner* scanner);
     ~Parser();
-
+    Exp* parseCExp();
     Program* parseProgram();
     IncludeList* parseIncludes();
     GlobalVarDecList* parseGlobalDeclarations();

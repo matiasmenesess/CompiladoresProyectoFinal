@@ -573,47 +573,86 @@ Stm* Parser::parseWhileStatement() {
     return new WhileStatement(cond, body);
 }
 Stm* Parser::parseForStatement() {
+    cout << "for";
+
+    if (!match(Token::LEFT_PAREN)) {
+        cout << "Error: se esperaba '('." << endl;
+        exit(1);
+    }
     //BORRAR LUEGO
-    cout<<"for";
+    cout << " (";
 
-    if (!match(Token::LEFT_PAREN)) throw runtime_error("Se esperaba '(' despues de 'for'.");
+    match(Token::IDENTIFIER);
+    string lex1 = previous->text;
+    if (!match(Token::ASSIGN)) {
+        cout << "Error: se esperaba un '=' después del identificador." << endl;
+        exit(1);
+    }
+    Exp* EAS1 = nullptr;
+    EAS1 = parseCExp();
+    AssignStatement* AS1 = new AssignStatement(lex1, EAS1);
 
-    //BORRAR LUEGO
-    cout<<" (";
-
-    Exp* init = nullptr;
-    init = parseExpression();
-    if (!match(Token::SEMICOLON)) throw runtime_error("Se esperaba ';' despues de la inicializacion del for.");
-
-    //BORRAR LUEGO
+    if (!match(Token::SEMICOLON)) {
+        cout << "Error: se esperaba ';'." << endl;
+        exit(1);
+    }
     cout<<"; ";
+    Exp* e = nullptr;
+    e = parseCExp();
+    if (!match(Token::SEMICOLON)) {
+        cout << "Error: se esperaba ';'." << endl;
+        exit(1);
+    }
+    cout << "; ";
+    match(Token::IDENTIFIER);
+    string lex2 = previous->text;
+    if (!match(Token::ASSIGN)) {
+        cout << "Error: se esperaba un '=' después del identificador." << endl;
+        exit(1);
+    }
+    Exp* EAS2 = parseCExp();
+    AssignStatement* AS2 = new AssignStatement(lex2, EAS2);
 
-    Exp* cond = nullptr;
-    parseExpression();
-    if (!match(Token::SEMICOLON)) throw runtime_error("Se esperaba ';' despues de la condicion del for.");
-
+    if (!match(Token::RIGHT_PAREN)) {
+        cout << "Error: se esperaba ')'." << endl;
+        exit(1);
+    }
     //BORRAR LUEGO
-    cout<<"; ";
-
-    Exp* update = nullptr;
-    if(!check(Token::RIGHT_PAREN)) update = parseExpression();
-    if (!match(Token::RIGHT_PAREN)) throw runtime_error("Se esperaba ')' despues de las clausulas del for.");
-
-    //BORRAR LUEGO
-    cout<<")";
+    cout << ")";
 
     if (!match(Token::LEFT_BRACE)) throw runtime_error("Se esperaba '{' para el cuerpo del for.");
 
     //BORRAR LUEGO
-    cout<<" {\n";
+    cout << " {\n";
 
     Body* body = parseBody();
     if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar el cuerpo del for.");
 
     //BORRAR LUEGO
-    cout<<"}\n";
+    cout << "}\n";
 
-    return new ForStatement(init, cond, update, body);
+    return new ForStatement(EAS1, e, EAS2, body);
+}
+
+Exp* Parser::parseCExp() {
+    Exp* left = parseExpression();
+    if (match(Token::LESS_EQUAL) || match(Token::LESS_THAN) || match(Token::EQUAL) || match(Token::GREATER_THAN) || match(Token::GREATER_THAN)) {
+        BinaryOp op;
+        if (previous->type == Token::LESS_THAN) {
+            op = LESS_THAN_OP;
+        } else if (previous->type == Token::LESS_EQUAL) {
+            op = LESS_EQUAL_OP;
+        } else if (previous->type == Token::EQUAL) {
+            op = EQUAL_OP;
+        }else if (previous->type == Token::GREATER_THAN) {
+            op = GREATER_THAN_OP;
+        } else {
+            op = GREATER_EQUAL_OP;
+        }
+        Exp* right = parseExpression();
+        left = new BinaryExp(left, right, op);
+    }
+    return left;
 }
 
 Stm* Parser::parseReturnStatement() {
@@ -688,7 +727,9 @@ Stm* Parser::parseExpressionStatement() {
 }
 
 // Expression parsing
-Exp* Parser::parseExpression() { return parseAssignment(); }
+Exp* Parser::parseExpression() {
+    return parseAssignment();
+}
 
 Exp* Parser::parseAssignment() {
     Exp* left = parseLogicalOr();

@@ -166,7 +166,6 @@ Token* Scanner::nextToken() {
         while (current < input.length() && (isalnum(input[current]) || input[current] == '_'))
             current++;
         string word = input.substr(first, current - first);
-        cout<< "Palabra: " << word << endl;
         if (word == "int") {
             token = new Token(Token::INT, word);
         } else if (word == "char") {
