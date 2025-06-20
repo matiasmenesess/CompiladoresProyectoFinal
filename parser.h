@@ -50,7 +50,6 @@ private:
     ParameterList* parseParameterList();
 
     Body* parseBody();
-    Function* parseFunction();
     StructDeclaration* parseStructDeclaration();
     Include* parseInclude();
 
@@ -64,6 +63,7 @@ public:
     StructDeclarationList* parseStructDeclarations();
     FunctionList* parseFunctions();
     MainFunction* parseMainFunction();
+    Function* parseFunction(Type* return_type, const string& name);
 
     StatementList* parseStatementList();
     list<Exp*> parseArguments();
