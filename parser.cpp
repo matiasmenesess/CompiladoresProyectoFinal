@@ -58,7 +58,13 @@ Parser::~Parser() {
 
 Program* Parser::parseProgram() {
     IncludeList* includes = parseIncludes();
-    match(Token::BLOCK_COMMENT);
+    if (check((Token::BLOCK_COMMENT))){
+        match(Token::BLOCK_COMMENT);
+
+        //BORRAR LUEGO
+        cout<<previous->text<<endl;
+
+    }
     GlobalVarDecList* globals = parseGlobalDeclarations();
     StructDeclarationList* structs = parseStructDeclarations();
     FunctionList* functions = parseFunctions();
