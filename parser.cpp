@@ -437,8 +437,8 @@ VarDecList* Parser::parseVarDecList() {
 
 VarDec* Parser::parseVarDec() {
     Type* type = parseType();
-    list<string> vars;
-    list<Exp*> initializers;
+    vector<string> vars;
+    vector<Exp*> initializers;
     do {
         if (!check(Token::IDENTIFIER)) {
             throw runtime_error("Se esperaba un identificador.");

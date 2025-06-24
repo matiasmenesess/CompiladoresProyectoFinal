@@ -133,10 +133,6 @@ ParenExp::~ParenExp() { delete inner; }
 
 Stm::~Stm() {}
 
-AssignStatement::AssignStatement(std::string id, Exp* e, BinaryOp op) :
-    id(id), rhs(e), assign_op(op) {}
-AssignStatement::~AssignStatement() { delete rhs; }
-
 
 
 PrintfStatement::PrintfStatement(string format) : format_string(format) {}
@@ -146,25 +142,34 @@ PrintfStatement::~PrintfStatement() {
 }
 
 IfStatement::IfStatement(Exp* cond, Body* statements, Stm* elsChain) :
-    condition(cond), statements(statements), elsChain(elsChain) {}
+    condition(cond), statements(statements), elsChain(elsChain) {
+    static int counter = 1;
+    id = counter++;
+}
 IfStatement::~IfStatement() {
     delete condition;
     delete statements;
     delete elsChain;
 }
 
-ElseIfStatement::ElseIfStatement(Tipo t, Exp* cond, Stm* body) :
+ElseIfStatement::ElseIfStatement(Tipo t, Exp* cond, Body* body) :
     tipo(t), condition(cond), body(body) {}
 
 WhileStatement::WhileStatement(Exp* condition, Body* b) :
-    condition(condition), b(b) {}
+    condition(condition), b(b) {
+    static int counter = 1;
+    id = counter++;
+}
 WhileStatement::~WhileStatement() {
     delete condition;
     delete b;
 }
 
 ForStatement::ForStatement(VarDec* init, Exp* condition, Exp* update, Body* b) :
-    init(init), condition(condition), update(update), b(b) {}
+    init(init), condition(condition), update(update), b(b) {
+    static int counter = 1;
+    id = counter++;
+}
 ForStatement::~ForStatement() {
     delete init;
     delete condition;
@@ -178,7 +183,7 @@ ExpressionStatement::~ExpressionStatement() { delete expression; }
 ReturnStatement::ReturnStatement(Exp* value) : return_value(value) {}
 ReturnStatement::~ReturnStatement() { delete return_value; }
 
-VarDec::VarDec(Type* type, list<string> vars) :
+VarDec::VarDec(Type* type, vector<string> vars) :
     type(type), vars(vars) {}
 void VarDec::add_initializer(Exp* init) { initializers.push_back(init); }
 VarDec::~VarDec() {

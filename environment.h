@@ -6,7 +6,6 @@
 #define ENVIRONMENT_H
 #include <unordered_map>
 
-#include <list>
 
 #include <vector>
 

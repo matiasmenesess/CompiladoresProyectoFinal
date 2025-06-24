@@ -32,7 +32,7 @@ class FunctionCallExp;
 class ArrayAccessExp;
 class MemberAccessExp;
 class ParenExp;
-class AssignStatement;
+
 class PrintfStatement;
 class IfStatement;
 class ElseIfStatement;
@@ -56,6 +56,7 @@ class Program;
 class Comment;
 class Visitor {
 public:
+
     virtual ~Visitor() = default;
 
     // Expressions
@@ -80,7 +81,6 @@ public:
     virtual int visit(ParenExp* exp) = 0;
 
     // Statements
-    virtual void visit(AssignStatement* stm) = 0;
     virtual void visit(PrintfStatement* stm) = 0;
     virtual void visit(IfStatement* stm) = 0;
     virtual void visit(ElseIfStatement* stm) = 0;
@@ -110,7 +110,9 @@ public:
 class PrintVisitor : public Visitor {
 public:
     void imprimir(Program* program);
+    int indent_level = 0;
 
+    void printIndent();
     // Implement all pure virtual functions from Visitor
     void visit(Include* inc) ;
     void visit(IncludeList* incList) ;
@@ -132,7 +134,6 @@ public:
     int visit(MemberAccessExp* exp) ;
     int visit(ParenExp* exp) ;
 
-    void visit(AssignStatement* stm) ;
     void visit(PrintfStatement* stm) ;
     void visit(IfStatement* stm) ;
     void visit(ElseIfStatement* stm) ;
@@ -156,7 +157,7 @@ public:
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
 };
-
+/*
 class GenCodeVisitor : public Visitor {
 public:
     unordered_map<string, int> memoria;
@@ -255,5 +256,5 @@ public:
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
 };
-
+*/
 #endif //VISITOR_H

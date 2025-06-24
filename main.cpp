@@ -55,6 +55,12 @@ int main(int argc, const char* argv[]) {
         cout << "\n=== INFORMACION DEL PROGRAMA ===" << endl;
         cout << "Programa parseado exitosamente" << endl;
 
+        PrintVisitor print_visitor;
+
+        cout << "\n=== FASE 3: VISITANTE DE IMPRESION ===" << endl;
+        print_visitor.imprimir(program);
+        cout << "\nImpresión del programa completada." << endl;
+
         delete program;
 
     } catch (const exception& e) {

@@ -199,7 +199,7 @@ class FunctionCallExp : public Exp {
 public:
     string function_name;
     int accept(Visitor *visitor) ;
-    list<Exp*> arguments;
+    vector<Exp*> arguments;
     FunctionCallExp(string name);
     void add_argument(Exp* arg);
     ~FunctionCallExp();
@@ -238,22 +238,14 @@ public:
     virtual int accept(Visitor* visitor) = 0;
 };
 
-class AssignStatement : public Stm {
-public:
-    std::string id;
-    Exp* rhs;
-    int accept(Visitor *visitor) ;
-    BinaryOp assign_op;
-    AssignStatement(std::string id, Exp* e, BinaryOp op = ASSIGN_OP);
-    ~AssignStatement();
-};
+
 
 
 class PrintfStatement : public Stm {
 public:
     string format_string;
     int accept(Visitor *visitor) ;
-    list<Exp*> arguments;
+    vector<Exp*> arguments;
     PrintfStatement(string format);
     void add_argument(Exp* arg);
     ~PrintfStatement();
@@ -273,12 +265,13 @@ public:
 };
 
 class ElseIfStatement : public Stm {
+public:
     enum Tipo { ELSE_IF, ELSE };
     int accept(Visitor *visitor);
     Tipo tipo;
     Exp* condition;
-    Stm* body;
-    ElseIfStatement(Tipo, Exp* cond, Stm* body);
+    Body* body;
+    ElseIfStatement(Tipo, Exp* cond, Body* body);
 };
 
 
@@ -325,9 +318,9 @@ public:
 class VarDec {
 public:
     Type* type;
-    list<string> vars;
-    list<Exp*> initializers;
-    VarDec(Type* type, list<string> vars);
+    vector<string> vars;
+    vector<Exp*> initializers;
+    VarDec(Type* type, vector<string> vars);
     void add_initializer(Exp* init);
     ~VarDec();
     int accept(Visitor* visitor) ;
@@ -335,7 +328,7 @@ public:
 
 class VarDecList {
 public:
-    list<VarDec*> vardecs;
+    vector<VarDec*> vardecs;
     VarDecList();
     void add(VarDec* vardec);
     int accept(Visitor* visitor) ;
@@ -355,7 +348,7 @@ public:
 
 class GlobalVarDecList {
 public:
-    list<GlobalVarDec*> global_vardecs;
+    vector<GlobalVarDec*> global_vardecs;
     GlobalVarDecList();
     void add(GlobalVarDec* vardec);
     int accept(Visitor* visitor) ;
@@ -373,7 +366,7 @@ public:
 
 class ParameterList {
 public:
-    list<Parameter*> parameters;
+    vector<Parameter*> parameters;
     ParameterList();
     void add(Parameter* param);
     ~ParameterList();
@@ -382,7 +375,7 @@ public:
 
 class StatementList {
 public:
-    list<Stm*> stms;
+    vector<Stm*> stms;
     StatementList();
     void add(Stm* stm);
     ~StatementList();
@@ -411,7 +404,7 @@ public:
 
 class FunctionList {
 public:
-    list<Function*> functions;
+    vector<Function*> functions;
     FunctionList();
     void add(Function* func);
     ~FunctionList();
@@ -439,7 +432,7 @@ public:
 
 class StructDeclarationList {
 public:
-    list<StructDeclaration*> structs;
+    vector<StructDeclaration*> structs;
     StructDeclarationList();
     void add(StructDeclaration* struct_decl);
     ~StructDeclarationList();
@@ -453,6 +446,7 @@ public:
     StructDeclarationList* struct_declarations;
     FunctionList* functions;
     MainFunction* main_function;
+    vector<Comment*> comments;
 
     Program(IncludeList* includes,
             GlobalVarDecList* globals,
