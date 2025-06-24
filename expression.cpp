@@ -80,10 +80,7 @@ Type::Type(string name, Exp* size) :
     type_name(name), is_pointer(false), is_array(true), array_size(size) {}
 Type::~Type() { if (array_size) delete array_size; }
 
-IFExp::IFExp(Exp *cond, Exp* l, Exp* r) : cond(cond), left(l), right(r) {}
-IFExp::~IFExp() {
-    delete cond; delete left; delete right;
-}
+
 
 BinaryExp::BinaryExp(Exp* l, Exp* r, BinaryOp op) :
     left(l), right(r), op(op) {}
@@ -140,8 +137,7 @@ AssignStatement::AssignStatement(std::string id, Exp* e, BinaryOp op) :
     id(id), rhs(e), assign_op(op) {}
 AssignStatement::~AssignStatement() { delete rhs; }
 
-PrintStatement::PrintStatement(Exp* e) : e(e) {}
-PrintStatement::~PrintStatement() { delete e; }
+
 
 PrintfStatement::PrintfStatement(string format) : format_string(format) {}
 void PrintfStatement::add_argument(Exp* arg) { arguments.push_back(arg); }

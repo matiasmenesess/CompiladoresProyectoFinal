@@ -8,6 +8,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include "visitor.h"
 using namespace std;
 
 class VarDec;
@@ -62,6 +63,7 @@ public:
 
 class Exp {
 public:
+    virtual int  accept(Visitor* visitor) = 0;
     virtual ~Exp() = 0;
     static string binopToChar(BinaryOp op);
     static string unaryToChar(UnaryOp op);
@@ -71,6 +73,7 @@ class Include {
 public:
     string header_name;
     bool is_system_header;
+    int accept(Visitor* visitor);
     Include(string header, bool system = false);
     ~Include();
 };
@@ -79,6 +82,7 @@ class IncludeList {
 public:
     list<Include*> includes;
     IncludeList();
+    int accept(Visitor* visitor);
     void add(Include* inc);
     ~IncludeList();
 };
@@ -86,6 +90,7 @@ public:
 class Comment {
 public:
     string text;
+    virtual int  accept(Visitor* visitor) = 0;
     Comment(string text);
     virtual ~Comment() = 0;
 };
@@ -93,11 +98,13 @@ public:
 class LineComment : public Comment {
 public:
     LineComment(string text);
+    int accept(Visitor* visitor);
     ~LineComment();
 };
 
 class BlockComment : public Comment {
 public:
+    int accept(Visitor *visitor);
     BlockComment(string text);
     ~BlockComment();
 };
@@ -108,25 +115,21 @@ public:
     bool is_pointer;
     bool is_array;
     Exp* array_size;
-
+     int  accept(Visitor* visitor);
     Type(string name);
     Type(string name, bool pointer);
     Type(string name, Exp* size);
     ~Type();
 };
 
-class IFExp : public Exp {
-public:
-    Exp *cond, *left, *right;
-    IFExp(Exp *cond, Exp* l, Exp* r);
-    ~IFExp();
-};
+
 
 class BinaryExp : public Exp {
 public:
     Exp *left, *right;
     string type;
     BinaryOp op;
+    int accept(Visitor *visitor);
     BinaryExp(Exp* l, Exp* r, BinaryOp op);
     ~BinaryExp();
 };
@@ -136,6 +139,7 @@ public:
     Exp* left;
     Exp* right;
     BinaryOp assign_op;
+    int accept(Visitor *visitor);
     AssignExp(Exp* l, Exp* r, BinaryOp op);
     ~AssignExp();
 };
@@ -146,6 +150,7 @@ public:
     string type;
     UnaryOp op;
     bool is_prefix;
+    int accept(Visitor *visitor) ;
     UnaryExp(Exp* uexp, UnaryOp op, bool prefix = true);
     ~UnaryExp();
 };
@@ -154,12 +159,14 @@ class NumberExp : public Exp {
 public:
     int value;
     NumberExp(int v);
+    int accept(Visitor* visitor);
     ~NumberExp();
 };
 
 class BoolExp : public Exp {
 public:
     int value;
+    int accept(Visitor* visitor);
     BoolExp(bool v);
     ~BoolExp();
 };
@@ -168,12 +175,14 @@ class CharExp : public Exp {
 public:
     char value;
     CharExp(char v);
+    int accept(Visitor *visitor);
     ~CharExp();
 };
 
 class StringExp : public Exp {
 public:
     string value;
+    int accept(Visitor *visitor);
     StringExp(string v);
     ~StringExp();
 };
@@ -181,6 +190,7 @@ public:
 class IdentifierExp : public Exp {
 public:
     std::string name;
+    int accept(Visitor *visitor) ;
     IdentifierExp(const std::string& n);
     ~IdentifierExp();
 };
@@ -188,6 +198,7 @@ public:
 class FunctionCallExp : public Exp {
 public:
     string function_name;
+    int accept(Visitor *visitor) ;
     list<Exp*> arguments;
     FunctionCallExp(string name);
     void add_argument(Exp* arg);
@@ -198,6 +209,7 @@ class ArrayAccessExp : public Exp {
 public:
     Exp* array;
     Exp* index;
+    int accept(Visitor *visitor);
     ArrayAccessExp(Exp* arr, Exp* idx);
     ~ArrayAccessExp();
 };
@@ -209,39 +221,38 @@ public:
     bool is_pointer;
     MemberAccessExp(Exp* obj, string member, bool ptr_access = false);
     ~MemberAccessExp();
+    int accept(Visitor *visitor) ;
 };
 
 class ParenExp : public Exp {
 public:
     Exp* inner;
     ParenExp(Exp* exp);
+    int accept(Visitor *visitor);
     ~ParenExp();
 };
 
 class Stm {
 public:
     virtual ~Stm() = 0;
+    virtual int accept(Visitor* visitor) = 0;
 };
 
 class AssignStatement : public Stm {
 public:
     std::string id;
     Exp* rhs;
+    int accept(Visitor *visitor) ;
     BinaryOp assign_op;
     AssignStatement(std::string id, Exp* e, BinaryOp op = ASSIGN_OP);
     ~AssignStatement();
 };
 
-class PrintStatement : public Stm {
-public:
-    Exp* e;
-    PrintStatement(Exp* e);
-    ~PrintStatement();
-};
 
 class PrintfStatement : public Stm {
 public:
     string format_string;
+    int accept(Visitor *visitor) ;
     list<Exp*> arguments;
     PrintfStatement(string format);
     void add_argument(Exp* arg);
@@ -254,6 +265,7 @@ public:
     int id;
     int counter;
     Exp* condition;
+    int accept(Visitor *visitor) ;
     Body* statements;
     Stm* elsChain;
     IfStatement(Exp* cond, Body* statements, Stm* elsChain);
@@ -262,6 +274,7 @@ public:
 
 class ElseIfStatement : public Stm {
     enum Tipo { ELSE_IF, ELSE };
+    int accept(Visitor *visitor);
     Tipo tipo;
     Exp* condition;
     Stm* body;
@@ -272,6 +285,7 @@ class ElseIfStatement : public Stm {
 class WhileStatement : public Stm {
 public:
     Exp* condition;
+    int accept(Visitor *visitor) ;
     Body* b;
     int id;
     int counter;
@@ -283,6 +297,7 @@ class ForStatement : public Stm {
 public:
     VarDec* init;
     Exp* condition;
+    int accept(Visitor *visitor) ;
     Exp* update;
     Body* b;
     int id;
@@ -295,6 +310,7 @@ class ExpressionStatement : public Stm {
 public:
     Exp* expression;
     ExpressionStatement(Exp* exp);
+    int accept(Visitor *visitor) ;
     ~ExpressionStatement();
 };
 
@@ -303,6 +319,7 @@ public:
     Exp* return_value;
     ReturnStatement(Exp* value = nullptr);
     ~ReturnStatement();
+    int accept(Visitor *visitor) ;
 };
 
 class VarDec {
@@ -313,6 +330,7 @@ public:
     VarDec(Type* type, list<string> vars);
     void add_initializer(Exp* init);
     ~VarDec();
+    int accept(Visitor* visitor) ;
 };
 
 class VarDecList {
@@ -320,8 +338,10 @@ public:
     list<VarDec*> vardecs;
     VarDecList();
     void add(VarDec* vardec);
+    int accept(Visitor* visitor) ;
     ~VarDecList();
 };
+
 
 class GlobalVarDec {
 public:
@@ -330,6 +350,7 @@ public:
     Exp* initializer; // for global initialization
     GlobalVarDec(Type* type, string name, Exp* init = nullptr);
     ~GlobalVarDec();
+    int accept(Visitor* visitor) ;
 };
 
 class GlobalVarDecList {
@@ -337,6 +358,7 @@ public:
     list<GlobalVarDec*> global_vardecs;
     GlobalVarDecList();
     void add(GlobalVarDec* vardec);
+    int accept(Visitor* visitor) ;
     ~GlobalVarDecList();
 };
 
@@ -346,6 +368,7 @@ public:
     string name;
     Parameter(Type* type, string name);
     ~Parameter();
+    int accept(Visitor* visitor) ;
 };
 
 class ParameterList {
@@ -354,6 +377,7 @@ public:
     ParameterList();
     void add(Parameter* param);
     ~ParameterList();
+    int accept(Visitor* visitor) ;
 };
 
 class StatementList {
@@ -362,6 +386,7 @@ public:
     StatementList();
     void add(Stm* stm);
     ~StatementList();
+    int accept(Visitor* visitor) ;
 };
 
 class Body {
@@ -370,6 +395,7 @@ public:
     StatementList* slist;
     Body(VarDecList* vardecs, StatementList* stms);
     ~Body();
+    int accept(Visitor* visitor) ;
 };
 
 class Function {
@@ -380,6 +406,7 @@ public:
     Body* body;
     Function(Type* ret_type, string name, ParameterList* params, Body* body);
     ~Function();
+    int accept(Visitor* visitor) ;
 };
 
 class FunctionList {
@@ -388,14 +415,18 @@ public:
     FunctionList();
     void add(Function* func);
     ~FunctionList();
+    int accept(Visitor* visitor) ;
 };
 
 class MainFunction {
 public:
     Body* body;
     MainFunction(Body* body);
+
     ~MainFunction();
+    int accept(Visitor* visitor) ;
 };
+
 
 class StructDeclaration {
 public:
@@ -403,6 +434,7 @@ public:
     VarDecList* members;
     StructDeclaration(string name, VarDecList* members);
     ~StructDeclaration();
+    int accept(Visitor* visitor) ;
 };
 
 class StructDeclarationList {
@@ -411,6 +443,7 @@ public:
     StructDeclarationList();
     void add(StructDeclaration* struct_decl);
     ~StructDeclarationList();
+    int accept(Visitor* visitor) ;
 };
 
 class Program {

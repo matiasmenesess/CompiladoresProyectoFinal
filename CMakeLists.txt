@@ -14,4 +14,7 @@ add_executable(TESTCOMPI main.cpp
         parser.h
         expression.cpp
         expression.h
+        visitor.cpp
+        visitor.h
+        environment.h
 )
