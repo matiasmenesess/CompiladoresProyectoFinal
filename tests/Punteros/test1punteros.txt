@@ -1,0 +1,9 @@
+#include <stdio.h>
+
+int main() {
+    int x = 50;
+    int* ptr;
+    ptr = &x;
+    printf("El valor de x es: %d\n", *ptr);
+    return 0;
+}

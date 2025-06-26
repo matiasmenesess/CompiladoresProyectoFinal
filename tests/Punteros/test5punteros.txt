@@ -1,0 +1,10 @@
+#include <stdio.h>
+
+int main() {
+    int y = 20;
+    int* p = &y;
+    printf("Valor original de y: %d\n", y);
+    *p = 30; // Modificar y a traves del puntero
+    printf("Nuevo valor de y: %d\n", y);
+    return 0;
+}

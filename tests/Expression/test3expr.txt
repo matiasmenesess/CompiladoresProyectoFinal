@@ -1,0 +1,8 @@
+#include <stdio.h>
+
+int main() {
+    int y = 5;
+    int z = ++y;
+    printf("Resultado: %d\n", z);
+    return 0;
+}

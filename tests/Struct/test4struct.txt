@@ -1,0 +1,14 @@
+#include <stdio.h>
+
+struct Punto {
+    int x;
+    int y;
+};
+
+int main() {
+    struct Punto p;
+    p.x = 5;
+    p.y = p.x * 2; // Acceder a un miembro para definir otro
+    printf("p.y deberia ser 10: %d\n", p.y);
+    return 0;
+}

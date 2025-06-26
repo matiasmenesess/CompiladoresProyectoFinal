@@ -1,0 +1,11 @@
+#include <stdio.h>
+
+int main() {
+    int i;
+    printf("Iniciando bucle for:\n");
+    for (i = 0; i < 5; i++) {
+        printf("Iteracion numero: %d\n", i);
+    }
+    printf("Bucle for finalizado.\n");
+    return 0;
+}
