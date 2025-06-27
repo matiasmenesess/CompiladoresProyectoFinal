@@ -87,27 +87,7 @@ public:
     ~IncludeList();
 };
 
-class Comment {
-public:
-    string text;
-    virtual int  accept(Visitor* visitor) = 0;
-    Comment(string text);
-    virtual ~Comment() = 0;
-};
 
-class LineComment : public Comment {
-public:
-    LineComment(string text);
-    int accept(Visitor* visitor);
-    ~LineComment();
-};
-
-class BlockComment : public Comment {
-public:
-    int accept(Visitor *visitor);
-    BlockComment(string text);
-    ~BlockComment();
-};
 
 class Type {
 public:
@@ -253,7 +233,6 @@ public:
 
 class IfStatement : public Stm {
 public:
-
     int id;
     int counter;
     Exp* condition;
@@ -271,7 +250,8 @@ public:
     Tipo tipo;
     Exp* condition;
     Body* body;
-    ElseIfStatement(Tipo, Exp* cond, Body* body);
+    Stm* nextChain;
+    ElseIfStatement(Tipo, Exp* cond, Body* body, Stm* nextChain);
 };
 
 
@@ -446,7 +426,6 @@ public:
     StructDeclarationList* struct_declarations;
     FunctionList* functions;
     MainFunction* main_function;
-    vector<Comment*> comments;
 
     Program(IncludeList* includes,
             GlobalVarDecList* globals,

@@ -63,14 +63,7 @@ IncludeList::~IncludeList() {
     for (auto inc : includes) delete inc;
 }
 
-Comment::Comment(string text) : text(text) {}
-Comment::~Comment() {}
 
-LineComment::LineComment(string text) : Comment(text) {}
-LineComment::~LineComment() {}
-
-BlockComment::BlockComment(string text) : Comment(text) {}
-BlockComment::~BlockComment() {}
 
 Type::Type(string name) :
     type_name(name), is_pointer(false), is_array(false), array_size(nullptr) {}
@@ -152,8 +145,8 @@ IfStatement::~IfStatement() {
     delete elsChain;
 }
 
-ElseIfStatement::ElseIfStatement(Tipo t, Exp* cond, Body* body) :
-    tipo(t), condition(cond), body(body) {}
+ElseIfStatement::ElseIfStatement(Tipo t, Exp* cond, Body* body, Stm* nextChain) :
+    tipo(t), condition(cond), body(body), nextChain(nextChain) {}
 
 WhileStatement::WhileStatement(Exp* condition, Body* b) :
     condition(condition), b(b) {

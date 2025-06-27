@@ -7,7 +7,16 @@
 #include "scanner.h"
 #include "token.h"
 using namespace std;
-
+void Parser::skipComments() {
+    while (check(Token::LINE_COMMENT) || check(Token::BLOCK_COMMENT)) {
+        if (check(Token::LINE_COMMENT)) {
+            advance();
+        }
+        else if (check(Token::BLOCK_COMMENT)) {
+            advance();
+        }
+    }
+}
 bool Parser::match(Token::Type ttype) {
     if (check(ttype)) {
         advance();
@@ -57,22 +66,25 @@ Parser::~Parser() {
 
 
 Program* Parser::parseProgram() {
+    skipComments(); // Ignora comentarios al inicio del archivo
+
     IncludeList* includes = parseIncludes();
-    if (check((Token::BLOCK_COMMENT))){
-        match(Token::BLOCK_COMMENT);
-
-        //BORRAR LUEGO
-        cout<<previous->text<<endl;
-
-    }
+    skipComments();
 
     GlobalVarDecList* globals = parseGlobalDeclarations();
+    skipComments();
+
     StructDeclarationList* structs = parseStructDeclarations();
+    skipComments();
+
     FunctionList* functions = parseFunctions();
+    skipComments();
+
     MainFunction* main = parseMainFunction();
+    skipComments();
+
     return new Program(includes, globals, structs, functions, main);
 }
-
 IncludeList* Parser::parseIncludes() {
     IncludeList* includes = new IncludeList();
     while (check(Token::INCLUDE)) {
@@ -106,6 +118,7 @@ Include* Parser::parseInclude() {
 }
 
 GlobalVarDecList* Parser::parseGlobalDeclarations() {
+    skipComments();
     GlobalVarDecList* globals = new GlobalVarDecList();
     // Esta lógica de lookahead es compleja y se mantiene igual.
     while (!isAtEnd() && !check(Token::STRUCT) && !check(Token::MAIN)) {
@@ -143,7 +156,9 @@ GlobalVarDecList* Parser::parseGlobalDeclarations() {
 }
 
 GlobalVarDec* Parser::parseGlobalVarDec() {
+    skipComments();
     Type* type = parseType();
+    skipComments();
     if (!check(Token::IDENTIFIER)) {
         throw runtime_error("Se esperaba un identificador para la variable global.");
     }
@@ -165,13 +180,14 @@ GlobalVarDec* Parser::parseGlobalVarDec() {
 }
 
 StructDeclarationList* Parser::parseStructDeclarations() {
+    skipComments();
     StructDeclarationList* structs = new StructDeclarationList();
     while(match(Token::STRUCT)) {
-
         //BORRAR LUEGO
         cout<<"struct ";
-
+        skipComments();
         structs->add(parseStructDeclaration());
+        skipComments();
     }
     return structs;
 }
@@ -494,7 +510,6 @@ Stm* Parser::parseStatement() {
 Stm* Parser::parseIfStatement() {
     //BORRAR LUEGO
     cout<<"if";
-
     if (!match(Token::LEFT_PAREN)) throw runtime_error("Se esperaba '(' despues de 'if'.");
 
     //BORRAR LUEGO
@@ -509,7 +524,6 @@ Stm* Parser::parseIfStatement() {
     if (!match(Token::LEFT_BRACE)) throw runtime_error("Se esperaba '{' para el cuerpo del if.");
 
     //BORRAR LUEGO
-    cout<<" {\n";
 
     Body* if_body = parseBody();
     if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar el cuerpo del if.");
@@ -519,32 +533,76 @@ Stm* Parser::parseIfStatement() {
 
     Stm* else_chain = nullptr;
     if (match(Token::ELSE_IF)) {
-        //BORRAR LUEGO
-        cout<<" \nelse ";
-
-        else_chain = parseIfStatement();
+        else_chain = parseElseIfStatement();
     } else if (match(Token::ELSE)) {
-        //BORRAR LUEGO
-        cout<<" \nelse";
-
-        if (!match(Token::LEFT_BRACE)) throw runtime_error("Se esperaba '{' para el cuerpo del else.");
-
-        //BORRAR LUEGO
-        cout<<" {\n";
-
-        Body* else_body = parseBody();
-        if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar el cuerpo del else.");
-
-        //BORRAR LUEGO
-        cout<<"}";
-
-        else_chain = new IfStatement(nullptr, else_body, nullptr);
+        else_chain = parseElseStatement();
     }
 
     //BORRAR LUEGO
     cout<<"\n";
 
     return new IfStatement(cond, if_body, else_chain);
+}
+
+Stm *Parser::parseElseIfStatement() {
+    cout << "else if";
+    if (!match(Token::LEFT_PAREN)) {
+        throw runtime_error("Se esperaba '(' despues de 'else if'.");
+    }
+    cout << " (";
+
+    Exp* else_if_cond = parseExpression();
+
+    if (!match(Token::RIGHT_PAREN)) {
+        throw runtime_error("Se esperaba ')' después de la condición else if");
+    }
+    cout << ")";
+
+    // Add missing brace handling
+    if (!match(Token::LEFT_BRACE)) {
+        throw runtime_error("Se esperaba '{' para el cuerpo del else if.");
+    }
+
+    cout << " {\n";
+
+    Body* else_if_body = parseBody();
+
+    if (!match(Token::RIGHT_BRACE)) {
+        throw runtime_error("Se esperaba '}' para cerrar el cuerpo del else if.");
+    }
+
+    cout << "}\n";
+
+    Stm* next_chain = nullptr;
+    if (match(Token::ELSE_IF)) {
+        next_chain = parseElseIfStatement();
+    }
+    else if (match(Token::ELSE)) {
+        next_chain = parseElseStatement();
+    }
+    return new ElseIfStatement(ElseIfStatement::ELSE_IF, else_if_cond,
+                             else_if_body, next_chain);
+}
+
+Stm* Parser::parseElseStatement() {
+    cout << "else";
+
+    // Add missing brace handling
+    if (!match(Token::LEFT_BRACE)) {
+        throw runtime_error("Se esperaba '{' para el cuerpo del else.");
+    }
+
+    cout << " {\n";
+
+    Body* else_body = parseBody();
+
+    if (!match(Token::RIGHT_BRACE)) {
+        throw runtime_error("Se esperaba '}' para cerrar el cuerpo del else.");
+    }
+
+    cout << "}\n";
+
+    return new ElseIfStatement(ElseIfStatement::ELSE, nullptr, else_body, nullptr);
 }
 
 Stm* Parser::parseWhileStatement() {
@@ -1024,6 +1082,7 @@ Exp* Parser::parsePostfix() {
 }
 
 Exp* Parser::parsePrimary() {
+
     if (match(Token::NUMBER)){
         //BORRAR LUEGO
         cout<<stoi(previous->text);
@@ -1062,7 +1121,7 @@ Exp* Parser::parsePrimary() {
         if(!inits.empty()) return inits.front();
         return nullptr;
     }
-    throw runtime_error("Se esperaba una expresión primaria (numero, identificador, cadena, parentesis).");
+    throw runtime_error("Se esperaba una expresión primaria (numero, identificador, cadena, parentesis). Se obtuvo el token " + current->text);
 }
 
 Exp* Parser::parseFunctionCall() {

@@ -8,7 +8,7 @@ class Parser {
 private:
     Scanner* scanner;
     Token *current, *previous;
-
+    void skipComments();
     bool match(Token::Type ttype);
     bool check(Token::Type ttype);
     bool advance();
@@ -43,6 +43,8 @@ private:
     Stm* parsePrintfStatement();
     Stm* parseExpressionStatement();
     Stm* parseVarDeclaration();
+    Stm* parseElseStatement();
+    Stm* parseElseIfStatement();
 
     VarDec* parseVarDec();
     VarDecList* parseVarDecList();
