@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="TESTCOMPI" targetName="TESTCOMPI" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="f">
+      <change afterPath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ejemplo1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environment.h" beforeDir="false" afterPath="$PROJECT_DIR$/environment.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expression.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/expression.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/expression.h" beforeDir="false" afterPath="$PROJECT_DIR$/expression.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/parser.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser.h" beforeDir="false" afterPath="$PROJECT_DIR$/parser.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test1declvar.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/DeclVar/test1declvar.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test2declvar.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/DeclVar/test2declvar.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test3declvar.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/DeclVar/test3declvar.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Expression/test1expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Expression/test1expr.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Expression/test2expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Expression/test2expr.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Expression/test3expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Expression/test3expr.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test1func.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Funciones/test1func.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test2func.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Funciones/test2func.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test3func.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Funciones/test3func.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test1punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test1punteros.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test2punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test2punteros.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test3punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test3punteros.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test4punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test4punteros.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test5punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test5punteros.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test1sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test1sentselect.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test2sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test2sentselect.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test3sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test3sentselect.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test4sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test4sentselect.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test5sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test5sentselect.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test6sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test6sentselect.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test1struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test1struct.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test2struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test2struct.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test3struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test3struct.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test4struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test4struct.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test5struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test5struct.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visitor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visitor.h" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.h" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2025" />
+    <option name="minorVersion" value="1.2" />
+    <option name="productBranch" value="Classic" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2ywAxhcpjbowV6RHnxc0ZEpDFhy" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "CMake Application.TESTCOMPI.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.west.config.association.type.startup.service": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/zamirlm/Documents/Utec/CIclo2025-1/Compiladores/proyecto/CompiladoresProyectoFinal",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "/home/zamirlm/Documents/Utec/CIclo2025-1/Compiladores/p/CompiladoresProyectoFinal/main.cpp",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TESTCOMPI" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ejemplo1.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="TESTCOMPI" TARGET_NAME="TESTCOMPI" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="TESTCOMPI" RUN_TARGET_NAME="TESTCOMPI">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="" />
+      <created>1750735509793</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1750735509793</updated>
+      <workItem from="1750735511366" duration="2620000" />
+      <workItem from="1750739598918" duration="11758000" />
+      <workItem from="1750781787325" duration="45000" />
+      <workItem from="1750985996240" duration="418000" />
+    </task>
+    <task id="LOCAL-00001" summary="f">
+      <option name="closed" value="true" />
+      <created>1750767173656</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1750767173656</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticReloadCMake value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="f" />
+    <option name="LAST_COMMIT_MESSAGE" value="f" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/visitor.cpp</url>
+          <line>304</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/expression.h</url>
+          <line>240</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

@@ -2,7 +2,7 @@
 //
 // Created by zamirlm on 6/21/25.
 //
-
+#include <stdexcept>
 #include "visitor.h"
 #include <iostream>
 #include "expression.h"
@@ -21,20 +21,8 @@ int IncludeList::accept(Visitor *visitor) {
     return 0;
 }
 
-int LineComment::accept(Visitor *visitor) {
-    visitor->visit(this);
-    return 0;
-}
 
-int BlockComment::accept(Visitor *visitor) {
-    visitor->visit(this);
-    return 0;
-}
 
-int Comment::accept(Visitor *visitor) {
-    visitor->visit(this);
-    return 0;
-}
 
 int Type::accept(Visitor *visitor) {
     visitor->visit(this);
@@ -203,23 +191,6 @@ void PrintVisitor::visit(IncludeList* inc_list) {
     }
 }
 
-void PrintVisitor::visit(LineComment* comment) {
-    printIndent();
-    cout << "//" << comment->text << endl;
-}
-
-void PrintVisitor::visit(BlockComment* comment) {
-    printIndent();
-    cout << "/*" << comment->text << "*/" << endl;
-}
-
-void PrintVisitor::visit(Comment* comment) {
-    if (dynamic_cast<LineComment*>(comment)) {
-        visit(static_cast<LineComment*>(comment));
-    } else if (dynamic_cast<BlockComment*>(comment)) {
-        visit(static_cast<BlockComment*>(comment));
-    }
-}
 
 void PrintVisitor::visit(Type* type) {
     cout << type->type_name;
@@ -336,44 +307,53 @@ void PrintVisitor::visit(IfStatement* stm) {
 
     // Imprimir if
     printIndent();
+
     cout << "if (";
     if (stm->condition) stm->condition->accept(this);
     cout << ") {" << endl;
 
-    // Cuerpo del if
     indent_level++;
     if (stm->statements) stm->statements->accept(this);
     indent_level--;
 
     printIndent();
-    cout << "}";
 
+    cout << "}";
     if (stm->elsChain) {
-        cout<<stm->elsChain->accept(this)<<endl;
+        stm->elsChain->accept(this);
     }
+
+
     cout << endl;
 }
 
 void PrintVisitor::visit(ElseIfStatement* stm) {
     if (!stm) return;
-    cout<<stm->tipo<<" "<<endl;
+
     if (stm->tipo == ElseIfStatement::ELSE_IF) {
         cout << "else if (";
         if (stm->condition)
             stm->condition->accept(this);
         cout << ")";
+        cout << " {" << endl;
+        indent_level++;
+        if (stm->body) stm->body->accept(this);
+        indent_level--;
+        printIndent();
+        cout << "}";
+        if (stm->nextChain) {
+            stm->nextChain->accept(this);
+        }
     }
-    cout << " {" << endl;
-    indent_level++;
-    if (stm->body) stm->body->accept(this);
-    indent_level--;
-    printIndent();
-    cout << "}";
 
-    // Manejar else if adicional si existe
-    if (stm->body && dynamic_cast<ElseIfStatement*>(stm->body)) {
-        cout << " else ";
-        stm->body->accept(this);
+
+    if (stm->tipo == ElseIfStatement::ELSE ) {
+        cout << " else {" << endl;
+        indent_level++;
+        if (stm->body) stm->body->accept(this);
+        indent_level--;
+        printIndent();
+        cout << "}";
     }
 }
 void PrintVisitor::visit(WhileStatement* stm) {
@@ -588,15 +568,7 @@ void PrintVisitor::imprimir(Program* program) {
         cout << endl;
     }
 
-    // Print comments
-    for (auto& comment : program->comments) {
-        if (comment) {
-            comment->accept(this);
-        }
-    }
-    if (!program->comments.empty()) {
-        cout << endl;
-    }
+
 
     // Print global declarations
     if (program->global_declarations) {
@@ -609,13 +581,50 @@ void PrintVisitor::imprimir(Program* program) {
         program->struct_declarations->accept(this);
     }
 
-    // Print functions
     if (program->functions) {
         program->functions->accept(this);
     }
 
-    // Print main function
     if (program->main_function) {
         program->main_function->accept(this);
     }
 }
+
+
+//TypeChecker
+
+enum TypeEnum {
+    INT_TYPE,
+    BOOL_TYPE,
+    CHAR_TYPE,
+    STRING_TYPE,
+    VOID_TYPE,
+    STRUCT_TYPE,
+    ARRAY_TYPE,
+    POINTER_TYPE,
+    UNDEFINED_TYPE
+};
+
+class TypeInfo {
+public:
+    TypeEnum type;
+    string struct_name;
+    TypeInfo* base_type;
+
+    TypeInfo(TypeEnum t) : type(t), base_type(nullptr) {}
+    TypeInfo(TypeEnum t, string name) : type(t), struct_name(name), base_type(nullptr) {}
+    TypeInfo(TypeEnum t, TypeInfo* base) : type(t), base_type(base) {}
+};
+/*
+
+TypeChecker::TypeChecker() {
+    env = new Environment();
+}
+
+TypeChecker::~TypeChecker() {
+    delete env;
+}
+void TypeChecker::visit(PrintfStatement *stm) {
+
+}
+*/

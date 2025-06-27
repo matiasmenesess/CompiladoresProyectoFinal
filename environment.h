@@ -5,15 +5,9 @@
 #ifndef ENVIRONMENT_H
 #define ENVIRONMENT_H
 #include <unordered_map>
-
-
 #include <vector>
-
 #include <string>
-
 #include <iostream>
-
-
 using namespace std;
 
 
@@ -21,7 +15,6 @@ class Environment {
 private:
     vector<unordered_map<string, int>> levels;  // Almacena valores de variables
     vector<unordered_map<string, string>> type_levels;  // Almacena tipos de variables
-    // Busca el nivel en el que está una variable
 
     int search_rib(string var) {
         int idx = levels.size() - 1;

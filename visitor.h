@@ -15,9 +15,6 @@ class Exp;
 class Stm;
 class Include;
 class IncludeList;
-class Comment;
-class LineComment;
-class BlockComment;
 class Type;
 class IFExp;
 class BinaryExp;
@@ -53,7 +50,6 @@ class MainFunction;
 class StructDeclaration;
 class StructDeclarationList;
 class Program;
-class Comment;
 class Visitor {
 public:
 
@@ -62,9 +58,6 @@ public:
     // Expressions
     virtual void visit(Include* inc) = 0;
     virtual void visit(IncludeList* incList) = 0;
-    virtual void visit(LineComment* comment) = 0;
-    virtual void visit(BlockComment* comment) = 0;
-    virtual void visit(Comment* comment) = 0;
     virtual void visit(Type* type) = 0;
 
     virtual int visit(BinaryExp* exp) = 0;
@@ -116,9 +109,6 @@ public:
     // Implement all pure virtual functions from Visitor
     void visit(Include* inc) ;
     void visit(IncludeList* incList) ;
-    void visit(LineComment* comment) ;
-    void visit(BlockComment* comment) ;
-    void visit(Comment* comment) ;
     void visit(Type* type) ;
 
     int visit(BinaryExp* exp) ;
@@ -166,9 +156,6 @@ public:
     void gencode(Program* program);
     void visit(Include* inc) ;
     void visit(IncludeList* incList) ;
-    void visit(LineComment* comment) ;
-    void visit(BlockComment* comment) ;
-    void visit(Comment* comment) ;
     void visit(Type* type) ;
     int visit(BinaryExp* exp) ;
     int visit(AssignExp* exp) ;
@@ -208,16 +195,15 @@ public:
     void visit(StructDeclarationList* structList) ;
 };
 
+
 class TypeChecker : public Visitor {
 
     Environment* env;
 public:
-    void check(Program* program);
+    TypeChecker();
+    ~TypeChecker();
     void visit(Include* inc) ;
     void visit(IncludeList* incList) ;
-    void visit(LineComment* comment) ;
-    void visit(BlockComment* comment) ;
-    void visit(Comment* comment) ;
     void visit(Type* type) ;
     int visit(BinaryExp* exp) ;
     int visit(AssignExp* exp) ;
@@ -232,7 +218,6 @@ public:
     int visit(MemberAccessExp* exp) ;
     int visit(ParenExp* exp) ;
 
-    void visit(AssignStatement* stm) ;
     void visit(PrintfStatement* stm) ;
     void visit(IfStatement* stm) ;
     void visit(ElseIfStatement* stm) ;
@@ -255,6 +240,9 @@ public:
     void visit(MainFunction* mainFunc) ;
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
+
+    void check(Program* program);
+
 };
 */
 #endif //VISITOR_H
