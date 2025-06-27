@@ -21,12 +21,10 @@ print("🔧 Compilando...")
 compile_cmd = ["g++", "-std=c++17", "-Wall"] + source_files + ["-o", executable]
 print(f"Ejecutando: {' '.join(compile_cmd)}")
 
-# Check if g++ is available
 try:
     subprocess.run(["g++", "--version"], check=True, capture_output=True)
 except (subprocess.CalledProcessError, FileNotFoundError):
     print("❌ g++ no encontrado. Intentando con otros compiladores...")
-    # Try other common compiler names on Windows
     for compiler in ["gcc", "clang++", "cl"]:
         try:
             subprocess.run([compiler, "--version"], check=True, capture_output=True)
