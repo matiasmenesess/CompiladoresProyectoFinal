@@ -1,8 +1,9 @@
-Contenido del archivo (190 caracteres):
+Contenido del archivo (210 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
 int resta = -11;
+int maximo = 100/2;
 
 int suma(void a, char b) {
     return a + b;
@@ -25,6 +26,13 @@ IDENTIFIER('resta')
 ASSIGN('=')
 MINUS('-')
 NUMBER('11')
+SEMICOLON(';')
+INT('int')
+IDENTIFIER('maximo')
+ASSIGN('=')
+NUMBER('100')
+DIVIDE('/')
+NUMBER('2')
 SEMICOLON(';')
 INT('int')
 IDENTIFIER('suma')
@@ -80,6 +88,7 @@ Programa parseado exitosamente
 #include <stdio.h>
 
 int resta = -11;
+int maximo = 100 / 2;
 
 int suma(void a, char b) {
     return a + b;

@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 int resta = -11;
+int maximo = 100/2;
 
 int suma(void a, char b) {
     return a + b;
