@@ -25,42 +25,63 @@ bool Parser::match(Token::Type ttype) {
     return false;
 }
 
-bool Parser::check(Token::Type ttype) {
-    if (isAtEnd()) return false;
-    return current->type == ttype;
+bool Parser::isAtEnd() const {
+    return current->type == Token::END_OF_FILE;
 }
 
 bool Parser::advance() {
     if (!isAtEnd()) {
-        Token* temp = current;
-        if (previous) delete previous;
-        current = scanner->nextToken();
-        previous = temp;
-        if (check(Token::ERROR)) {
-            cout << "Error de análisis, carácter no reconocido: " << current->text << endl;
-            exit(1);
-        }
-        return true;
+        previous     = current;
+        currentIndex++;
+        current      = tokens[currentIndex];
     }
-    return false;
+    return true;
 }
 
-bool Parser::isAtEnd() {
-    return (current->type == Token::END_OF_FILE);
+bool Parser::check(Token::Type ttype) const {
+    if (isAtEnd()) return false;
+    return current->type == ttype;
 }
 
-Parser::Parser(Scanner* sc):scanner(sc) {
-    previous = NULL;
-    current = scanner->nextToken();
-    if (current->type == Token::ERROR) {
-        cout << "Error en el primer token: " << current->text << endl;
-        exit(1);
+Token* Parser::peekNext(size_t offset) const {
+    size_t idx = currentIndex + offset;
+    if (idx < tokens.size()) return tokens[idx];
+    return eofToken;
+}
+
+Token* Parser::consume(Token::Type ttype, const std::string& message) {
+    if (check(ttype)) {
+        advance();
+        return previous;
     }
+    throw std::runtime_error(message);
+}
+
+Token* Parser::consumeIdent(const std::string& message) {
+    if (check(Token::IDENTIFIER)) {
+        advance();
+        return previous;
+    }
+    throw std::runtime_error(message);
+}
+
+
+
+Parser::Parser(Scanner* scanner)
+  : scanner(scanner), currentIndex(0)
+{
+    Token* tok;
+    while ((tok = scanner->nextToken())->type != Token::END_OF_FILE) {
+        tokens.push_back(tok);
+    }
+    tokens.push_back(tok);
+    eofToken     = tok;
+    current      = tokens[0];
+    previous     = nullptr;
 }
 
 Parser::~Parser() {
-    if (current) delete current;
-    if (previous) delete previous;
+    for (auto t : tokens) delete t;
 }
 
 
@@ -71,17 +92,15 @@ Program* Parser::parseProgram() {
     IncludeList* includes = parseIncludes();
     skipComments();
 
-    // GlobalVarDecList* globals = parseGlobalDeclarations();
+    GlobalVarDecList* globals = parseGlobalDeclarations();
     skipComments();
-    GlobalVarDecList* globals = nullptr;
+    // GlobalVarDecList* globals = nullptr;
     
 
     StructDeclarationList* structs = parseStructDeclarations();
     skipComments();
     
     FunctionList* functions = parseFunctions();
-    skipComments();
-    // matcheado el main, siguiente debe matcher ()
     MainFunction* main = parseMainFunction();
     skipComments();
 
@@ -121,40 +140,16 @@ GlobalVarDecList* Parser::parseGlobalDeclarations() {
     GlobalVarDecList* globals = new GlobalVarDecList();
 
     while (!isAtEnd() && !check(Token::STRUCT) && !check(Token::MAIN)) {
+        if ((check(Token::INT) || check(Token::CHAR)) &&
+            peekNext(2)->type == Token::LEFT_PAREN) {
+            break;
+        }
+
         if (check(Token::INT) || check(Token::CHAR)) {
-            auto saving = current;
-            Token* savedPrevious = previous;
-            scanner->mark();
-            cout<<saving->text<<endl;
-            
-            parseType();
-
-            cout<<current->text<<endl;
-
-
-            if (!check(Token::IDENTIFIER)) break;
-
-            Token* id_tok = current;
-            advance();
-
-            cout<<current->text<<endl;
-
-            if (current->type == Token::LEFT_PAREN) {
-
-                current = saving;
-                cout<< current->text<<endl;
-                previous = savedPrevious;
-                cout<<scanner->nextToken()->text<<endl;
-                break;
-            }
-
             globals->add(parseGlobalVarDec());
-
-
             if (!match(Token::SEMICOLON)) {
-                throw runtime_error("Se esperaba ';' después de la declaración de variable global.");
+                throw std::runtime_error("Se esperaba ';' después de la declaración de variable global.");
             }
-
         } else {
             break;
         }

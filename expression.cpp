@@ -48,6 +48,8 @@ string Exp::unaryToChar(UnaryOp op) {
         case PLUS_PLUS_OP: return "++";
         case MINUS_MINUS_OP: return "--";
         case DEREFERENCE_OP: return "*";
+        case UNARY_PLUS_OP: return "+";
+        case UNARY_MINUS_OP: return "-";
         case ADDRESS_OF_OP: return "&";
         default: return "?";
     }

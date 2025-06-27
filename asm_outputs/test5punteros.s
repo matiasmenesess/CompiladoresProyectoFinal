@@ -68,6 +68,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 int main() {
     int y = 20;
     int* p = &y;

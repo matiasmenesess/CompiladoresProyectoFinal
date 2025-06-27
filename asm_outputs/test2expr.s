@@ -66,6 +66,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 int main() {
     int a = 10, b = 2, c = 4;
     int y = (a + b) / c;

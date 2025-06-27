@@ -1,6 +1,8 @@
-Contenido del archivo (172 caracteres):
+Contenido del archivo (190 caracteres):
 ----------------------------------------
 #include <stdio.h>
+
+int resta = -11;
 
 int suma(void a, char b) {
     return a + b;
@@ -18,6 +20,12 @@ Iniciando Scanner:
 
 INCLUDE('#include')
 HEADER_NAME('<stdio.h>')
+INT('int')
+IDENTIFIER('resta')
+ASSIGN('=')
+MINUS('-')
+NUMBER('11')
+SEMICOLON(';')
 INT('int')
 IDENTIFIER('suma')
 LEFT_PAREN('(')
@@ -70,6 +78,8 @@ Programa parseado exitosamente
 
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
+
+int resta = -11;
 
 int suma(void a, char b) {
     return a + b;

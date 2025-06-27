@@ -242,6 +242,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 struct Persona {
     char* nombre;
     int edad;

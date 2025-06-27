@@ -71,6 +71,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 int main() {
     printf("Iniciando bucle for:\n");
     for (int i = 0; i < 5; i++) {

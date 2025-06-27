@@ -7,15 +7,20 @@
 class Parser {
 private:
     Scanner* scanner;
-    Token *current, *previous;
+    std::vector<Token*> tokens;
+    size_t currentIndex;
+    Token* current;
+    Token* previous;
+    Token* eofToken;
+    Token* peekNext(size_t offset = 1) const;
     void skipComments();
     bool match(Token::Type ttype);
-    bool check(Token::Type ttype);
+    bool check(Token::Type ttype) const;
     bool advance();
-    bool isAtEnd();
+    bool isAtEnd() const;
 
-    Token *consume(Token::Type ttype, const string &message);
-    Token* consumeIdent(const string& message);
+    Token* consume(Token::Type ttype, const std::string& message);
+    Token* consumeIdent(const std::string& message);
 
     Exp* parseExpression();
     Exp* parseAssignment();

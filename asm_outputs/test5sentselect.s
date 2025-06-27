@@ -90,6 +90,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 int main() {
     printf("Iniciando bucles anidados:\n");
     for (int i = 1; i <= 3; i++) {

@@ -62,6 +62,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 int main() {
     int x = 1, y = 0;
     if (x == 1 && y == 0) {

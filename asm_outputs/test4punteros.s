@@ -79,6 +79,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 void cambiar_valor(int* num) {
     *num = 100;
 }

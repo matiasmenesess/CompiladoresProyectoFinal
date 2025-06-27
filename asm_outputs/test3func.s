@@ -85,6 +85,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 int factorial(int n) {
     if (n <= 1) {
         return 1;

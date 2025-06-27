@@ -75,6 +75,7 @@ Programa parseado exitosamente
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
 
+
 int main() {
     int contador = 5;
     printf("Iniciando bucle while (cuenta regresiva):\n");
