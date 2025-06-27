@@ -425,7 +425,12 @@ public:
     GlobalVarDecList* global_declarations;
     StructDeclarationList* struct_declarations;
     FunctionList* functions;
-    MainFunction* main_function;
+    MainFunction* main_function;    
+        int countVars() const {
+        if (main_function && main_function->body && main_function->body->vardecs)
+            return main_function->body->vardecs->vardecs.size();
+        return 0;
+    }
 
     Program(IncludeList* includes,
             GlobalVarDecList* globals,

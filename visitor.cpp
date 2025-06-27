@@ -592,7 +592,7 @@ void PrintVisitor::imprimir(Program* program) {
 
 
 //TypeChecker
-
+/*
 enum TypeEnum {
     INT_TYPE,
     BOOL_TYPE,
@@ -615,7 +615,7 @@ public:
     TypeInfo(TypeEnum t, string name) : type(t), struct_name(name), base_type(nullptr) {}
     TypeInfo(TypeEnum t, TypeInfo* base) : type(t), base_type(base) {}
 };
-/*
+
 
 TypeChecker::TypeChecker() {
     env = new Environment();
@@ -629,4 +629,283 @@ void TypeChecker::visit(PrintfStatement *stm) {
 }
 */
 
+// Haremos el gencode
 
+GenCodeVisitor::GenCodeVisitor(Environment* env) : env(new Environment()){};
+GenCodeVisitor::~GenCodeVisitor() {
+    delete env;
+}// ...existing code...
+
+void GenCodeVisitor::gencode(Program* program) {
+    cout << ".data" << endl;
+    cout << "print_fmt: .string \"%ld \\n\" " << endl;
+    cout << ".text " << endl;
+    cout << ".globl main " << endl;
+    cout << "main: " << endl;
+    cout << " pushq %rbp" << endl;
+    cout << " movq %rsp, %rbp" << endl;
+    cout << " subq $" << program->countVars()*8 << ", %rsp" << endl;
+
+    // Global variables
+    if (program->global_declarations)
+        program->global_declarations->accept(this);
+
+    // Structs (no generan código, pero puedes registrar en env)
+    if (program->struct_declarations)
+        program->struct_declarations->accept(this);
+
+    // Funciones
+    if (program->functions)
+        program->functions->accept(this);
+
+    // Main
+    if (program->main_function)
+        program->main_function->accept(this);
+
+    cout << " movl $0, %eax " << endl;
+    cout << " leave" << endl;
+    cout << " ret" << endl;
+    cout << ".section .note.GNU-stack,\"\",@progbits" << endl;
+}
+
+// --- Expresiones ---
+
+int GenCodeVisitor::visit(NumberExp* exp) {
+    cout << " movl $" << exp->value << ", %eax" << endl;
+    return exp->value;
+}
+
+int GenCodeVisitor::visit(CharExp* exp) {
+    cout << " movb $" << (int)exp->value << ", %al" << endl;
+    return exp->value;
+}
+
+int GenCodeVisitor::visit(BoolExp* exp) {
+    cout << " movl $" << exp->value << ", %eax" << endl;
+    return exp->value;
+}
+
+int GenCodeVisitor::visit(StringExp* exp) {
+    // Asigna una etiqueta para el string y guárdala en .data si es necesario
+    // Aquí solo ejemplo:
+    cout << " lea string_label, %rax" << endl;
+    return 0;
+}
+
+int GenCodeVisitor::visit(IdentifierExp* exp) {
+    // Busca la variable en env y genera código para cargarla
+    // Ejemplo: supón offset en stack
+    // int offset = env->lookup(exp->name);
+    // cout << " movl " << offset << "(%rbp), %eax" << endl;
+    return 0;
+}
+
+int GenCodeVisitor::visit(BinaryExp* exp) {
+    // Evalúa left y right, usa stack para preservar valores
+    exp->left->accept(this);
+    cout << " push %rax" << endl;
+    exp->right->accept(this);
+    cout << " pop %rcx" << endl;
+    // Ejemplo para suma:
+    if (exp->op == PLUS_OP)
+        cout << " add %ecx, %eax" << endl;
+    // Completa para otros operadores...
+    return 0;
+}
+
+int GenCodeVisitor::visit(AssignExp* exp) {
+    // Evalúa la derecha y asigna a la izquierda
+    exp->right->accept(this);
+    // Supón offset de la variable:
+    // int offset = env->lookup(exp->left->name);
+    // cout << " movl %eax, " << offset << "(%rbp)" << endl;
+    return 0;
+}
+
+int GenCodeVisitor::visit(UnaryExp* exp) {
+    exp->uexp->accept(this);
+    // Aplica el operador
+    // Ejemplo: negación
+    if (exp->op == NEGACION_OP)
+        cout << " not %eax" << endl;
+    return 0;
+}
+
+int GenCodeVisitor::visit(FunctionCallExp* exp) {
+    // Empuja argumentos en orden inverso
+    for (int i = exp->arguments.size() - 1; i >= 0; --i) {
+        exp->arguments[i]->accept(this);
+        cout << " push %rax" << endl;
+    }
+    cout << " call " << exp->function_name << endl;
+    cout << " addq $" << (exp->arguments.size() * 8) << ", %rsp" << endl;
+    return 0;
+}
+
+// --- Statements ---
+
+void GenCodeVisitor::visit(PrintfStatement* stm) {
+    // Empuja argumentos y llama a printf
+    for (int i = stm->arguments.size() - 1; i >= 0; --i) {
+        stm->arguments[i]->accept(this);
+        cout << " push %rax" << endl;
+    }
+    cout << " lea print_fmt(%rip), %rdi" << endl;
+    cout << " call printf" << endl;
+    cout << " addq $" << (stm->arguments.size() * 8) << ", %rsp" << endl;
+}
+
+void GenCodeVisitor::visit(IfStatement* stm) {
+    int label_else = cantidad++;
+    int label_end = cantidad++;
+    stm->condition->accept(this);
+    cout << " cmp $0, %eax" << endl;
+    cout << " je else_" << label_else << endl;
+    if (stm->statements) stm->statements->accept(this);
+    cout << " jmp endif_" << label_end << endl;
+    cout << "else_" << label_else << ":" << endl;
+    if (stm->elsChain) stm->elsChain->accept(this);
+    cout << "endif_" << label_end << ":" << endl;
+}
+
+void GenCodeVisitor::visit(ElseIfStatement* stm) {
+    // Similar a IfStatement, usa labels únicos
+    // ...
+}
+
+void GenCodeVisitor::visit(WhileStatement* stm) {
+    int label_start = cantidad++;
+    int label_end = cantidad++;
+    cout << "while_" << label_start << ":" << endl;
+    stm->condition->accept(this);
+    cout << " cmp $0, %eax" << endl;
+    cout << " je endwhile_" << label_end << endl;
+    stm->b->accept(this);
+    cout << " jmp while_" << label_start << endl;
+    cout << "endwhile_" << label_end << ":" << endl;
+}
+
+void GenCodeVisitor::visit(ForStatement* stm) {
+    int label_start = cantidad++;
+    int label_end = cantidad++;
+    if (stm->init) stm->init->accept(this);
+    cout << "for_" << label_start << ":" << endl;
+    if (stm->condition) stm->condition->accept(this);
+    cout << " cmp $0, %eax" << endl;
+    cout << " je endfor_" << label_end << endl;
+    if (stm->b) stm->b->accept(this);
+    if (stm->update) stm->update->accept(this);
+    cout << " jmp for_" << label_start << endl;
+    cout << "endfor_" << label_end << ":" << endl;
+}
+
+void GenCodeVisitor::visit(ExpressionStatement* stm) {
+    if (stm->expression) stm->expression->accept(this);
+}
+
+void GenCodeVisitor::visit(ReturnStatement* stm) {
+    if (stm->return_value) stm->return_value->accept(this);
+    cout << " leave" << endl;
+    cout << " ret" << endl;
+}
+
+void GenCodeVisitor::visit(VarDec* stm) {
+    // Reserva espacio y registra en env
+    for (size_t i = 0; i < stm->vars.size(); ++i) {
+        // int offset = ...; // calcula offset en stack
+        // env->add_var(stm->vars[i], offset, stm->type->type_name);
+        if (stm->initializers[i]) {
+            stm->initializers[i]->accept(this);
+            // cout << " movl %eax, " << offset << "(%rbp)" << endl;
+        }
+    }
+}
+
+void GenCodeVisitor::visit(VarDecList* stm) {
+    for (auto vardec : stm->vardecs) {
+        vardec->accept(this);
+    }
+}
+
+void GenCodeVisitor::visit(GlobalVarDec* dec) {
+    // Genera en .data
+    cout << dec->var_name << ": .quad 0" << endl;
+    if (dec->initializer) {
+        // Puedes inicializar aquí si lo deseas
+    }
+}
+
+void GenCodeVisitor::visit(GlobalVarDecList* decList) {
+    for (auto dec : decList->global_vardecs) {
+        dec->accept(this);
+    }
+}
+
+void GenCodeVisitor::visit(Parameter* param) {
+    // Puedes registrar en env el offset del parámetro
+}
+
+void GenCodeVisitor::visit(ParameterList* paramList) {
+    for (auto param : paramList->parameters) {
+        param->accept(this);
+    }
+}
+
+void GenCodeVisitor::visit(StatementList* stm) {
+    for (auto s : stm->stms) {
+        s->accept(this);
+    }
+}
+
+void GenCodeVisitor::visit(Body* b) {
+    if (b->vardecs) b->vardecs->accept(this);
+    if (b->slist) b->slist->accept(this);
+}
+
+void GenCodeVisitor::visit(Function* func) {
+    cout << func->name << ":" << endl;
+    cout << " pushq %rbp" << endl;
+    cout << " movq %rsp, %rbp" << endl;
+    // Reserva espacio para variables locales
+    // env->add_level();
+    if (func->body) func->body->accept(this);
+    // env->remove_level();
+    cout << " leave" << endl;
+    cout << " ret" << endl;
+}
+
+void GenCodeVisitor::visit(FunctionList* funcList) {
+    for (auto func : funcList->functions) {
+        func->accept(this);
+    }
+}
+
+void GenCodeVisitor::visit(MainFunction* mainFunc) {
+    if (mainFunc->body) mainFunc->body->accept(this);
+}
+
+void GenCodeVisitor::visit(StructDeclaration* structDecl) {
+    // Registra el struct en env
+    StructInfo info;
+    for (auto member : structDecl->members->vardecs) {
+        for (auto& var : member->vars) {
+            info.fields[var] = member->type->type_name;
+        }
+    }
+    env->add_struct(structDecl->struct_name, info);
+}
+
+void GenCodeVisitor::visit(StructDeclarationList* structList) {
+    for (auto structDecl : structList->structs) {
+        structDecl->accept(this);
+    }
+}
+
+void GenCodeVisitor::visit(Include* inc) { /* nada para assembly */ }
+void GenCodeVisitor::visit(IncludeList* incList) { /* nada para assembly */ }
+void GenCodeVisitor::visit(Type* type) { /* nada para assembly */ }
+int GenCodeVisitor::visit(ArrayAccessExp* exp) { return 0; }
+int GenCodeVisitor::visit(MemberAccessExp* exp) { return 0; }
+int GenCodeVisitor::visit(ParenExp* exp) { return exp->inner->accept(this); }
+
+// ...existing code...

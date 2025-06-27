@@ -11,10 +11,21 @@
 using namespace std;
 
 
+struct FunctionInfo {
+    string return_type;
+    vector<pair<string, string>> params; // {param_type, param_name}
+};
+struct StructInfo {
+    unordered_map<string, string> fields; // nombre_campo -> tipo
+};
+
+
 class Environment {
 private:
     vector<unordered_map<string, int>> levels;  // Almacena valores de variables
     vector<unordered_map<string, string>> type_levels;  // Almacena tipos de variables
+    unordered_map<string, FunctionInfo> functions;  // Almacena información de funciones
+    unordered_map<string, StructInfo> structs;
 
     int search_rib(string var) {
         int idx = levels.size() - 1;
@@ -106,6 +117,36 @@ public:
             return false;
         }
         return true;
+    }
+    void add_function(const string& name, const FunctionInfo& info) {
+        functions[name] = info;
+    }
+
+    bool has_function(const string& name) {
+        return functions.find(name) != functions.end();
+    }
+
+    FunctionInfo get_function(const string& name) {
+        if (!has_function(name)) {
+            cout << "Función no declarada: " << name << endl;
+            exit(0);
+        }
+        return functions[name];
+    }
+     void add_struct(const string& name, const StructInfo& info) {
+        structs[name] = info;
+    }
+
+    bool has_struct(const string& name) {
+        return structs.find(name) != structs.end();
+    }
+
+    StructInfo get_struct(const string& name) {
+        if (!has_struct(name)) {
+            cout << "Struct no declarado: " << name << endl;
+            exit(0);
+        }
+        return structs[name];
     }
 };
 

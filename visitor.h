@@ -147,12 +147,10 @@ public:
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
 };
-/*
+
 class GenCodeVisitor : public Visitor {
 public:
-    unordered_map<string, int> memoria;
-    int cantidad = 1;
-
+    Environment env;
     void gencode(Program* program);
     void visit(Include* inc) ;
     void visit(IncludeList* incList) ;
