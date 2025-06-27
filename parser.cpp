@@ -562,6 +562,8 @@ Stm* Parser::parseForStatement() {
 
 
     VarDec* init = parseVarDec();
+    
+    
 
     if (!match(Token::SEMICOLON)) {
         cout << "Error: se esperaba ';'." << endl;

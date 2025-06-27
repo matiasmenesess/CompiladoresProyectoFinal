@@ -295,7 +295,7 @@ public:
     int accept(Visitor *visitor) ;
 };
 
-class VarDec {
+class VarDec : public Stm {
 public:
     Type* type;
     vector<string> vars;
