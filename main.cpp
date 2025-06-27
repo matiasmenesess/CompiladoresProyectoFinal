@@ -50,16 +50,13 @@ int main(int argc, const char* argv[]) {
         cout << "Iniciando parser...\n" << endl;
         Program* program = parser.parseProgram();
 
-        cout << "\nPrograma parseado correctamente." << endl;
-
-        cout << "\n=== INFORMACION DEL PROGRAMA ===" << endl;
         cout << "Programa parseado exitosamente" << endl;
 
         PrintVisitor print_visitor;
 
         cout << "\n=== FASE 3: VISITANTE DE IMPRESION ===" << endl;
         print_visitor.imprimir(program);
-        cout << "\nImpresión del programa completada." << endl;
+        cout << "\nImpresion del programa completada." << endl;
 
         delete program;
 

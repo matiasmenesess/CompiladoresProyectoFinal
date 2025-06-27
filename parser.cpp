@@ -99,8 +99,6 @@ Include* Parser::parseInclude() {
         exit(1);
     }
 
-    //BORRAR LUEGO
-    cout<<"#include";
 
     if(!match(Token::HEADER_NAME)){
         cout << "Error: se esperaba un nombre de header después de #include." << endl;
@@ -109,8 +107,7 @@ Include* Parser::parseInclude() {
 
     string headerName = previous->text;
 
-    //BORRAR LUEGO
-    cout<<headerName+"\n";
+
 
     bool isSystemHeader = (headerName[0] == '<');
 
@@ -120,11 +117,10 @@ Include* Parser::parseInclude() {
 GlobalVarDecList* Parser::parseGlobalDeclarations() {
     skipComments();
     GlobalVarDecList* globals = new GlobalVarDecList();
-    // Esta lógica de lookahead es compleja y se mantiene igual.
     while (!isAtEnd() && !check(Token::STRUCT) && !check(Token::MAIN)) {
         if (check(Token::INT) || check(Token::CHAR)) {
             Token* type_tok = current; advance();
-            if(!check(Token::IDENTIFIER)) break; // Salir si no es un patrón de declaración
+            if(!check(Token::IDENTIFIER)) break;
             Token* id_tok = current;
 
             if(check(Token::LEFT_PAREN)) {
@@ -145,9 +141,6 @@ GlobalVarDecList* Parser::parseGlobalDeclarations() {
                 throw runtime_error("Se esperaba ';' despues de la declaracion de variable global.");
             }
 
-            //BORRAR LUEGO
-            cout<<";\n";
-
         } else {
             break;
         }
@@ -164,15 +157,12 @@ GlobalVarDec* Parser::parseGlobalVarDec() {
     }
     string name = current->text;
 
-    //BORRAR LUEGO
-    cout<<" "<<name;
+
 
     advance();
 
     Exp* init = nullptr;
     if (match(Token::ASSIGN)) {
-        //BORRAR LUEGO
-        cout<<" = ";
 
         init = parseExpression();
     }
@@ -183,8 +173,6 @@ StructDeclarationList* Parser::parseStructDeclarations() {
     skipComments();
     StructDeclarationList* structs = new StructDeclarationList();
     while(match(Token::STRUCT)) {
-        //BORRAR LUEGO
-        cout<<"struct ";
         skipComments();
         structs->add(parseStructDeclaration());
         skipComments();
@@ -198,8 +186,6 @@ StructDeclaration* Parser::parseStructDeclaration() {
     }
     string name = current->text;
 
-    //BORRAR LUEGO
-    cout<<name;
 
     advance();
 
@@ -207,8 +193,6 @@ StructDeclaration* Parser::parseStructDeclaration() {
         throw runtime_error("Se esperaba '{' para iniciar el cuerpo del struct.");
     }
 
-    //BORRAR LUEGO
-    cout<<" {\n";
 
 
     VarDecList* members = parseVarDecList();
@@ -216,16 +200,9 @@ StructDeclaration* Parser::parseStructDeclaration() {
         throw runtime_error("Se esperaba '}' para finalizar el cuerpo del struct.");
     }
 
-    //BORRAR LUEGO
-    cout<<"}";
-
     if (!match(Token::SEMICOLON)) {
         throw runtime_error("Se esperaba ';' despues de la declaracion de struct.");
     }
-
-    //BORRAR LUEGO
-    cout<<";\n";
-
     return new StructDeclaration(name, members);
 }
 
@@ -234,14 +211,11 @@ FunctionList* Parser::parseFunctions() {
     bool mainFound = false;
 
     while(!isAtEnd() && (check(Token::INT) || check(Token::CHAR) || check(Token::VOID))) {
-        // Parseamos el tipo primero
         Type* return_type = parseType();
 
         if(check(Token::IDENTIFIER)){
             string function_name = current->text;
 
-            //BORRAR LUEGO
-            cout<<" "<<function_name;
 
             advance();
 
@@ -271,8 +245,7 @@ Function* Parser::parseFunction(Type* return_type, const string& name) {
         throw runtime_error("Se esperaba '(' despues del nombre de funcion");
     }
 
-    //BORRAR LUEGO
-    cout<<"(";
+
 
     ParameterList* params = parseParameterList();
 
@@ -280,15 +253,12 @@ Function* Parser::parseFunction(Type* return_type, const string& name) {
         throw runtime_error("Se esperaba ')' despues de los parametros de la funcion");
     }
 
-    //BORRAR LUEGO
-    cout<<")";
 
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' antes del cuerpo de la funcion");
     }
 
-    //BORRAR LUEGO
-    cout<<" {\n";
+
 
     Body* body = parseBody();
 
@@ -296,44 +266,34 @@ Function* Parser::parseFunction(Type* return_type, const string& name) {
         throw runtime_error("Se esperaba '}' despues del cuerpo de la funcion '");
     }
 
-    //BORRAR LUEGO
-    cout<<"}\n";
 
     return new Function(return_type, name, params, body);
 }
 MainFunction* Parser::parseMainFunction() {
 
-    //BORRAR LUEGO
-    cout<<" main";
+
 
     if (!match(Token::LEFT_PAREN)) {
         throw runtime_error("Se esperaba '(' despues de 'main'");
     }
 
-    //BORRAR LUEGO
-    cout<<"(";
+
 
     if (!match(Token::RIGHT_PAREN)) {
         throw runtime_error("Se esperaba ')' despues de '(' en la funcion main");
     }
 
-    //BORRAR LUEGO
-    cout<<")";
-
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' para el cuerpo de main en linea ");
     }
 
-    //BORRAR LUEGO
-    cout<<" {\n";
+
 
     Body* body = parseBody();
     if (!match(Token::RIGHT_BRACE)) {
         throw runtime_error("Se esperaba '}' para cerrar main en linea)");
     }
 
-    //BORRAR LUEGO
-    cout<<"}\n";
 
     return new MainFunction(body);
 
@@ -345,27 +305,22 @@ Type* Parser::parseType() {
     if (check(Token::INT)) {
         typeName = "int";
 
-        //BORRAR LUEGO
-        cout<<typeName;
+
 
         advance();
     } else if (check(Token::CHAR)) {
         typeName = "char";
 
-        //BORRAR LUEGO
-        cout<<typeName;
+
 
         advance();
     } else if (check(Token::VOID)) {
         typeName = "void";
 
-        //BORRAR LUEGO
-        cout<<typeName;
+
 
         advance();
     } else if (check(Token::STRUCT)) {
-        //BORRAR LUEGO
-        cout<<"struct";
 
         advance();
 
@@ -374,8 +329,6 @@ Type* Parser::parseType() {
             exit(1);
         }
 
-        //BORRAR LUEGO
-        cout<<" "<<current->text;
 
         typeName = "struct " + current->text;
         advance();
@@ -388,8 +341,6 @@ Type* Parser::parseType() {
     while (check(Token::MULTIPLY)) {
         isPointer = true;
 
-        //BORRAR LUEGO
-        cout<<"*";
 
         advance(); // Consumir cada '*'
     }
@@ -407,8 +358,6 @@ ParameterList* Parser::parseParameterList() {
         do {
             params->add(parseParameter());
             if (check(Token::COMMA)) {
-                //BORRAR LUEGO
-                cout<<", ";
             }
         } while (match(Token::COMMA));
     }
@@ -422,8 +371,7 @@ Parameter* Parser::parseParameter() {
     }
     string name = current->text;
 
-    //BORRAR LUEGO
-    cout<<" "<<name;
+
 
     advance();
     return new Parameter(type, name);
@@ -444,8 +392,7 @@ VarDecList* Parser::parseVarDecList() {
             throw runtime_error("Se esperaba ';' despues de la declaracion de variable.");
         }
 
-        //BORRAR LUEGO
-        cout << ";\n";
+
 
     }
     return vardecs;
@@ -461,15 +408,12 @@ VarDec* Parser::parseVarDec() {
         }
         string name = current->text;
 
-        //BORRAR LUEGO
-        cout <<" "<<name;
 
         advance();
         vars.push_back(name);
 
         if (match(Token::ASSIGN)) {
-            //BORRAR LUEGO
-            cout << " = ";
+
 
             initializers.push_back(parseExpression());
         } else {
@@ -478,8 +422,7 @@ VarDec* Parser::parseVarDec() {
 
         if (check(Token::COMMA)) {
 
-            //BORRAR LUEGO
-            cout << ", ";
+
         }
 
     } while (match(Token::COMMA));
@@ -508,28 +451,22 @@ Stm* Parser::parseStatement() {
 }
 
 Stm* Parser::parseIfStatement() {
-    //BORRAR LUEGO
-    cout<<"if";
+
     if (!match(Token::LEFT_PAREN)) throw runtime_error("Se esperaba '(' despues de 'if'.");
 
-    //BORRAR LUEGO
-    cout<<" (";
+
 
     Exp* cond = parseExpression();
     if (!match(Token::RIGHT_PAREN)) throw runtime_error("Se esperaba ')' despues de la condicion del if.");
 
-    //BORRAR LUEGO
-    cout<<")";
 
     if (!match(Token::LEFT_BRACE)) throw runtime_error("Se esperaba '{' para el cuerpo del if.");
 
-    //BORRAR LUEGO
 
     Body* if_body = parseBody();
     if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar el cuerpo del if.");
 
-    //BORRAR LUEGO
-    cout<<"}";
+
 
     Stm* else_chain = nullptr;
     if (match(Token::ELSE_IF)) {
@@ -538,32 +475,27 @@ Stm* Parser::parseIfStatement() {
         else_chain = parseElseStatement();
     }
 
-    //BORRAR LUEGO
-    cout<<"\n";
+
 
     return new IfStatement(cond, if_body, else_chain);
 }
 
 Stm *Parser::parseElseIfStatement() {
-    cout << "else if";
     if (!match(Token::LEFT_PAREN)) {
         throw runtime_error("Se esperaba '(' despues de 'else if'.");
     }
-    cout << " (";
 
     Exp* else_if_cond = parseExpression();
 
     if (!match(Token::RIGHT_PAREN)) {
         throw runtime_error("Se esperaba ')' después de la condición else if");
     }
-    cout << ")";
 
     // Add missing brace handling
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' para el cuerpo del else if.");
     }
 
-    cout << " {\n";
 
     Body* else_if_body = parseBody();
 
@@ -571,7 +503,6 @@ Stm *Parser::parseElseIfStatement() {
         throw runtime_error("Se esperaba '}' para cerrar el cuerpo del else if.");
     }
 
-    cout << "}\n";
 
     Stm* next_chain = nullptr;
     if (match(Token::ELSE_IF)) {
@@ -585,14 +516,11 @@ Stm *Parser::parseElseIfStatement() {
 }
 
 Stm* Parser::parseElseStatement() {
-    cout << "else";
 
-    // Add missing brace handling
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' para el cuerpo del else.");
     }
 
-    cout << " {\n";
 
     Body* else_body = parseBody();
 
@@ -600,49 +528,34 @@ Stm* Parser::parseElseStatement() {
         throw runtime_error("Se esperaba '}' para cerrar el cuerpo del else.");
     }
 
-    cout << "}\n";
 
     return new ElseIfStatement(ElseIfStatement::ELSE, nullptr, else_body, nullptr);
 }
 
 Stm* Parser::parseWhileStatement() {
-    //BORRAR LUEGO
-    cout<<"while";
 
     if (!match(Token::LEFT_PAREN)) throw runtime_error("Se esperaba '(' despues de 'while'.");
 
-    //BORRAR LUEGO
-    cout<<" (";
 
     Exp* cond = parseExpression();
     if (!match(Token::RIGHT_PAREN)) throw runtime_error("Se esperaba ')' despues de la condicion del while.");
 
-    //BORRAR LUEGO
-    cout<<")";
-
     if (!match(Token::LEFT_BRACE)) throw runtime_error("Se esperaba '{' para el cuerpo del while.");
 
-    //BORRAR LUEGO
-    cout<<" {\n";
 
     Body* body = parseBody();
     if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar el cuerpo del while.");
 
-    //BORRAR LUEGO
-    cout<<"}\n";
-
     return new WhileStatement(cond, body);
 }
 Stm* Parser::parseForStatement() {
-    //BORRAR LUEGO
-    cout << "for";
+
 
     if (!match(Token::LEFT_PAREN)) {
         cout << "Error: se esperaba '('." << endl;
         exit(1);
     }
-    //BORRAR LUEGO
-    cout << " (";
+
 
     VarDec* init = parseVarDec();
 
@@ -651,8 +564,7 @@ Stm* Parser::parseForStatement() {
         exit(1);
     }
 
-    //BORRAR LUEGO
-    cout << ";";
+
 
     Exp* e1 = parseExpression();
 
@@ -661,8 +573,6 @@ Stm* Parser::parseForStatement() {
         exit(1);
     }
 
-    //BORRAR LUEGO
-    cout << ";";
 
     Exp* e2 = parseExpression();
 
@@ -671,17 +581,12 @@ Stm* Parser::parseForStatement() {
         exit(1);
     }
 
-    //BORRAR LUEGO
-    cout << ")";
-
 
     if (!match(Token::LEFT_BRACE)) {
         cout << "Error: se esperaba '{'." << endl;
         exit(1);
     }
 
-    //BORRAR LUEGO
-    cout << "{\n";
 
     Body* body = parseBody();
 
@@ -690,67 +595,54 @@ Stm* Parser::parseForStatement() {
         exit(1);
     }
 
-    //BORRAR LUEGO
-    cout << "}";
 
     return new ForStatement(init,e1,e2,body);}
 
 
 Stm* Parser::parseReturnStatement() {
-    //BORRAR LUEGO
-    cout<<"return";
+
 
     Exp* val = nullptr;
     if (!check(Token::SEMICOLON)) {
-        //BORRAR LUEGO
-        cout<<" ";
 
         val = parseExpression();
     }
     if (!match(Token::SEMICOLON)) throw runtime_error("Se esperaba ';' despues de la sentencia return.");
 
-    //BORRAR LUEGO
-    cout<<";\n";
+
 
     return new ReturnStatement(val);
 }
 
 Stm* Parser::parsePrintfStatement() {
-    //BORRAR LUEGO
-    cout<<"printf";
+
 
     if (!match(Token::LEFT_PAREN)) throw runtime_error("Se esperaba '(' despues de 'printf'.");
 
-    //BORRAR LUEGO
-    cout<<"(";
+
 
     if(!check(Token::FORMAT_STRING) && !check(Token::STRING_LITERAL)) {
         throw runtime_error("Se esperaba una cadena de formato en printf.");
     }
     string format_string = current->text;
 
-    //BORRAR LUEGO
-    cout<<format_string;
 
     advance();
 
     PrintfStatement* printf_stm = new PrintfStatement(format_string);
     if(match(Token::COMMA)) {
-        //BORRAR LUEGO
-        cout<<", ";
+
 
         list<Exp*> args = parseArguments();
         for(auto arg: args) printf_stm->add_argument(arg);
     }
     if (!match(Token::RIGHT_PAREN)) throw runtime_error("Se esperaba ')' despues de los argumentos de printf.");
 
-    //BORRAR LUEGO
-    cout<<")";
+
 
     if (!match(Token::SEMICOLON)) throw runtime_error("Se esperaba ';' despues de la llamada a printf.");
 
-    //BORRAR LUEGO
-    cout<<";\n";
+
 
     return printf_stm;
 }
@@ -760,9 +652,6 @@ Stm* Parser::parseExpressionStatement() {
     if (!match(Token::SEMICOLON)) {
         throw runtime_error("Se esperaba ';' despues de la expresion.");
     }
-
-    //BORRAR LUEGO
-    cout<<";\n";
 
     return new ExpressionStatement(exp);
 }
@@ -780,33 +669,26 @@ Exp* Parser::parseAssignment() {
         BinaryOp op;
         if(op_token->type == Token::ASSIGN) {
             op = ASSIGN_OP;
-            //BORRAR LUEGO
-            cout<<" = ";
+
         }
         else if(op_token->type == Token::PLUS_ASSIGN) {
             op = PLUS_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" += ";
+
         }
         else if(op_token->type == Token::MINUS_ASSIGN) {
             op = MINUS_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" -= ";
+
         }
         else if(op_token->type == Token::MULTIPLY_ASSIGN) {
             op = MULTIPLY_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" *= ";
         }
         else if(op_token->type == Token::DIVIDE_ASSIGN) {
             op = DIVIDE_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" /= ";
+
         }
         else {
             op = MODULO_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" %= ";
+
         }
         Exp* right = parseAssignment();
         return new AssignExp(left, right, op);
@@ -818,9 +700,6 @@ Exp* Parser::parseLogicalOr() {
     Exp* expr = parseLogicalAnd();
     while (match(Token::LOGICAL_OR)) {
 
-        //BORRAR LUEGO
-        cout<<" || ";
-
         expr = new BinaryExp(expr, parseLogicalAnd(), LOGICAL_OR_OP);
     }
     return expr;
@@ -828,8 +707,6 @@ Exp* Parser::parseLogicalOr() {
 Exp* Parser::parseLogicalAnd() {
     Exp* expr = parseEquality();
     while (match(Token::LOGICAL_AND)) {
-        //BORRAR LUEGO
-        cout<<" && ";
 
         expr = new BinaryExp(expr, parseEquality(), LOGICAL_AND_OP);
     }
@@ -844,20 +721,15 @@ Exp* Parser::parseComparison() {
         BinaryOp op;
         if (check(Token::LESS_THAN)) {
             op = LESS_THAN_OP;
-            //BORRAR LUEGO
-            cout<<" < ";
+
         } else if (check(Token::GREATER_THAN)) {
             op = GREATER_THAN_OP;
-            //BORRAR LUEGO
-            cout<<" > ";
         } else if (check(Token::LESS_EQUAL)) {
             op = LESS_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" <= ";
+
         } else {
             op = GREATER_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" >= ";
+
         }
 
         advance(); // Consumir el operador
@@ -876,12 +748,10 @@ Exp* Parser::parseEquality() {
         BinaryOp op;
         if (check(Token::EQUAL)) {
             op = EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" == ";
+
         } else {
             op = NOT_EQUAL_OP;
-            //BORRAR LUEGO
-            cout<<" != ";
+
         }
 
         advance(); // Consumir el operador
@@ -900,15 +770,13 @@ Exp* Parser::parseAdditive() {
         BinaryOp op;
         if (check(Token::PLUS)) {
             op = PLUS_OP;
-            //BORRAR LUEGO
-            cout<<" + ";
+
         } else {
             op = MINUS_OP;
-            //BORRAR LUEGO
-            cout<<" - ";
+
         }
 
-        advance(); // Consumir el operador
+        advance();
 
         Exp* right = parseMultiplicative();
         expr = new BinaryExp(expr, right, op);
@@ -924,19 +792,16 @@ Exp* Parser::parseMultiplicative() {
         BinaryOp op;
         if (check(Token::MULTIPLY)) {
             op = MULT_OP;
-            //BORRAR LUEGO
-            cout<<" * ";
+
         } else if (check(Token::DIVIDE)) {
             op = DIV_OP;
-            //BORRAR LUEGO
-            cout<<" / ";
+
         } else {
             op = MOD_OP;
-            //BORRAR LUEGO
-            cout<<" % ";
+
         }
 
-        advance(); // Consumir el operador
+        advance();
 
         Exp* right = parseUnary();
         expr = new BinaryExp(expr, right, op);
@@ -953,32 +818,25 @@ Exp* Parser::parseUnary() {
         UnaryOp op;
         if (check(Token::LOGICAL_NOT)) {
             op = NEGACION_OP;
-            //BORRAR LUEGO
-            cout<<"!";
+
         } else if (check(Token::INCREMENT)) {
             op = PLUS_PLUS_OP;
-            //BORRAR LUEGO
-            cout<<"++";
+
         } else if (check(Token::DECREMENT)) {
             op = MINUS_MINUS_OP;
-            //BORRAR LUEGO
-            cout<<"--";
+
         } else if (check(Token::DEREFERENCE)) {
             op = DEREFERENCE_OP;
-            //BORRAR LUEGO
-            cout<<"*";
+
         } else if (check(Token::ADDRESS_OF)) {
             op = ADDRESS_OF_OP;
-            //BORRAR LUEGO
-            cout<<"&";
+
         } else if (check(Token::PLUS)) {
             op = UNARY_PLUS_OP;
-            //BORRAR LUEGO
-            cout<<"+";
+
         } else if (check(Token::MINUS)) {
             op = UNARY_MINUS_OP;
-            //BORRAR LUEGO
-            cout<<"-";
+
         }
 
         advance();
@@ -988,7 +846,6 @@ Exp* Parser::parseUnary() {
         return new UnaryExp(expr, op, true);
     }
 
-    // Si no hay operador unario, pasamos a postfix
     return parsePostfix();
 }
 
@@ -998,26 +855,16 @@ Exp* Parser::parsePostfix() {
     while (true) {
         if (match(Token::INCREMENT)) {
 
-            //BORRAR
-            cout<<"++";
-
             expr = new UnaryExp(expr, PLUS_PLUS_OP, false);
         } else if (match(Token::DECREMENT)) {
 
-            //BORRAR LUEGO
-            cout<<"--";
 
             expr = new UnaryExp(expr, MINUS_MINUS_OP, false);
         } else if (match(Token::LEFT_BRACKET)) {
 
-            //BORRAR LUEGO
-            cout<<"[";
-
             Exp* index = parseExpression();
             if (!match(Token::RIGHT_BRACKET)) throw runtime_error("Se esperaba ']' despues del indice del array.");
 
-            //BORRAR LUEGO
-            cout<<"]";
 
             expr = new ArrayAccessExp(expr, index);
         } else if (match(Token::LEFT_PAREN)) {
@@ -1029,8 +876,6 @@ Exp* Parser::parsePostfix() {
             FunctionCallExp* call = new FunctionCallExp(id_exp->name);
             if(!check(Token::RIGHT_PAREN)){
 
-                //BORRAR LUEGO
-                cout<<"(";
 
                 list<Exp*> args = parseArguments();
                 for(auto arg: args) call->add_argument(arg);
@@ -1040,19 +885,12 @@ Exp* Parser::parsePostfix() {
 
             expr = call;
 
-            //BORRAR LUEGO
-            cout<<")";
 
         } else if (match(Token::DOT)) {
 
-            //BORRAR LUEGO
-            cout<<".";
 
             if (!check(Token::IDENTIFIER)) throw runtime_error("Se esperaba el nombre del miembro.");
             string member_name = current->text;
-
-            //BORRAR LUEGO
-            cout<<member_name;
 
             advance();
 
@@ -1061,14 +899,8 @@ Exp* Parser::parsePostfix() {
             expr = new MemberAccessExp(expr, member_name, false);
         } else if (match(Token::ARROW)) {
 
-            //BORRAR LUEGO
-            cout<<"->";
-
             if (!check(Token::IDENTIFIER)) throw runtime_error("Se esperaba el nombre del miembro.");
             string member_name = current->text;
-
-            //BORRAR LUEGO
-            cout<<member_name;
 
             advance();
 
@@ -1084,22 +916,17 @@ Exp* Parser::parsePostfix() {
 Exp* Parser::parsePrimary() {
 
     if (match(Token::NUMBER)){
-        //BORRAR LUEGO
-        cout<<stoi(previous->text);
         return new NumberExp(stoi(previous->text));
     }
     if (match(Token::IDENTIFIER)) {
-        cout<<previous->text;
         return new IdentifierExp(previous->text);
     }
     if (match(Token::STRING_LITERAL) || match(Token::FORMAT_STRING)){
-        //BORRAR LUEGO
-        cout<<previous->text;
+
         return new StringExp(previous->text);
     }
     if (match(Token::CHARACTER_CONSTANT)) {
-        //BORRAR LUEGO
-        cout<<previous->text[1];
+
         return new CharExp(previous->text[1]);
     }
     if (match(Token::LEFT_PAREN)) {
@@ -1109,14 +936,10 @@ Exp* Parser::parsePrimary() {
     }
     if(match(Token::LEFT_BRACE)){
 
-        //BORRAR LUEGO
-        cout<<"{";
 
         list<Exp*> inits = parseInitializerList();
         if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar la lista de inicializadores.");
 
-        //BORRAR LUEGO
-        cout<<"}";
 
         if(!inits.empty()) return inits.front();
         return nullptr;
@@ -1125,20 +948,17 @@ Exp* Parser::parsePrimary() {
 }
 
 Exp* Parser::parseFunctionCall() {
-    // Esta lógica está ahora dentro de `parsePostfix` para permitir encadenamiento.
-    // Dejar vacía o eliminar.
+
     return nullptr;
 }
 
 Exp* Parser::parseArrayAccess() {
-    // Esta lógica está ahora dentro de `parsePostfix` para permitir encadenamiento.
-    // Dejar vacía o eliminar.
+
     return nullptr;
 }
 
 Exp* Parser::parseMemberAccess() {
-    // Esta lógica está ahora dentro de `parsePostfix` para permitir encadenamiento.
-    // Dejar vacía o eliminar.
+
     return nullptr;
 }
 
@@ -1163,8 +983,6 @@ list<Exp*> Parser::parseArguments() {
 
     while(match(Token::COMMA)){
 
-        //BORRAR LUEGO
-        cout<<", ";
 
         args.push_back(parseExpression());
     }
@@ -1179,8 +997,6 @@ list<Exp*> Parser::parseInitializerList() {
 
     while (match(Token::COMMA)){
 
-        //BORRAR LUEGO
-        cout<<", ";
 
         inits.push_back(parseExpression());
 
