@@ -1,4 +1,4 @@
-Contenido del archivo (216 caracteres):
+Contenido del archivo (180 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
@@ -6,7 +6,7 @@ int main() {
     int y = 20;
     int* p = &y;
     printf("Valor original de y: %d\n", y);
-    *p = 30; // Modificar y a traves del puntero
+    *p = 30;
     printf("Nuevo valor de y: %d\n", y);
     return 0;
 }
@@ -46,8 +46,6 @@ IDENTIFIER('p')
 ASSIGN('=')
 NUMBER('30')
 SEMICOLON(';')
-LINE_COMMENT('// Modificar y a traves del puntero
-')
 PRINTF('printf')
 LEFT_PAREN('(')
 FORMAT_STRING('"Nuevo valor de y: %d\n"')
@@ -65,8 +63,20 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
-Buscando funciones...
-Encontramos el token main
+Programa parseado exitosamente
 
-Error durante el analisis: Se esperaba una expresión primaria (numero, identificador, cadena, parentesis). Se obtuvo el token // Modificar y a traves del puntero
+=== FASE 3: VISITANTE DE IMPRESION ===
+#include <stdio.h>
 
+int main() {
+    int y = 20;
+    int* p = &y;
+    printf("Valor original de y: %d\n", y);
+    *p = 30;
+    printf("Nuevo valor de y: %d\n", y);
+    return 0;
+}
+
+Impresion del programa completada.
+
+=== ANALISIS COMPLETADO EXITOSAMENTE ===

@@ -4,7 +4,7 @@ int main() {
     int y = 20;
     int* p = &y;
     printf("Valor original de y: %d\n", y);
-    *p = 30; // Modificar y a traves del puntero
+    *p = 30;
     printf("Nuevo valor de y: %d\n", y);
     return 0;
 }

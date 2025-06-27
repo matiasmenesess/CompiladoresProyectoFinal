@@ -17,7 +17,7 @@
   </component>
   <component name="CMakeRunConfigurationManager">
     <generated>
-      <config projectName="TESTCOMPI" targetName="TESTCOMPI" />
+      <config projectName="ProyectoCompi" targetName="ProyectoCompi" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -27,9 +27,41 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="f">
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test1declvar.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test1declvar.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test1expr.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test1expr.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test1func.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test1func.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test1punteros.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test1punteros.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test1sentselect.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test1sentselect.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test1struct.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test1struct.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test2declvar.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test2declvar.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test2expr.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test2expr.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test2func.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test2func.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test2punteros.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test2punteros.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test2sentselect.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test2sentselect.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test2struct.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test2struct.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test3declvar.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test3declvar.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test3expr.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test3expr.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test3func.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test3func.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test3punteros.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test3punteros.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test3sentselect.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test3sentselect.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test3struct.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test3struct.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test4punteros.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test4punteros.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test4sentselect.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test4sentselect.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test4struct.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test4struct.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test5punteros.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test5punteros.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test5sentselect.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test5sentselect.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test5struct.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test5struct.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asm_outputs/test6sentselect.s" beforeDir="false" afterPath="$PROJECT_DIR$/asm_outputs/test6sentselect.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/make.py" beforeDir="false" afterPath="$PROJECT_DIR$/make.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/parser.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visitor.h" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scanner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/scanner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scanner.h" beforeDir="false" afterPath="$PROJECT_DIR$/scanner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test1func.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Funciones/test1func.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +75,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;matiasmenesess&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/matiasmenesess/CompiladoresProyectoFinal&quot;,
+    &quot;accountId&quot;: &quot;8813db48-7c11-4d15-86e2-519d2fef1e6d&quot;
+  }
+}</component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
     <option name="majorVersion" value="2025" />
@@ -59,6 +103,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "CMake Application.ProyectoCompi.executor": "Run",
     "CMake Application.TESTCOMPI.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.RadMigrateCodeStyle": "true",
@@ -78,20 +123,25 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "/home/zamirlm/Documents/Utec/CIclo2025-1/Compiladores/p/CompiladoresProyectoFinal/main.cpp",
+    "settings.editor.selected.configurable": "CPPToolchains",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TESTCOMPI" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ejemplo1.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="TESTCOMPI" TARGET_NAME="TESTCOMPI" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="TESTCOMPI" RUN_TARGET_NAME="TESTCOMPI">
+  <component name="RunManager" selected="CMake Application.ProyectoCompi">
+    <configuration name="ProyectoCompi" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ProyectoCompi" TARGET_NAME="ProyectoCompi" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ProyectoCompi" RUN_TARGET_NAME="ProyectoCompi">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TESTCOMPI" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ejemplo1.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ProyectoCompi" TARGET_NAME="TESTCOMPI" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ProyectoCompi" RUN_TARGET_NAME="TESTCOMPI">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.TESTCOMPI" />
+      <item itemvalue="CMake Application.ProyectoCompi" />
+    </list>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -104,6 +154,7 @@
       <workItem from="1750739598918" duration="11758000" />
       <workItem from="1750781787325" duration="45000" />
       <workItem from="1750985996240" duration="3643000" />
+      <workItem from="1750991199652" duration="1439000" />
     </task>
     <task id="LOCAL-00001" summary="f">
       <option name="closed" value="true" />

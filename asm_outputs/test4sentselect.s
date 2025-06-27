@@ -1,11 +1,11 @@
-Contenido del archivo (218 caracteres):
+Contenido del archivo (212 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
 int main() {
-    int i;
+
     printf("Iniciando bucle for:\n");
-    for (i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
         printf("Iteracion numero: %d\n", i);
     }
     printf("Bucle for finalizado.\n");
@@ -23,9 +23,6 @@ MAIN('main')
 LEFT_PAREN('(')
 RIGHT_PAREN(')')
 LEFT_BRACE('{')
-INT('int')
-IDENTIFIER('i')
-SEMICOLON(';')
 PRINTF('printf')
 LEFT_PAREN('(')
 STRING_LITERAL('"Iniciando bucle for:\n"')
@@ -33,6 +30,7 @@ RIGHT_PAREN(')')
 SEMICOLON(';')
 FOR('for')
 LEFT_PAREN('(')
+INT('int')
 IDENTIFIER('i')
 ASSIGN('=')
 NUMBER('0')
@@ -68,6 +66,20 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
-Buscando funciones...
-Encontramos el token main
-Error: se esperaba un tipo (int, char, void, struct).
+Programa parseado exitosamente
+
+=== FASE 3: VISITANTE DE IMPRESION ===
+#include <stdio.h>
+
+int main() {
+    printf("Iniciando bucle for:\n");
+    for (int i = 0; i < 5; i++) {
+        printf("Iteracion numero: %d\n", i);
+    }
+    printf("Bucle for finalizado.\n");
+    return 0;
+}
+
+Impresion del programa completada.
+
+=== ANALISIS COMPLETADO EXITOSAMENTE ===

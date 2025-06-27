@@ -1,8 +1,8 @@
-Contenido del archivo (170 caracteres):
+Contenido del archivo (172 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
-int suma(int a, int b) {
+int suma(void a, char b) {
     return a + b;
 }
 
@@ -21,10 +21,10 @@ HEADER_NAME('<stdio.h>')
 INT('int')
 IDENTIFIER('suma')
 LEFT_PAREN('(')
-INT('int')
+VOID('void')
 IDENTIFIER('a')
 COMMA(',')
-INT('int')
+CHAR('char')
 IDENTIFIER('b')
 RIGHT_PAREN(')')
 LEFT_BRACE('{')
@@ -66,5 +66,21 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
+Programa parseado exitosamente
 
-Error durante el analisis: Se esperaba ';' despues de la declaracion de variable global.
+=== FASE 3: VISITANTE DE IMPRESION ===
+#include <stdio.h>
+
+int suma(void a, char b) {
+    return a + b;
+}
+
+int main() {
+    int resultado = suma(5, 3);
+    printf("La suma es: %d\n", resultado);
+    return 0;
+}
+
+Impresion del programa completada.
+
+=== ANALISIS COMPLETADO EXITOSAMENTE ===

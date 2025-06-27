@@ -8,7 +8,7 @@ struct Punto {
 int main() {
     struct Punto p;
     p.x = 5;
-    p.y = p.x * 2; // Acceder a un miembro para definir otro
+    p.y = p.x * 2;
     printf("p.y deberia ser 10: %d\n", p.y);
     return 0;
 }

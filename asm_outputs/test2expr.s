@@ -61,13 +61,10 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
-Buscando funciones...
-Encontramos el token main
 Programa parseado exitosamente
 
 === FASE 3: VISITANTE DE IMPRESION ===
 #include <stdio.h>
-
 
 int main() {
     int a = 10, b = 2, c = 4;

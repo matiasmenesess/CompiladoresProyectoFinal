@@ -1,4 +1,4 @@
-Contenido del archivo (229 caracteres):
+Contenido del archivo (187 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
@@ -10,7 +10,7 @@ struct Punto {
 int main() {
     struct Punto p;
     p.x = 5;
-    p.y = p.x * 2; // Acceder a un miembro para definir otro
+    p.y = p.x * 2;
     printf("p.y deberia ser 10: %d\n", p.y);
     return 0;
 }
@@ -57,8 +57,6 @@ IDENTIFIER('x')
 MULTIPLY('*')
 NUMBER('2')
 SEMICOLON(';')
-LINE_COMMENT('// Acceder a un miembro para definir otro
-')
 PRINTF('printf')
 LEFT_PAREN('(')
 FORMAT_STRING('"p.y deberia ser 10: %d\n"')
@@ -78,9 +76,24 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
-Buscando funciones...
-Encontramos el token int
-Tipo de retorno: int
+Programa parseado exitosamente
 
-Error durante el analisis: Se esperaba una expresión primaria (numero, identificador, cadena, parentesis). Se obtuvo el token // Acceder a un miembro para definir otro
+=== FASE 3: VISITANTE DE IMPRESION ===
+#include <stdio.h>
 
+struct Punto {
+    int x;
+    int y;
+};
+
+int main() {
+    struct Punto p;
+    p.x = 5;
+    p.y = p.x * 2;
+    printf("p.y deberia ser 10: %d\n", p.y);
+    return 0;
+}
+
+Impresion del programa completada.
+
+=== ANALISIS COMPLETADO EXITOSAMENTE ===

@@ -66,20 +66,22 @@ Parser::~Parser() {
 
 
 Program* Parser::parseProgram() {
-    skipComments(); // Ignora comentarios al inicio del archivo
+    skipComments();
 
     IncludeList* includes = parseIncludes();
     skipComments();
 
-    GlobalVarDecList* globals = parseGlobalDeclarations();
+    // GlobalVarDecList* globals = parseGlobalDeclarations();
     skipComments();
+    GlobalVarDecList* globals = nullptr;
+    
 
     StructDeclarationList* structs = parseStructDeclarations();
     skipComments();
-
+    
     FunctionList* functions = parseFunctions();
     skipComments();
-
+    // matcheado el main, siguiente debe matcher ()
     MainFunction* main = parseMainFunction();
     skipComments();
 
@@ -117,36 +119,50 @@ Include* Parser::parseInclude() {
 GlobalVarDecList* Parser::parseGlobalDeclarations() {
     skipComments();
     GlobalVarDecList* globals = new GlobalVarDecList();
+
     while (!isAtEnd() && !check(Token::STRUCT) && !check(Token::MAIN)) {
         if (check(Token::INT) || check(Token::CHAR)) {
-            Token* type_tok = current; advance();
-            if(!check(Token::IDENTIFIER)) break;
-            Token* id_tok = current;
+            auto saving = current;
+            Token* savedPrevious = previous;
+            scanner->mark();
+            cout<<saving->text<<endl;
+            
+            parseType();
 
-            if(check(Token::LEFT_PAREN)) {
-                scanner->reset();
-                current = scanner->nextToken();
-                while(current->text != type_tok->text) current = scanner->nextToken();
-                previous = nullptr;
+            cout<<current->text<<endl;
+
+
+            if (!check(Token::IDENTIFIER)) break;
+
+            Token* id_tok = current;
+            advance();
+
+            cout<<current->text<<endl;
+
+            if (current->type == Token::LEFT_PAREN) {
+
+                current = saving;
+                cout<< current->text<<endl;
+                previous = savedPrevious;
+                cout<<scanner->nextToken()->text<<endl;
                 break;
             }
-            scanner->reset();
-            current = scanner->nextToken();
-            while(current->text != type_tok->text) current = scanner->nextToken();
-            previous = nullptr;
 
             globals->add(parseGlobalVarDec());
 
+
             if (!match(Token::SEMICOLON)) {
-                throw runtime_error("Se esperaba ';' despues de la declaracion de variable global.");
+                throw runtime_error("Se esperaba ';' después de la declaración de variable global.");
             }
 
         } else {
             break;
         }
     }
+
     return globals;
 }
+
 
 GlobalVarDec* Parser::parseGlobalVarDec() {
     skipComments();
@@ -208,23 +224,18 @@ StructDeclaration* Parser::parseStructDeclaration() {
 
 FunctionList* Parser::parseFunctions() {
     FunctionList* functions = new FunctionList();
-    bool mainFound = false;
-    cout<< "Buscando funciones..." << endl;
-    cout<< "Encontramos el token " << current->text << endl;
-    
+
     while(!isAtEnd() && (check(Token::INT) || check(Token::CHAR) || check(Token::VOID))) {
         Type* return_type = parseType();
-        cout<< "Tipo de retorno: " << return_type->type_name << endl;
-        if(check(Token::MAIN)){
-            if (return_type->type_name != "int"){
-                throw runtime_error("Se esperaba que el tipo del main sea int");
-            }
-            advance();
-            mainFound = true;
-            return functions;
 
-        } 
-        else if(check(Token::IDENTIFIER)){
+
+        if (check(Token::MAIN)) {
+            match(Token::MAIN);
+            return functions;
+            continue;
+        }
+
+        if (check(Token::IDENTIFIER)) {
             string function_name = current->text;
             advance();
             Function* func = parseFunction(return_type, function_name);
@@ -234,13 +245,10 @@ FunctionList* Parser::parseFunctions() {
         }
     }
 
-    if (check(Token::MAIN)) {
-        advance();
-    }else if (!mainFound) {
-        throw runtime_error("Se esperaba la funcion 'main' en el programa.");
-    }else if (!check(Token::MAIN)) {
-        throw runtime_error("Se esperaba la funcion 'main' en el programa.");
+    if (!check(Token::MAIN)) {
+        return functions;
     }
+
     return functions;
 }
 
@@ -275,12 +283,9 @@ Function* Parser::parseFunction(Type* return_type, const string& name) {
 }
 MainFunction* Parser::parseMainFunction() {
 
-
-
     if (!match(Token::LEFT_PAREN)) {
         throw runtime_error("Se esperaba '(' despues de 'main'");
     }
-
 
 
     if (!match(Token::RIGHT_PAREN)) {

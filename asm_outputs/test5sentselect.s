@@ -1,12 +1,11 @@
-Contenido del archivo (277 caracteres):
+Contenido del archivo (271 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
 int main() {
-    int i, j;
     printf("Iniciando bucles anidados:\n");
-    for (i = 1; i <= 3; i++) {
-        for (j = 1; j <= 2; j++) {
+    for (int i = 1; i <= 3; i++) {
+        for (int j = 1; j <= 2; j++) {
             printf("i=%d, j=%d\n", i, j);
         }
     }
@@ -25,11 +24,6 @@ MAIN('main')
 LEFT_PAREN('(')
 RIGHT_PAREN(')')
 LEFT_BRACE('{')
-INT('int')
-IDENTIFIER('i')
-COMMA(',')
-IDENTIFIER('j')
-SEMICOLON(';')
 PRINTF('printf')
 LEFT_PAREN('(')
 STRING_LITERAL('"Iniciando bucles anidados:\n"')
@@ -37,6 +31,7 @@ RIGHT_PAREN(')')
 SEMICOLON(';')
 FOR('for')
 LEFT_PAREN('(')
+INT('int')
 IDENTIFIER('i')
 ASSIGN('=')
 NUMBER('1')
@@ -51,6 +46,7 @@ RIGHT_PAREN(')')
 LEFT_BRACE('{')
 FOR('for')
 LEFT_PAREN('(')
+INT('int')
 IDENTIFIER('j')
 ASSIGN('=')
 NUMBER('1')
@@ -89,6 +85,22 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
-Buscando funciones...
-Encontramos el token main
-Error: se esperaba un tipo (int, char, void, struct).
+Programa parseado exitosamente
+
+=== FASE 3: VISITANTE DE IMPRESION ===
+#include <stdio.h>
+
+int main() {
+    printf("Iniciando bucles anidados:\n");
+    for (int i = 1; i <= 3; i++) {
+        for (int j = 1; j <= 2; j++) {
+            printf("i=%d, j=%d\n", i, j);
+        }
+    }
+    printf("Bucles anidados finalizados.\n");
+    return 0;
+}
+
+Impresion del programa completada.
+
+=== ANALISIS COMPLETADO EXITOSAMENTE ===

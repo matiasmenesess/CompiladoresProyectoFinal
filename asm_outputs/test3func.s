@@ -80,5 +80,24 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
+Programa parseado exitosamente
 
-Error durante el analisis: Se esperaba ';' despues de la declaracion de variable global.
+=== FASE 3: VISITANTE DE IMPRESION ===
+#include <stdio.h>
+
+int factorial(int n) {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int f = factorial(5);
+    printf("Factorial de 5 es: %d\n", f);
+    return 0;
+}
+
+Impresion del programa completada.
+
+=== ANALISIS COMPLETADO EXITOSAMENTE ===

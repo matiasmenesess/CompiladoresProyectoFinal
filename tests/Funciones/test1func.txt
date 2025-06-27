@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int suma(int a, int b) {
+int suma(void a, char b) {
     return a + b;
 }
 
