@@ -27,39 +27,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="f">
-      <change afterPath="$PROJECT_DIR$/.idea/git_toolbox_prj.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ejemplo1.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/environment.h" beforeDir="false" afterPath="$PROJECT_DIR$/environment.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expression.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/expression.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expression.h" beforeDir="false" afterPath="$PROJECT_DIR$/expression.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/parser.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser.h" beforeDir="false" afterPath="$PROJECT_DIR$/parser.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test1declvar.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/DeclVar/test1declvar.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test2declvar.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/DeclVar/test2declvar.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test3declvar.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/DeclVar/test3declvar.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Expression/test1expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Expression/test1expr.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Expression/test2expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Expression/test2expr.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Expression/test3expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Expression/test3expr.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Funciones/test1func.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Funciones/test1func.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Funciones/test2func.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Funciones/test2func.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Funciones/test3func.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Funciones/test3func.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Punteros/test1punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test1punteros.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Punteros/test2punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test2punteros.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Punteros/test3punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test3punteros.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Punteros/test4punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test4punteros.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Punteros/test5punteros.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Punteros/test5punteros.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test1sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test1sentselect.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test2sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test2sentselect.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test3sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test3sentselect.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test4sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test4sentselect.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test5sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test5sentselect.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test6sentselect.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/SenContSelec/test6sentselect.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Struct/test1struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test1struct.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Struct/test2struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test2struct.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Struct/test3struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test3struct.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Struct/test4struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test4struct.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Struct/test5struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/t/Struct/test5struct.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/visitor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/visitor.h" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.h" afterDir="false" />
     </list>
@@ -135,7 +103,7 @@
       <workItem from="1750735511366" duration="2620000" />
       <workItem from="1750739598918" duration="11758000" />
       <workItem from="1750781787325" duration="45000" />
-      <workItem from="1750985996240" duration="418000" />
+      <workItem from="1750985996240" duration="1757000" />
     </task>
     <task id="LOCAL-00001" summary="f">
       <option name="closed" value="true" />
@@ -145,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750767173656</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="f">
+      <option name="closed" value="true" />
+      <created>1750986483081</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1750986483081</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

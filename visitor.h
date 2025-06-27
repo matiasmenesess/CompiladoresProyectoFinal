@@ -147,7 +147,7 @@ public:
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
 };
-/*
+
 class GenCodeVisitor : public Visitor {
 public:
     unordered_map<string, int> memoria;
@@ -170,7 +170,6 @@ public:
     int visit(MemberAccessExp* exp) ;
     int visit(ParenExp* exp) ;
 
-    void visit(AssignStatement* stm) ;
     void visit(PrintfStatement* stm) ;
     void visit(IfStatement* stm) ;
     void visit(ElseIfStatement* stm) ;
@@ -194,7 +193,7 @@ public:
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
 };
-
+/*
 
 class TypeChecker : public Visitor {
 
