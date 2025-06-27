@@ -147,7 +147,7 @@ public:
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
 };
-
+/*
 class GenCodeVisitor : public Visitor {
 public:
     unordered_map<string, int> memoria;

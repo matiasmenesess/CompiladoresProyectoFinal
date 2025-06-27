@@ -209,20 +209,13 @@ StructDeclaration* Parser::parseStructDeclaration() {
 FunctionList* Parser::parseFunctions() {
     FunctionList* functions = new FunctionList();
     bool mainFound = false;
-
+    cout<< "Buscando funciones..." << endl;
+    cout<< "Encontramos el token " << current->text << endl;
+    
     while(!isAtEnd() && (check(Token::INT) || check(Token::CHAR) || check(Token::VOID))) {
         Type* return_type = parseType();
-
-        if(check(Token::IDENTIFIER)){
-            string function_name = current->text;
-
-
-            advance();
-
-            Function* func = parseFunction(return_type, function_name);
-            functions->add(func);
-
-        } else if(check(Token::MAIN)){
+        cout<< "Tipo de retorno: " << return_type->type_name << endl;
+        if(check(Token::MAIN)){
             if (return_type->type_name != "int"){
                 throw runtime_error("Se esperaba que el tipo del main sea int");
             }
@@ -230,14 +223,25 @@ FunctionList* Parser::parseFunctions() {
             mainFound = true;
             return functions;
 
+        } 
+        else if(check(Token::IDENTIFIER)){
+            string function_name = current->text;
+            advance();
+            Function* func = parseFunction(return_type, function_name);
+            functions->add(func);
         } else {
             throw runtime_error("Se esperaba un nombre de funcion o 'main'");
         }
     }
 
-    if (!mainFound) {
-        throw runtime_error("Error: No se encontro la funcion 'main' en el programa.");
+    if (check(Token::MAIN)) {
+        advance();
+    }else if (!mainFound) {
+        throw runtime_error("Se esperaba la funcion 'main' en el programa.");
+    }else if (!check(Token::MAIN)) {
+        throw runtime_error("Se esperaba la funcion 'main' en el programa.");
     }
+    return functions;
 }
 
 Function* Parser::parseFunction(Type* return_type, const string& name) {
@@ -884,18 +888,10 @@ Exp* Parser::parsePostfix() {
             if (!match(Token::RIGHT_PAREN)) throw runtime_error("Se esperaba ')' despues de los argumentos de la funcion.");
 
             expr = call;
-
-
         } else if (match(Token::DOT)) {
-
-
             if (!check(Token::IDENTIFIER)) throw runtime_error("Se esperaba el nombre del miembro.");
             string member_name = current->text;
-
             advance();
-
-
-
             expr = new MemberAccessExp(expr, member_name, false);
         } else if (match(Token::ARROW)) {
 
