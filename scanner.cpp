@@ -188,7 +188,12 @@ Token* Scanner::nextToken() {
             token = new Token(Token::MAIN, word);
         } else if (word == "printf") {
             token = new Token(Token::PRINTF, word);
-        } else {
+        } else if(word == "true"){
+            token = new Token(Token::TRUE);
+        }else if (word == "false"){
+            token = new Token(Token::FALSE);
+        }
+        else {
             token = new Token(Token::IDENTIFIER, word);
         }
         return token;

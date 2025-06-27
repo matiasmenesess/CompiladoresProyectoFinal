@@ -3,6 +3,11 @@
 int main() {
     int y = 5;
     int z = ++y;
-    printf("Resultado: %d\n", z);
+    bool f = true;
+    bool g = false;
+    if (f && g){
+        printf("Resultado: %d\n", z);
+
+    }
     return 0;
 }

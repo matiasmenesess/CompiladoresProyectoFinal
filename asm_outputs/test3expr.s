@@ -1,11 +1,16 @@
-Contenido del archivo (115 caracteres):
+Contenido del archivo (182 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
 int main() {
     int y = 5;
     int z = ++y;
-    printf("Resultado: %d\n", z);
+    bool f = true;
+    bool g = false;
+    if (f && g){
+        printf("Resultado: %d\n", z);
+
+    }
     return 0;
 }
 ----------------------------------------
@@ -31,6 +36,23 @@ ASSIGN('=')
 INCREMENT('++')
 IDENTIFIER('y')
 SEMICOLON(';')
+IDENTIFIER('bool')
+IDENTIFIER('f')
+ASSIGN('=')
+IDENTIFIER('true')
+SEMICOLON(';')
+IDENTIFIER('bool')
+IDENTIFIER('g')
+ASSIGN('=')
+IDENTIFIER('false')
+SEMICOLON(';')
+IF('if')
+LEFT_PAREN('(')
+IDENTIFIER('f')
+LOGICAL_AND('&&')
+IDENTIFIER('g')
+RIGHT_PAREN(')')
+LEFT_BRACE('{')
 PRINTF('printf')
 LEFT_PAREN('(')
 FORMAT_STRING('"Resultado: %d\n"')
@@ -38,6 +60,7 @@ COMMA(',')
 IDENTIFIER('z')
 RIGHT_PAREN(')')
 SEMICOLON(';')
+RIGHT_BRACE('}')
 RETURN('return')
 NUMBER('0')
 SEMICOLON(';')
@@ -48,19 +71,5 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
-Programa parseado exitosamente
 
-=== FASE 3: VISITANTE DE IMPRESION ===
-#include <stdio.h>
-
-
-int main() {
-    int y = 5;
-    int z = ++y;
-    printf("Resultado: %d\n", z);
-    return 0;
-}
-
-Impresion del programa completada.
-
-=== ANALISIS COMPLETADO EXITOSAMENTE ===
+Error durante el analisis: Se esperaba ';' despues de la expresion.

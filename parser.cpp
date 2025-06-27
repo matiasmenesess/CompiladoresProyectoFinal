@@ -875,8 +875,6 @@ Exp* Parser::parsePostfix() {
             expr = new ArrayAccessExp(expr, index);
         } else if (match(Token::LEFT_PAREN)) {
 
-
-
             IdentifierExp* id_exp = dynamic_cast<IdentifierExp*>(expr);
             if (!id_exp) throw runtime_error("La llamada a función debe ser sobre un identificador.");
             FunctionCallExp* call = new FunctionCallExp(id_exp->name);
@@ -919,6 +917,13 @@ Exp* Parser::parsePrimary() {
     if (match(Token::IDENTIFIER)) {
         return new IdentifierExp(previous->text);
     }
+    if (match(Token::TRUE)) {
+        return new BoolExp(true);
+    }
+    if (match(Token::FALSE)) {
+        return new BoolExp(false);
+    }
+
     if (match(Token::STRING_LITERAL) || match(Token::FORMAT_STRING)){
 
         return new StringExp(previous->text);

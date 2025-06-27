@@ -69,6 +69,15 @@ public:
     static string unaryToChar(UnaryOp op);
 };
 
+
+class BoolExp : public Exp {
+public:
+    int value;
+    int accept(Visitor* visitor);
+    BoolExp(bool v);
+    ~BoolExp();
+};
+
 class Include {
 public:
     string header_name;
