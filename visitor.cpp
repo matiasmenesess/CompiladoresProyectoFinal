@@ -658,27 +658,42 @@ void GenCodeVisitor::gencode(Program* program) {
     out << ".text" << endl;
     out << ".globl main" << endl;
     
+    // IMPORTANTE: Generar funciones ANTES de main
     if (program->functions)
         program->functions->accept(this);
-    
+
+    // Generar función main
     out << "main:" << endl;
     out << "    pushq %rbp" << endl;
     out << "    movq %rsp, %rbp" << endl;
-    
+
+    // Calcular espacio para variables locales de main
     int total_vars = 0;
     if (program->main_function && program->main_function->body && program->main_function->body->vardecs) {
         for (auto vardec : program->main_function->body->vardecs->vardecs) {
             total_vars += vardec->vars.size();
         }
     }
-    
+
     if (total_vars > 0) {
         out << "    subq $" << (total_vars * 8) << ", %rsp" << endl;
     }
 
-    // Agregar nivel para main
+    // Agregar nivel para main y configurar variables
     env->add_level();
-    
+
+    // Pre-registrar variables locales de main en el environment
+    int current_offset = -8;
+    if (program->main_function && program->main_function->body && program->main_function->body->vardecs) {
+        for (auto vardec : program->main_function->body->vardecs->vardecs) {
+            for (const auto& var : vardec->vars) {
+                env->add_var(var, current_offset, vardec->type->type_name,
+                            vardec->type->is_pointer, vardec->type->is_array);
+                current_offset -= 8;
+            }
+        }
+    }
+
     if (program->main_function)
         program->main_function->accept(this);
 
@@ -690,7 +705,6 @@ void GenCodeVisitor::gencode(Program* program) {
     out << "    ret" << endl;
     out << ".section .note.GNU-stack,\"\",@progbits" << endl;
 }
-
 // --- Expresiones ---
 
 int GenCodeVisitor::visit(NumberExp* exp) {
@@ -1183,7 +1197,6 @@ void GenCodeVisitor::visit(ReturnStatement* stm) {
 }
 
 void GenCodeVisitor::visit(VarDec* stm) {
-    static int current_offset = -8; 
     
     for (size_t i = 0; i < stm->vars.size(); ++i) {
         string var_name = stm->vars[i];
@@ -1196,7 +1209,7 @@ void GenCodeVisitor::visit(VarDec* stm) {
         int var_size = is_char || is_bool ? 1 : 8;
         string mov_inst = is_char || is_bool ? "movb" : "movq";
         string reg = is_char || is_bool ? "%al" : "%rax";
-
+        int current_offset = env->lookup(var_name).offset;
         if (is_array && var_type->array_size) {
             var_type->array_size->accept(this);
             
@@ -1291,85 +1304,87 @@ void GenCodeVisitor::visit(StatementList* stm) {
 }
 
 void GenCodeVisitor::visit(Body* b) {
-    if (b->vardecs) 
+    // Procesar declaraciones (inicializaciones)
+    if (b->vardecs) {
         b->vardecs->accept(this);
-    if (b->slist) 
+    }
+
+    // Procesar sentencias
+    if (b->slist) {
         b->slist->accept(this);
+    }
 }
 
+
 void GenCodeVisitor::visit(Function* func) {
-    // Prologo
-    out << ".globl " << func->name << endl;
+    // Prólogo
     out << func->name << ":" << endl;
     out << "    pushq %rbp" << endl;
     out << "    movq %rsp, %rbp" << endl;
-    
+
     // Calcular espacio necesario para variables locales
-    int stack_space = 0;
+    int local_vars = 0;
     if (func->body && func->body->vardecs) {
         for (auto vardec : func->body->vardecs->vardecs) {
-            for (auto var : vardec->vars) {
-                stack_space += 8; // Todos los tipos ocupan 8 bytes (incluyendo char/bool por alineación)
-            }
+            local_vars += vardec->vars.size();
         }
     }
-    
-    // Reservar espacio en stack
-    if (stack_space > 0) {
-        out << "    subq $" << stack_space << ", %rsp" << endl;
-    }
-    
-    out << "    pushq %rbx" << endl;
-    out << "    pushq %r12" << endl;
-    out << "    pushq %r13" << endl;
-    out << "    pushq %r14" << endl;
-    out << "    pushq %r15" << endl;
-    
-    FunctionInfo info;
-    info.return_type = func->return_type->type_name;
-    info.stack_size = stack_space + 40; // 5 registros * 8 bytes
+
+    // Calcular espacio total: parámetros + variables locales
+    int num_params = 0;
     if (func->parameters) {
+        num_params = func->parameters->parameters.size();
+    }
+
+    int total_space = (num_params + local_vars) * 8;
+    if (total_space > 0) {
+        out << "    subq $" << total_space << ", %rsp" << endl;
+    }
+
+    // Agregar nivel para la función
+    env->add_level();
+
+    // Manejar parámetros: copiar de registros al stack
+    if (func->parameters) {
+        const char* param_regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+
         for (size_t i = 0; i < func->parameters->parameters.size(); ++i) {
             auto param = func->parameters->parameters[i];
-            
-            if (param->is_reference) {
-                if (i < 6) {
-                    static const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-                    out << "    movq " << regs[i] << ", " << (i * 8) << "(%rbp)\n";
-                    env->add_var(param->name, (i * 8), param->type->type_name, true, false);
-                } else {
-                    int offset = 16 + (i - 6) * 8; // 16 por callq + push %rbp
-                    env->add_var(param->name, offset, param->type->type_name, true, false);
-                }
-            } else {
-                FunctionParamInfo param_info;
-                param_info.type = param->type->type_name;
-                param_info.is_pointer = param->type->is_pointer;
-                param_info.is_array = param->type->is_array;
-                param_info.offset = 0;
-                param_info.reg_index = (i < 6) ? i : -1;
-                info.params.push_back(param_info);
+            int offset = -8 * (i + 1); // Parámetros en offsets negativos
+
+            // Guardar parámetro del registro al stack
+            if (i < 6) {
+                out << "    movq " << param_regs[i] << ", " << offset << "(%rbp)  # param " << param->name << endl;
+            }
+
+            // Añadir al environment
+            env->add_var(param->name, offset, param->type->type_name,
+                        param->type->is_pointer, param->type->is_array);
+        }
+    }
+
+    // Pre-registrar variables locales en el environment
+    int local_offset = -8 * (num_params + 1);
+    if (func->body && func->body->vardecs) {
+        for (auto vardec : func->body->vardecs->vardecs) {
+            for (const auto& var : vardec->vars) {
+                env->add_var(var, local_offset, vardec->type->type_name,
+                            vardec->type->is_pointer, vardec->type->is_array);
+                local_offset -= 8;
             }
         }
     }
-    env->add_function(func->name, info);
-    
-    if (func->parameters) {
-        func->parameters->accept(this);
-    }
-    
-    env->add_level();
+
+    // Procesar cuerpo de la función
     if (func->body) {
         func->body->accept(this);
     }
+
+    // Remover nivel
     env->remove_level();
-    
-    out << "    popq %r15" << endl;
-    out << "    popq %r14" << endl;
-    out << "    popq %r13" << endl;
-    out << "    popq %r12" << endl;
-    out << "    popq %rbx" << endl;
-    
+
+    // Epílogo por defecto (si no hay return explícito)
+    out << "    movl $0, %eax" << endl;
     out << "    leave" << endl;
     out << "    ret" << endl;
 }

@@ -26,7 +26,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="f" />
+    <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="f">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visitor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -92,12 +97,12 @@
   }
 }</component>
   <component name="RunManager" selected="CMake Application.ProyectoCompi">
-    <configuration name="ProyectoCompi" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ProyectoCompi" TARGET_NAME="ProyectoCompi" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ProyectoCompi" RUN_TARGET_NAME="ProyectoCompi">
+    <configuration name="ProyectoCompi" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ejemplo1.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ProyectoCompi" TARGET_NAME="ProyectoCompi" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ProyectoCompi" RUN_TARGET_NAME="ProyectoCompi">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TESTCOMPI" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ejemplo1.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ProyectoCompi" TARGET_NAME="TESTCOMPI" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ProyectoCompi" RUN_TARGET_NAME="TESTCOMPI">
+    <configuration name="TESTCOMPI" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ejemplo1.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ProyectoCompi" TARGET_NAME="TESTCOMPI" RUN_TARGET_PROJECT_NAME="ProyectoCompi" RUN_TARGET_NAME="TESTCOMPI">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -121,6 +126,7 @@
       <workItem from="1750991199652" duration="1439000" />
       <workItem from="1751001177696" duration="881000" />
       <workItem from="1751046560997" duration="661000" />
+      <workItem from="1751136445986" duration="1554000" />
     </task>
     <task id="LOCAL-00001" summary="f">
       <option name="closed" value="true" />
@@ -158,12 +164,12 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/visitor.cpp</url>
-          <line>304</line>
+          <line>317</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/expression.h</url>
-          <line>249</line>
+          <line>246</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
