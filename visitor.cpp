@@ -1379,34 +1379,49 @@ int GenCodeVisitor::visit(FunctionCallExp* exp) {
         cerr << "Error: Función '" << exp->function_name << "' no declarada" << endl;
         exit(1);
     }
-    
+    auto func_info = env->get_function(exp->function_name);
+
     int stack_args = 0;
     for (int i = 0; i < exp->arguments.size(); ++i) {
-        exp->arguments[i]->accept(this);
-        
+        auto& param_info = func_info.params[i];
+        bool is_ref = param_info.is_pointer || param_info.is_array; // o tu flag de referencia
+
+        if (is_ref) {
+            // Solo soporta paso de variables locales por referencia
+            if (auto id = dynamic_cast<IdentifierExp*>(exp->arguments[i])) {
+                int var_offset = env->lookup(id->name).offset;
+                out << "    leaq " << var_offset << "(%rbp), %rax\n";
+            } else {
+                cerr << "Error: Solo se puede pasar variables por referencia/array\n";
+                exit(1);
+            }
+        } else {
+            exp->arguments[i]->accept(this);
+        }
+
         if (i < 6) {
             static const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-            out << "    movq %rax, " << regs[i] << endl;
+            out << "    movq %rax, " << regs[i] << "\n";
         } else {
-            out << "    pushq %rax" << endl;
+            out << "    pushq %rax\n";
             stack_args++;
         }
     }
-    
+
     if ((stack_args % 2) != 0) {
         out << "    subq $8, %rsp" << endl;
     }
-    
+
     out << "    call " << exp->function_name << endl;
-    
+
     if (stack_args > 0) {
         out << "    addq $" << (stack_args * 8)<< ", %rsp" << endl;
     }
-    
+
     if ((stack_args % 2) != 0) {
         out << "    addq $8, %rsp" << endl;
     }
-    
+
     return 0;
 }
 
@@ -1423,16 +1438,56 @@ void GenCodeVisitor::visit(MainFunction* mainFunc) {
 
 void GenCodeVisitor::visit(StructDeclaration* structDecl) {
     StructInfo info;
+    int offset = 0;
+    
     if (structDecl->members) {
         for (auto member : structDecl->members->vardecs) {
+            // Determinar el tamaño del tipo del miembro
+            int member_size = 8; // Tamaño por defecto (64 bits)
+            if (member->type->type_name == "char" || member->type->type_name == "bool") {
+                member_size = 1;
+            } else if (member->type->type_name == "int") {
+                member_size = 4;
+            } else if (env->has_struct(member->type->type_name)) {
+                // Si es otro struct, obtener su tamaño total
+                member_size = env->get_struct_size(member->type->type_name);
+            }
+            
+            // Aplicar alineación (normalmente al tamaño de palabra)
+            int alignment = 8;
+            offset = (offset + alignment - 1) & ~(alignment - 1);
+            
             for (auto& var : member->vars) {
-                info.fields[var] = member->type->type_name;
+                info.fields[var] = {member->type->type_name, member->type->is_pointer, member->type->is_array};
+                info.offsets[var] = offset;
+                
+                // Para arrays, usar el tamaño especificado o marcarlo como array sin tamaño
+                if (member->type->is_array) {
+                    if (member->type->array_size) {
+                        member->type->array_size->accept(this);
+                        out << "    imulq $" << member_size << ", %rax" << endl;
+                        out << "    movq %rax, %rcx" << endl;
+                        member_size = -1; // Marcador para array con tamaño dinámico
+                    } else {
+                        // Array sin tamaño (como parámetro)
+                        member_size = 8; // Tratar como puntero
+                    }
+                }
+                
+                offset += member_size;
             }
         }
     }
+    
+    info.size = (offset + 7) & ~7;
     env->add_struct(structDecl->struct_name, info);
+    
+    // Generar información de debug (opcional)
+    out << "# Estructura " << structDecl->struct_name << " (tamaño: " << info.size << " bytes)" << endl;
+    for (const auto& field : info.offsets) {
+        out << "#   " << field.first << " : offset " << field.second << endl;
+    }
 }
-
 void GenCodeVisitor::visit(StructDeclarationList* structList) {
     for (auto structDecl : structList->structs) {
         structDecl->accept(this);

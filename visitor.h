@@ -157,6 +157,8 @@ class GenCodeVisitor : public Visitor {
 public:
      std::ostream& out;
     Environment* env;
+    GenCodeVisitor(std::ostream& out) : out(out) {}
+
     int cantidad = 1;
     void gencode(Program* program);
     void visit(Include* inc) ;

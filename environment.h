@@ -7,11 +7,17 @@
 using namespace std;
 
 
-struct StructInfo {
-    unordered_map<string, string> fields; // nombre_campo -> tipo
-    unordered_map<string, int> offsets;   // nombre_campo -> offset en bytes
+struct FieldInfo {
+    std::string type_name;
+    bool is_pointer;
+    bool is_array;
 };
 
+struct StructInfo {
+    std::unordered_map<std::string, FieldInfo> fields; // nombre_campo -> info de campo
+    std::unordered_map<std::string, int> offsets;      // nombre_campo -> offset en bytes
+    int size = 0;                                      // tamaño total del struct
+};
 struct VarInfo {
     int offset;
     string type;
@@ -132,14 +138,15 @@ public:
     }
 
     // Structs
-    void add_struct(const string& name, const StructInfo& info) {
-        int offset = 0;
-        for (const auto& field : info.fields) {
-            // Suponiendo que todos los campos son de 8 bytes (ajusta según tipo real)
-            structs[name].offsets[field.first] = offset;
-            offset += 8;
+    int get_struct_size(const std::string& name) {
+        if (!has_struct(name)) {
+            std::cout << "Struct no declarado: " << name << std::endl;
+            exit(0);
         }
-        structs[name].fields = info.fields;
+        return structs[name].size;
+    }
+    void add_struct(const std::string& name, const StructInfo& info) {
+        structs[name] = info;
     }
 
     int get_struct_member_offset(const string& struct_name, const string& member_name) {
