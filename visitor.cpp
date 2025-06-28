@@ -21,9 +21,6 @@ int IncludeList::accept(Visitor *visitor) {
     return 0;
 }
 
-
-
-
 int Type::accept(Visitor *visitor) {
     visitor->visit(this);
     return 0;
@@ -105,6 +102,10 @@ int ForStatement::accept(Visitor *visitor) {
 int ExpressionStatement::accept(Visitor *visitor) {
     visitor->visit(this);
     return 0;
+}
+int ArrayInitializerExp::accept(Visitor *visitor) {
+    return visitor->visit(this);
+    
 }
 
 int ReturnStatement::accept(Visitor *visitor) {
@@ -208,6 +209,18 @@ int PrintVisitor::visit(BinaryExp* exp) {
     exp->left->accept(this);
     cout << " " << Exp::binopToChar(exp->op) << " ";
     exp->right->accept(this);
+    return 0;
+}
+
+int PrintVisitor::visit(ArrayInitializerExp* exp) {
+    cout << "{";
+    for (size_t i = 0; i < exp->elements.size(); ++i) {
+        exp->elements[i]->accept(this);
+        if (i < exp->elements.size() - 1) {
+            cout << ", ";
+        }
+    }
+    cout << "}";
     return 0;
 }
 
@@ -356,6 +369,7 @@ void PrintVisitor::visit(ElseIfStatement* stm) {
         cout << "}";
     }
 }
+
 void PrintVisitor::visit(WhileStatement* stm) {
     printIndent();
     cout << "while (";
@@ -695,7 +709,6 @@ int GenCodeVisitor::visit(BoolExp* exp) {
 }
 
 int GenCodeVisitor::visit(StringExp* exp) {
-    // Generar label único para string
     string label = "string_" + to_string(cantidad++);
     out << ".section .rodata" << endl;
     out << label << ": .string \"" << exp->value << "\"" << endl;
@@ -711,7 +724,7 @@ int GenCodeVisitor::visit(IdentifierExp* exp) {
     }
     
     // Obtener offset de la variable desde el environment
-    int offset = env->lookup(exp->name);
+    int offset = env->lookup(exp->name).offset;
     out << "    movq " << offset << "(%rbp), %rax  # " << exp->name << endl;
     return 0;
 }
@@ -814,7 +827,7 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
                     cerr << "Error: Variable no declarada: " << id->name << endl;
                     exit(1);
                 }
-                int offset = env->lookup(id->name);
+                int offset = env->lookup(id->name).offset;
                 out << "    movq %rcx, " << offset << "(%rbp)  # " << id->name << " = valor" << endl;
                 out << "    movq %rcx, %rax" << endl;
             }
@@ -825,13 +838,12 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
         case MULTIPLY_EQUAL_OP:
         case DIVIDE_EQUAL_OP:
         case MODULO_EQUAL_OP: {
-            // Operadores de asignación compuesta
             if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
                 if (!env->check(id->name)) {
                     cerr << "Error: Variable no declarada: " << id->name << endl;
                     exit(1);
                 }
-                int offset = env->lookup(id->name);
+                int offset = env->lookup(id->name).offset;
                 
                 switch (exp->op) {
                     case PLUS_EQUAL_OP:
@@ -866,16 +878,14 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
 }
 
 int GenCodeVisitor::visit(AssignExp* exp) {
-    // Evaluar lado derecho
     exp->right->accept(this);
     
-    // Asignar al lado izquierdo
     if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
         if (!env->check(id->name)) {
             cerr << "Error: Variable no declarada: " << id->name << endl;
             exit(1);
         }
-        int offset = env->lookup(id->name);
+        int offset = env->lookup(id->name).offset;
         out << "    movq %rax, " << offset << "(%rbp)  # " << id->name << " = valor" << endl;
     }
     
@@ -904,7 +914,7 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
                     cerr << "Error: Variable no declarada: " << id->name << endl;
                     exit(1);
                 }
-                int offset = env->lookup(id->name);
+                int offset = env->lookup(id->name).offset;
                 if (exp->is_prefix) {
                     // ++var
                     out << "    incq %rax" << endl;
@@ -924,7 +934,7 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
                     cerr << "Error: Variable no declarada: " << id->name << endl;
                     exit(1);
                 }
-                int offset = env->lookup(id->name);
+                int offset = env->lookup(id->name).offset;
                 if (exp->is_prefix) {
                     // --var
                     out << "    decq %rax" << endl;
@@ -944,7 +954,7 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
                     cerr << "Error: Variable no declarada: " << id->name << endl;
                     exit(1);
                 }
-                int offset = env->lookup(id->name);
+                int offset = env->lookup(id->name).offset;
                 out << "    leaq " << offset << "(%rbp), %rax  # &" << id->name << endl;
             }
             break;
@@ -959,28 +969,6 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
     return 0;
 }
 
-int GenCodeVisitor::visit(FunctionCallExp* exp) {
-    // Verificar si la función existe
-    if (!env->has_function(exp->function_name)) {
-        cerr << "Error: Función no declarada: " << exp->function_name << endl;
-        exit(1);
-    }
-    
-    // Empujar argumentos en orden inverso (convención x86-64)
-    for (int i = exp->arguments.size() - 1; i >= 0; --i) {
-        exp->arguments[i]->accept(this);
-        out << "    pushq %rax" << endl;
-    }
-    
-    out << "    call " << exp->function_name << endl;
-    
-    // Limpiar stack
-    if (exp->arguments.size() > 0) {
-        out << "    addq $" << (exp->arguments.size() * 8) << ", %rsp" << endl;
-    }
-    
-    return 0;
-}
 
 int GenCodeVisitor::visit(ArrayAccessExp* exp) {
     // Evaluar índice
@@ -1000,17 +988,28 @@ int GenCodeVisitor::visit(ArrayAccessExp* exp) {
 
 int GenCodeVisitor::visit(MemberAccessExp* exp) {
     exp->object->accept(this);
-    
+
     if (exp->is_pointer) {
-        // Acceso a través de puntero: obj->member
         out << "    movq (%rax), %rax" << endl;
     }
-    
-    // Aquí necesitarías obtener el offset real del miembro desde el environment
-    // Por simplicidad, usamos un offset fijo
-    out << "    addq $8, %rax  # offset del miembro " << exp->member_name << endl;
+
+    std::string struct_type;
+    if (auto id = dynamic_cast<IdentifierExp*>(exp->object)) {
+        struct_type = env->lookup_type(id->name); // Usa lookup_type, ya que get_var_type no existe
+    } else {
+        struct_type = "";
+    }
+
+    int member_offset = 0;
+    if (env->has_struct(struct_type)) {
+        member_offset = env->get_struct_member_offset(struct_type, exp->member_name);
+    } else {
+        member_offset = 8;
+    }
+
+    out << "    addq $" << member_offset << ", %rax  # offset del miembro " << exp->member_name << endl;
     out << "    movq (%rax), %rax" << endl;
-    
+
     return 0;
 }
 
@@ -1018,7 +1017,16 @@ int GenCodeVisitor::visit(ParenExp* exp) {
     return exp->inner->accept(this);
 }
 
-// --- Statements ---
+int GenCodeVisitor::visit(ArrayInitializerExp* exp) {
+    // Asumimos que el array ya ha sido declarado y tiene un tamaño fijo
+    out << "    leaq array_" << cantidad++ << "(%rip), %rax" << endl; // Label único para el array
+    for (size_t i = 0; i < exp->elements.size(); ++i) {
+        exp->elements[i]->accept(this);
+        out << "    movq %rax, " << (i * 8) << "(%rbp)  # Inicializando elemento " << i << endl;
+    }
+    return 0;
+}
+
 
 void GenCodeVisitor::visit(PrintfStatement* stm) {
     // Preparar argumentos para printf
@@ -1026,11 +1034,17 @@ void GenCodeVisitor::visit(PrintfStatement* stm) {
         stm->arguments[i]->accept(this);
         out << "    pushq %rax" << endl;
     }
-    
-    out << "    leaq print_fmt(%rip), %rdi" << endl;
+    // Generar un label único para el formato
+    static int fmt_count = 0;
+    std::string fmt_label = "printf_fmt_" + std::to_string(fmt_count++);
+    out << ".section .rodata" << endl;
+    out << fmt_label << ": .string \"" << stm->format_string << "\"" << endl;
+    out << ".text" << endl;
+
+    out << "    leaq " << fmt_label << "(%rip), %rdi" << endl;
     out << "    movl $0, %eax" << endl;  // No hay argumentos vectoriales
     out << "    call printf" << endl;
-    
+
     // Limpiar stack
     if (stm->arguments.size() > 0) {
         out << "    addq $" << (stm->arguments.size() * 8) << ", %rsp" << endl;
@@ -1038,50 +1052,76 @@ void GenCodeVisitor::visit(PrintfStatement* stm) {
 }
 
 void GenCodeVisitor::visit(IfStatement* stm) {
-    int label_else = cantidad++;
-    int label_end = cantidad++;
-    
+    if (!stm) return;
+
+    // 1. Generar etiquetas únicas para este if-else (usando stm->id)
+    int label_else = stm->id * 2;      // Ej: .Lelse2
+    int label_end = stm->id * 2 + 1;   // Ej: .Lendif3
+
+    // 2. Generar código para la condición
     stm->condition->accept(this);
     out << "    testq %rax, %rax" << endl;
-    out << "    jz .Lelse" << label_else << endl;
-    
+    out << "    jz .Lelse" << label_else << endl;  // Saltar a "else" si la condición es falsa
+
+    // 3. Cuerpo del "if"
     if (stm->statements) 
         stm->statements->accept(this);
-    
-    out << "    jmp .Lendif" << label_end << endl;
-    out << ".Lelse" << label_else << ":" << endl;
-    
-    if (stm->elsChain) 
-        stm->elsChain->accept(this);
-    
-    out << ".Lendif" << label_end << ":" << endl;
-}
 
-void GenCodeVisitor::visit(ElseIfStatement* stm) {
-    if (stm->tipo == ElseIfStatement::ELSE_IF) {
-        int label_else = cantidad++;
-        int label_end = cantidad++;
-        
-        stm->condition->accept(this);
-        out << "    testq %rax, %rax" << endl;
-        out << "    jz .Lelse" << label_else << endl;
-        
-        if (stm->body)
-            stm->body->accept(this);
-        
+    // 4. Si hay "else/else if", saltar al final para evitar ejecutarlos
+    if (stm->elsChain) {
         out << "    jmp .Lendif" << label_end << endl;
-        out << ".Lelse" << label_else << ":" << endl;
-        
-        if (stm->nextChain)
-            stm->nextChain->accept(this);
-        
+    }
+
+    // 5. Etiqueta para el "else" (compartida por else if/else)
+    out << ".Lelse" << label_else << ":" << endl;
+
+    // 6. Generar código para la cadena else/else if
+    if (stm->elsChain) {
+        stm->elsChain->accept(this);
+    }
+
+    // 7. Etiqueta de cierre (solo si hubo else/else if)
+    if (stm->elsChain) {
         out << ".Lendif" << label_end << ":" << endl;
-    } else { // ELSE
-        if (stm->body)
-            stm->body->accept(this);
     }
 }
 
+void GenCodeVisitor::visit(ElseIfStatement* stm) {
+    if (!stm) return;
+
+    if (stm->tipo == ElseIfStatement::ELSE_IF) {
+        // Obtener el id del IfStatement padre (asumimos que stm->parentIfId existe)
+        int label_else = stm->parentId * 2;    // Misma etiqueta que el if padre
+        int label_end = stm->parentId * 2 + 1;
+
+        // 1. Generar código para la condición
+        stm->condition->accept(this);
+        out << "    testq %rax, %rax" << endl;
+        out << "    jz .Lelse" << label_else << endl;  // Saltar al siguiente "else" si es falso
+
+        // 2. Cuerpo del "else if"
+        if (stm->body) 
+            stm->body->accept(this);
+
+        // 3. Si hay más condiciones, saltar al final
+        if (stm->nextChain) {
+            out << "    jmp .Lendif" << label_end << endl;
+        }
+
+        // 4. Etiqueta compartida para el siguiente "else"
+        out << ".Lelse" << label_else << ":" << endl;
+
+        // 5. Procesar siguiente condición en la cadena (else if/else)
+        if (stm->nextChain) {
+            stm->nextChain->accept(this);
+        }
+    } 
+    else {  // ELSE simple
+        if (stm->body) {
+            stm->body->accept(this);  // No necesita etiquetas, es el último caso
+        }
+    }
+}
 void GenCodeVisitor::visit(WhileStatement* stm) {
     int label_start = cantidad++;
     int label_end = cantidad++;
@@ -1127,6 +1167,8 @@ void GenCodeVisitor::visit(ForStatement* stm) {
     out << ".Lendfor" << label_end << ":" << endl;
 }
 
+
+
 void GenCodeVisitor::visit(ExpressionStatement* stm) {
     if (stm->expression) 
         stm->expression->accept(this);
@@ -1141,22 +1183,70 @@ void GenCodeVisitor::visit(ReturnStatement* stm) {
 }
 
 void GenCodeVisitor::visit(VarDec* stm) {
-    static int current_offset = -8; // Empezar desde -8(%rbp)
+    static int current_offset = -8; 
     
     for (size_t i = 0; i < stm->vars.size(); ++i) {
-        // Agregar variable al environment con su offset
-        env->add_var(stm->vars[i], current_offset, stm->type->type_name);
-        
-        if (stm->initializers[i]) {
-            // Evaluar inicializador
-            stm->initializers[i]->accept(this);
-            out << "    movq %rax, " << current_offset << "(%rbp)  # " << stm->vars[i] << endl;
-        } else {
-            // Inicializar a 0
-            out << "    movq $0, " << current_offset << "(%rbp)  # " << stm->vars[i] << endl;
+        string var_name = stm->vars[i];
+        Type* var_type = stm->type;
+        bool is_char = (var_type->type_name == "char");
+        bool is_bool = (var_type->type_name == "bool");
+        bool is_ptr = var_type->is_pointer;
+        bool is_array = var_type->is_array;
+
+        int var_size = is_char || is_bool ? 1 : 8;
+        string mov_inst = is_char || is_bool ? "movb" : "movq";
+        string reg = is_char || is_bool ? "%al" : "%rax";
+
+        if (is_array && var_type->array_size) {
+            var_type->array_size->accept(this);
+            
+            if (is_char) {
+                out << "    # Reservando arreglo de char[" << var_type->array_size << "]\n";
+            } else {
+                out << "    imulq $8, %rax  # Elementos * 8 bytes\n";
+            }
+            
+            out << "    movq %rax, %rcx  # Guardar tamaño total\n";
+            out << "    subq %rcx, %rsp  # Reservar espacio en stack\n";
+            out << "    movq %rsp, " << current_offset << "(%rbp)  # Guardar puntero al arreglo\n";
+            
+            if (stm->initializers[i]) {
+                stm->initializers[i]->accept(this);
+            } else {
+                out << "    movq %rsp, %rdi\n";
+                out << "    xorq %rax, %rax\n";
+                out << "    rep stosb\n";
+            }
+            
+            current_offset -= 16; 
+            continue;
         }
-        
-        current_offset -= 8; // Siguiente variable 8 bytes más abajo
+
+        env->add_var(var_name, current_offset, var_type->type_name, is_ptr, is_array);
+
+        if (stm->initializers[i]) {
+            stm->initializers[i]->accept(this);
+            out << "    " << mov_inst << " " << reg << ", " << current_offset << "(%rbp)  # " << var_name << "\n";
+            
+            if (is_bool) {
+                out << "    andb $1, " << current_offset << "(%rbp)  # Asegurar 0/1\n";
+            }
+        } else {
+            if (is_ptr) {
+                out << "    movq $0, " << current_offset << "(%rbp)  # NULL para puntero\n";
+            } else {
+                out << "    " << mov_inst << " $0, " << current_offset << "(%rbp)  # Inicializar a 0\n";
+            }
+        }
+
+        current_offset -= var_size;
+        if (var_size < 8) {
+            int padding = (8 - (abs(current_offset) % 8) % 8);
+            if (padding > 0) {
+                current_offset -= padding;
+                out << "    # Padding de " << padding << " bytes para alineación\n";
+            }
+        }
     }
 }
 
@@ -1165,14 +1255,14 @@ void GenCodeVisitor::visit(VarDecList* stm) {
         vardec->accept(this);
     }
 }
-
 void GenCodeVisitor::visit(GlobalVarDec* dec) {
     out << ".data" << endl;
-    out << dec->var_name << ": .quad 0" << endl;
+    out << dec->var_name << ": .quad 0" << endl; // Puedes cambiar 0 por el valor inicial si lo tienes
     out << ".text" << endl;
-    
-    // Agregar variable global al environment
-    env->add_var(dec->var_name, 0, dec->type->type_name); // offset 0 para globals
+
+    bool is_ptr = dec->type->is_pointer;
+    bool is_array = dec->type->is_array;
+    env->add_var(dec->var_name, 0, dec->type->type_name, is_ptr, is_array); // offset 0 para globals
 }
 
 void GenCodeVisitor::visit(GlobalVarDecList* decList) {
@@ -1184,7 +1274,7 @@ void GenCodeVisitor::visit(GlobalVarDecList* decList) {
 void GenCodeVisitor::visit(Parameter* param) {
     // Los parámetros se manejan en la función
     static int param_offset = 16; // Empezar desde 16(%rbp) para parámetros
-    env->add_var(param->name, param_offset, param->type->type_name);
+    env->add_var(param->name, param_offset, param->type->type_name, param->type->is_pointer, param->type->is_array);
     param_offset += 8;
 }
 
@@ -1208,48 +1298,116 @@ void GenCodeVisitor::visit(Body* b) {
 }
 
 void GenCodeVisitor::visit(Function* func) {
+    // Prologo
+    out << ".globl " << func->name << endl;
     out << func->name << ":" << endl;
     out << "    pushq %rbp" << endl;
     out << "    movq %rsp, %rbp" << endl;
     
-    // Agregar nivel para la función
-    env->add_level();
-    
-    // Procesar parámetros
-    if (func->parameters) {
-        func->parameters->accept(this);
-    }
-    
-    // Calcular espacio para variables locales
-    int local_vars = 0;
+    // Calcular espacio necesario para variables locales
+    int stack_space = 0;
     if (func->body && func->body->vardecs) {
         for (auto vardec : func->body->vardecs->vardecs) {
-            local_vars += vardec->vars.size();
+            for (auto var : vardec->vars) {
+                stack_space += 8; // Todos los tipos ocupan 8 bytes (incluyendo char/bool por alineación)
+            }
         }
     }
     
-    if (local_vars > 0) {
-        out << "    subq $" << (local_vars * 8) << ", %rsp" << endl;
+    // Reservar espacio en stack
+    if (stack_space > 0) {
+        out << "    subq $" << stack_space << ", %rsp" << endl;
     }
     
-    // Registrar función en environment
+    out << "    pushq %rbx" << endl;
+    out << "    pushq %r12" << endl;
+    out << "    pushq %r13" << endl;
+    out << "    pushq %r14" << endl;
+    out << "    pushq %r15" << endl;
+    
     FunctionInfo info;
     info.return_type = func->return_type->type_name;
+    info.stack_size = stack_space + 40; // 5 registros * 8 bytes
     if (func->parameters) {
-        for (auto param : func->parameters->parameters) {
-            info.params.push_back({param->type->type_name, param->name});
+        for (size_t i = 0; i < func->parameters->parameters.size(); ++i) {
+            auto param = func->parameters->parameters[i];
+            
+            if (param->is_reference) {
+                if (i < 6) {
+                    static const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+                    out << "    movq " << regs[i] << ", " << (i * 8) << "(%rbp)\n";
+                    env->add_var(param->name, (i * 8), param->type->type_name, true, false);
+                } else {
+                    int offset = 16 + (i - 6) * 8; // 16 por callq + push %rbp
+                    env->add_var(param->name, offset, param->type->type_name, true, false);
+                }
+            } else {
+                FunctionParamInfo param_info;
+                param_info.type = param->type->type_name;
+                param_info.is_pointer = param->type->is_pointer;
+                param_info.is_array = param->type->is_array;
+                param_info.offset = 0;
+                param_info.reg_index = (i < 6) ? i : -1;
+                info.params.push_back(param_info);
+            }
         }
     }
     env->add_function(func->name, info);
     
-    if (func->body) 
-        func->body->accept(this);
+    if (func->parameters) {
+        func->parameters->accept(this);
+    }
     
-    // Remover nivel de la función
+    env->add_level();
+    if (func->body) {
+        func->body->accept(this);
+    }
     env->remove_level();
+    
+    out << "    popq %r15" << endl;
+    out << "    popq %r14" << endl;
+    out << "    popq %r13" << endl;
+    out << "    popq %r12" << endl;
+    out << "    popq %rbx" << endl;
     
     out << "    leave" << endl;
     out << "    ret" << endl;
+}
+
+int GenCodeVisitor::visit(FunctionCallExp* exp) {
+    if (!env->has_function(exp->function_name)) {
+        cerr << "Error: Función '" << exp->function_name << "' no declarada" << endl;
+        exit(1);
+    }
+    
+    int stack_args = 0;
+    for (int i = 0; i < exp->arguments.size(); ++i) {
+        exp->arguments[i]->accept(this);
+        
+        if (i < 6) {
+            static const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+            out << "    movq %rax, " << regs[i] << endl;
+        } else {
+            out << "    pushq %rax" << endl;
+            stack_args++;
+        }
+    }
+    
+    if ((stack_args % 2) != 0) {
+        out << "    subq $8, %rsp" << endl;
+    }
+    
+    out << "    call " << exp->function_name << endl;
+    
+    if (stack_args > 0) {
+        out << "    addq $" << (stack_args * 8)<< ", %rsp" << endl;
+    }
+    
+    if ((stack_args % 2) != 0) {
+        out << "    addq $8, %rsp" << endl;
+    }
+    
+    return 0;
 }
 
 void GenCodeVisitor::visit(FunctionList* funcList) {
@@ -1281,15 +1439,11 @@ void GenCodeVisitor::visit(StructDeclarationList* structList) {
     }
 }
 
-// Métodos que no generan código
 void GenCodeVisitor::visit(Include* inc) { 
-    // No genera código assembly
 }
 
 void GenCodeVisitor::visit(IncludeList* incList) { 
-    // No genera código assembly
 }
 
 void GenCodeVisitor::visit(Type* type) { 
-    // No genera código assembly
 }

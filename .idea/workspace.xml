@@ -26,12 +26,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="f">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Expression/test3expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Expression/test3expr.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visitor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visitor.h" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.h" afterDir="false" />
-    </list>
+    <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="f" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -125,7 +120,7 @@
       <workItem from="1750985996240" duration="3643000" />
       <workItem from="1750991199652" duration="1439000" />
       <workItem from="1751001177696" duration="881000" />
-      <workItem from="1751046560997" duration="4000" />
+      <workItem from="1751046560997" duration="661000" />
     </task>
     <task id="LOCAL-00001" summary="f">
       <option name="closed" value="true" />
@@ -168,7 +163,7 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/expression.h</url>
-          <line>240</line>
+          <line>249</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>

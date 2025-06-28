@@ -70,13 +70,7 @@ public:
 };
 
 
-class BoolExp : public Exp {
-public:
-    int value;
-    int accept(Visitor* visitor);
-    BoolExp(bool v);
-    ~BoolExp();
-};
+
 
 class Include {
 public:
@@ -104,10 +98,12 @@ public:
     bool is_pointer;
     bool is_array;
     Exp* array_size;
-     int  accept(Visitor* visitor);
+    bool is_reference = false; 
+    int  accept(Visitor* visitor);
     Type(string name);
-    Type(string name, bool pointer);
+    Type(string name, bool pointer, bool is_reference=false);
     Type(string name, Exp* size);
+    Type(string name, bool pointer, bool array, Exp* size = nullptr, bool is_reference = false);
     ~Type();
 };
 
@@ -254,13 +250,15 @@ public:
 
 class ElseIfStatement : public Stm {
 public:
+    int id;
+    int parentId;
     enum Tipo { ELSE_IF, ELSE };
     int accept(Visitor *visitor);
     Tipo tipo;
     Exp* condition;
     Body* body;
     Stm* nextChain;
-    ElseIfStatement(Tipo, Exp* cond, Body* body, Stm* nextChain);
+    ElseIfStatement(Tipo, Exp* cond, Body* body, Stm* nextChain, int id, int parentId);
 };
 
 
@@ -348,7 +346,8 @@ class Parameter {
 public:
     Type* type;
     string name;
-    Parameter(Type* type, string name);
+    bool is_reference;
+    Parameter(Type* type, string name, bool reference = false);
     ~Parameter();
     int accept(Visitor* visitor) ;
 };
@@ -426,6 +425,14 @@ public:
     void add(StructDeclaration* struct_decl);
     ~StructDeclarationList();
     int accept(Visitor* visitor) ;
+};
+
+class ArrayInitializerExp: public Exp {
+public:
+    vector<Exp*> elements;
+    ArrayInitializerExp(const std::vector<Exp*>& elems);
+    int accept(Visitor* visitor);
+    ~ArrayInitializerExp();
 };
 
 class Program {

@@ -19,7 +19,7 @@ std::ostream& operator<<(std::ostream& outs, const Token& tok) {
         case Token::CHARACTER_CONSTANT: outs << "CHARACTER_CONSTANT"; break;
         case Token::STRING_LITERAL: outs << "STRING_LITERAL"; break;
         case Token::FORMAT_STRING: outs << "FORMAT_STRING"; break;
-
+        case Token::BIT_AND: outs << "REFERENCE"; break;
         case Token::INT: outs << "INT"; break;
         case Token::CHAR: outs << "CHAR"; break;
         case Token::VOID: outs << "VOID"; break;
@@ -85,7 +85,9 @@ std::ostream& operator<<(std::ostream& outs, const Token& tok) {
         case Token::END_OF_FILE: outs << "END_OF_FILE"; break;
         case Token::ERROR: outs << "ERROR"; break;
         case Token::UNKNOWN: outs << "UNKNOWN"; break;
-
+        case Token::BOOL: outs << "BOOL"; break;
+        case Token::TRUE: outs << "TRUE"; break;
+        case Token::FALSE: outs << "FALSE"; break;
         default: outs << "UNKNOWN_TOKEN_TYPE"; break;
     }
 

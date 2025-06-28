@@ -12,7 +12,7 @@ ImpValue::ImpValue(string tipo, int valor, bool bol) : tipo(tipo), valor(valor),
 ImpValue::ImpValue() : tipo(""), valor(0), bool_value(false) {}
 ImpValue::~ImpValue() {}
 
-// Exp implementation
+// Exp 
 Exp::~Exp() {}
 
 string Exp::binopToChar(BinaryOp op) {
@@ -68,13 +68,14 @@ IncludeList::~IncludeList() {
 
 
 Type::Type(string name) :
-    type_name(name), is_pointer(false), is_array(false), array_size(nullptr) {}
-Type::Type(string name, bool pointer) :
-    type_name(name), is_pointer(pointer), is_array(false), array_size(nullptr) {}
+    type_name(name), is_pointer(false), is_array(false), array_size(nullptr), is_reference(false) {}
+Type::Type(string name, bool pointer, bool is_reference) :
+    type_name(name), is_pointer(pointer), is_array(false), array_size(nullptr), is_reference(is_reference) {}
 Type::Type(string name, Exp* size) :
-    type_name(name), is_pointer(false), is_array(true), array_size(size) {}
+    type_name(name), is_pointer(false), is_array(true), array_size(size), is_reference(false) {}
 Type::~Type() { if (array_size) delete array_size; }
-
+Type::Type(string name, bool pointer, bool array, Exp* size, bool is_reference) :
+    type_name(name), is_pointer(pointer), is_array(array), array_size(size), is_reference(is_reference) {}
 
 
 BinaryExp::BinaryExp(Exp* l, Exp* r, BinaryOp op) :
@@ -95,9 +96,6 @@ UnaryExp::~UnaryExp() { delete uexp; }
 
 NumberExp::NumberExp(int v) : value(v) {}
 NumberExp::~NumberExp() {}
-
-BoolExp::BoolExp(bool v) : value(v) {}
-BoolExp::~BoolExp() {}
 
 CharExp::CharExp(char v) : value(v) {}
 CharExp::~CharExp() {}
@@ -147,8 +145,8 @@ IfStatement::~IfStatement() {
     delete elsChain;
 }
 
-ElseIfStatement::ElseIfStatement(Tipo t, Exp* cond, Body* body, Stm* nextChain) :
-    tipo(t), condition(cond), body(body), nextChain(nextChain) {}
+ElseIfStatement::ElseIfStatement(Tipo t, Exp* cond, Body* body, Stm* nextChain, int id, int parentId) :
+    tipo(t), condition(cond), body(body), nextChain(nextChain), id(id), parentId(parentId) {}
 
 WhileStatement::WhileStatement(Exp* condition, Body* b) :
     condition(condition), b(b) {
@@ -171,6 +169,8 @@ ForStatement::~ForStatement() {
     delete update;
     delete b;
 }
+BoolExp::BoolExp(bool v) : value(v) {}
+BoolExp::~BoolExp() {}
 
 ExpressionStatement::ExpressionStatement(Exp* exp) : expression(exp) {}
 ExpressionStatement::~ExpressionStatement() { delete expression; }
@@ -205,7 +205,7 @@ GlobalVarDecList::~GlobalVarDecList() {
     for (auto vardec : global_vardecs) delete vardec;
 }
 
-Parameter::Parameter(Type* type, string name) : type(type), name(name) {}
+Parameter::Parameter(Type* type, string name, bool reference) : type(type), name(name), is_reference(reference) {}
 Parameter::~Parameter() { delete type; }
 
 ParameterList::ParameterList() {}
@@ -267,6 +267,11 @@ Program::Program(IncludeList* includes,
     functions(functions),
     main_function(main) {}
 
+ArrayInitializerExp::ArrayInitializerExp(const std::vector<Exp*>& elems):elements(elems){};
+ArrayInitializerExp::~ArrayInitializerExp() {
+    for (auto elem : elements) delete elem;
+}    
+
 Program::~Program() {
     delete includes;
     delete global_declarations;
@@ -274,3 +279,4 @@ Program::~Program() {
     delete functions;
     delete main_function;
 }
+

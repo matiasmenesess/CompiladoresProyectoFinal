@@ -81,7 +81,7 @@ struct Libro {
 };
 
 int main() {
-    struct Libro mi_libro = ""C Programming"";
+    struct Libro mi_libro = {""C Programming"", 1978};
     printf("Libro: %s, Publicado en: %d\n", mi_libro.titulo, mi_libro.anio);
     return 0;
 }

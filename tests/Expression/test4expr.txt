@@ -1,0 +1,10 @@
+#include <stdio.h>
+
+int main() {
+    int arr[3] = {1, 2, 3};
+    int* p = arr;
+    int x = *(p + 1); 
+    int u = arr[2]
+    *(p + 2) = 10;
+    return 0;
+}

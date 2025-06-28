@@ -1,17 +1,13 @@
-Contenido del archivo (187 caracteres):
+Contenido del archivo (156 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
-void llenar(int arr[], int n) {
-    for (int i = 0; i < n; ++i) {
-        arr[i] = i;
-    }
-}
-
 int main() {
-    int datos[10];
-    llenar(datos, 10);
-
+    int arr[3] = {1, 2, 3};
+    int* p = arr;
+    int x = *(p + 1); 
+    int u = arr[2]
+    *(p + 2) = 10;
     return 0;
 }
 ----------------------------------------
@@ -21,59 +17,56 @@ Iniciando Scanner:
 
 INCLUDE('#include')
 HEADER_NAME('<stdio.h>')
-VOID('void')
-IDENTIFIER('llenar')
-LEFT_PAREN('(')
-INT('int')
-IDENTIFIER('arr')
-LEFT_BRACKET('[')
-RIGHT_BRACKET(']')
-COMMA(',')
-INT('int')
-IDENTIFIER('n')
-RIGHT_PAREN(')')
-LEFT_BRACE('{')
-FOR('for')
-LEFT_PAREN('(')
-INT('int')
-IDENTIFIER('i')
-ASSIGN('=')
-NUMBER('0')
-SEMICOLON(';')
-IDENTIFIER('i')
-LESS_THAN('<')
-IDENTIFIER('n')
-SEMICOLON(';')
-INCREMENT('++')
-IDENTIFIER('i')
-RIGHT_PAREN(')')
-LEFT_BRACE('{')
-IDENTIFIER('arr')
-LEFT_BRACKET('[')
-IDENTIFIER('i')
-RIGHT_BRACKET(']')
-ASSIGN('=')
-IDENTIFIER('i')
-SEMICOLON(';')
-RIGHT_BRACE('}')
-RIGHT_BRACE('}')
 INT('int')
 MAIN('main')
 LEFT_PAREN('(')
 RIGHT_PAREN(')')
 LEFT_BRACE('{')
 INT('int')
-IDENTIFIER('datos')
+IDENTIFIER('arr')
 LEFT_BRACKET('[')
-NUMBER('10')
+NUMBER('3')
 RIGHT_BRACKET(']')
-SEMICOLON(';')
-IDENTIFIER('llenar')
-LEFT_PAREN('(')
-IDENTIFIER('datos')
+ASSIGN('=')
+LEFT_BRACE('{')
+NUMBER('1')
 COMMA(',')
-NUMBER('10')
+NUMBER('2')
+COMMA(',')
+NUMBER('3')
+RIGHT_BRACE('}')
+SEMICOLON(';')
+INT('int')
+MULTIPLY('*')
+IDENTIFIER('p')
+ASSIGN('=')
+IDENTIFIER('arr')
+SEMICOLON(';')
+INT('int')
+IDENTIFIER('x')
+ASSIGN('=')
+DEREFERENCE('*')
+LEFT_PAREN('(')
+IDENTIFIER('p')
+PLUS('+')
+NUMBER('1')
 RIGHT_PAREN(')')
+SEMICOLON(';')
+INT('int')
+IDENTIFIER('u')
+ASSIGN('=')
+IDENTIFIER('arr')
+LEFT_BRACKET('[')
+NUMBER('2')
+RIGHT_BRACKET(']')
+MULTIPLY('*')
+LEFT_PAREN('(')
+IDENTIFIER('p')
+PLUS('+')
+NUMBER('2')
+RIGHT_PAREN(')')
+ASSIGN('=')
+NUMBER('10')
 SEMICOLON(';')
 RETURN('return')
 NUMBER('0')
@@ -91,15 +84,11 @@ Programa parseado exitosamente
 #include <stdio.h>
 
 
-void llenar(int arr, int n) {
-    for (int i = 0; i < n; ++i) {
-        arr[i] = i;
-    }
-}
-
 int main() {
-    int[10] datos;
-    llenar(datos, 10);
+    int[3] arr = {1, 2, 3};
+    int* p = arr;
+    int x = *(p + 1);
+    int u = arr[2] * (p + 2) = 10;
     return 0;
 }
 

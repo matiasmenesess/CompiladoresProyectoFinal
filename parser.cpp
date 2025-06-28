@@ -7,6 +7,7 @@
 #include "scanner.h"
 #include "token.h"
 using namespace std;
+int next_if_id = 1;
 void Parser::skipComments() {
     while (check(Token::LINE_COMMENT) || check(Token::BLOCK_COMMENT)) {
         if (check(Token::LINE_COMMENT)) {
@@ -251,21 +252,15 @@ Function* Parser::parseFunction(Type* return_type, const string& name) {
     if (!match(Token::LEFT_PAREN)) {
         throw runtime_error("Se esperaba '(' despues del nombre de funcion");
     }
-
-
-
     ParameterList* params = parseParameterList();
 
     if (!match(Token::RIGHT_PAREN)) {
-        throw runtime_error("Se esperaba ')' despues de los parametros de la funcion");
+        throw runtime_error("Se esperaba ')' despues de los parametros de la funcion. Se encontro " + current->text);
     }
-
 
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' antes del cuerpo de la funcion");
     }
-
-
 
     Body* body = parseBody();
 
@@ -277,28 +272,20 @@ Function* Parser::parseFunction(Type* return_type, const string& name) {
     return new Function(return_type, name, params, body);
 }
 MainFunction* Parser::parseMainFunction() {
-
     if (!match(Token::LEFT_PAREN)) {
         throw runtime_error("Se esperaba '(' despues de 'main'");
     }
 
-
     if (!match(Token::RIGHT_PAREN)) {
         throw runtime_error("Se esperaba ')' despues de '(' en la funcion main");
     }
-
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' para el cuerpo de main en linea ");
     }
-
-
-
     Body* body = parseBody();
     if (!match(Token::RIGHT_BRACE)) {
         throw runtime_error("Se esperaba '}' para cerrar main en linea)");
     }
-
-
     return new MainFunction(body);
 
 }
@@ -308,32 +295,23 @@ Type* Parser::parseType() {
 
     if (check(Token::INT)) {
         typeName = "int";
-
-
-
         advance();
     } else if (check(Token::CHAR)) {
         typeName = "char";
-
-
-
         advance();
-    } else if (check(Token::VOID)) {
+    }else if (check(Token::BOOL)) {
+        typeName = "bool";
+        advance();
+    }   
+    else if (check(Token::VOID)) {
         typeName = "void";
-
-
-
         advance();
     } else if (check(Token::STRUCT)) {
-
         advance();
-
         if (!check(Token::IDENTIFIER)) {
             cout << "Error: se esperaba un nombre de struct después de 'struct'." << endl;
             exit(1);
         }
-
-
         typeName = "struct " + current->text;
         advance();
     } else {
@@ -342,18 +320,21 @@ Type* Parser::parseType() {
     }
 
     bool isPointer = false;
-    while (check(Token::MULTIPLY)) {
-        isPointer = true;
-
-
-        advance(); // Consumir cada '*'
+    bool isReference = false;
+    while (check(Token::MULTIPLY) || check(Token::POINTER_DECL) || check(Token::ADDRESS_OF)) {
+          if (check(Token::MULTIPLY) || check(Token::POINTER_DECL)) {
+            isPointer = true;
+        } else if (check(Token::ADDRESS_OF)) {
+            isReference = true;
+        }
+        advance();
+    }
+    if (isPointer && isReference) {
+        cerr << "Error: un parámetro no puede ser puntero y referencia al mismo tiempo." << endl;
+        exit(1);
     }
 
-    if (isPointer) {
-        return new Type(typeName, true);
-    } else {
-        return new Type(typeName);
-    }
+    return new Type(typeName, isPointer, isReference, nullptr);
 }
 
 ParameterList* Parser::parseParameterList() {
@@ -374,11 +355,21 @@ Parameter* Parser::parseParameter() {
         throw runtime_error("Se esperaba un nombre para el parametro.");
     }
     string name = current->text;
-
-
-
     advance();
-    return new Parameter(type, name);
+
+    // Ahora parsea si es un array
+    if (match(Token::LEFT_BRACKET)) {
+        Exp* array_size = nullptr;
+        if (!check(Token::RIGHT_BRACKET)) {
+            array_size = parseExpression();
+        }
+        if (!match(Token::RIGHT_BRACKET)) {
+            throw runtime_error("Se esperaba ']' después del tamaño del array.");
+        }
+        type = new Type(type->type_name, false, true, array_size, type->is_reference);
+    }
+    bool is_ref = type->is_reference || type->is_array;
+    return new Parameter(type, name, is_ref);
 }
 
 Body* Parser::parseBody() {
@@ -389,7 +380,7 @@ Body* Parser::parseBody() {
 VarDecList* Parser::parseVarDecList() {
     VarDecList* vardecs = new VarDecList();
 
-    while (check(Token::INT) || check(Token::CHAR) || check(Token::STRUCT)) {
+    while (check(Token::INT) || check(Token::CHAR) || check(Token::STRUCT) || check(Token::BOOL)) {
 
         vardecs->add(parseVarDec());
         if (!match(Token::SEMICOLON)) {
@@ -411,26 +402,34 @@ VarDec* Parser::parseVarDec() {
             throw runtime_error("Se esperaba un identificador.");
         }
         string name = current->text;
-
-
         advance();
         vars.push_back(name);
-
+        Type* btype = type;
+        if (match(Token::LEFT_BRACKET)) {
+            Exp* array_size = parseExpression();
+            if (!match(Token::RIGHT_BRACKET)) {
+                throw runtime_error("Se esperaba ']' después del tamaño del array.");
+            }
+            type = new Type(btype->type_name, false, true, array_size);
+        }
         if (match(Token::ASSIGN)) {
-
-
-            initializers.push_back(parseExpression());
-        } else {
+            if (check(Token::LEFT_BRACE)) {
+                advance();
+                std::vector<Exp*> inits;
+                inits.push_back(parseExpression());
+                while (match(Token::COMMA)) {
+                    inits.push_back(parseExpression());
+                }
+                if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar la lista de inicializadores.");
+                initializers.push_back(new ArrayInitializerExp(inits));
+            } else {
+                initializers.push_back(parseExpression());
+            }        } else {
             initializers.push_back(nullptr);
         }
-
         if (check(Token::COMMA)) {
-
-
         }
-
     } while (match(Token::COMMA));
-
     VarDec* vd = new VarDec(type, vars);
     for(auto init : initializers) {
         if(init) vd->add_initializer(init);
@@ -469,14 +468,12 @@ Stm* Parser::parseIfStatement() {
 
     Body* if_body = parseBody();
     if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar el cuerpo del if.");
-
-
-
+    int if_id = next_if_id++;
     Stm* else_chain = nullptr;
     if (match(Token::ELSE_IF)) {
-        else_chain = parseElseIfStatement();
+        else_chain = parseElseIfStatement(if_id);
     } else if (match(Token::ELSE)) {
-        else_chain = parseElseStatement();
+        else_chain = parseElseStatement(if_id);
     }
 
 
@@ -484,7 +481,7 @@ Stm* Parser::parseIfStatement() {
     return new IfStatement(cond, if_body, else_chain);
 }
 
-Stm *Parser::parseElseIfStatement() {
+Stm *Parser::parseElseIfStatement(int if_id) {
     if (!match(Token::LEFT_PAREN)) {
         throw runtime_error("Se esperaba '(' despues de 'else if'.");
     }
@@ -494,32 +491,27 @@ Stm *Parser::parseElseIfStatement() {
     if (!match(Token::RIGHT_PAREN)) {
         throw runtime_error("Se esperaba ')' después de la condición else if");
     }
-
-    // Add missing brace handling
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' para el cuerpo del else if.");
     }
 
-
     Body* else_if_body = parseBody();
-
     if (!match(Token::RIGHT_BRACE)) {
         throw runtime_error("Se esperaba '}' para cerrar el cuerpo del else if.");
     }
-
-
+    int else_if_id = next_if_id++;
     Stm* next_chain = nullptr;
     if (match(Token::ELSE_IF)) {
-        next_chain = parseElseIfStatement();
+        next_chain = parseElseIfStatement(if_id);
     }
     else if (match(Token::ELSE)) {
-        next_chain = parseElseStatement();
+        next_chain = parseElseStatement(if_id);
     }
     return new ElseIfStatement(ElseIfStatement::ELSE_IF, else_if_cond,
-                             else_if_body, next_chain);
+                             else_if_body, next_chain, else_if_id, if_id);
 }
 
-Stm* Parser::parseElseStatement() {
+Stm* Parser::parseElseStatement(int if_id) {
 
     if (!match(Token::LEFT_BRACE)) {
         throw runtime_error("Se esperaba '{' para el cuerpo del else.");
@@ -532,8 +524,8 @@ Stm* Parser::parseElseStatement() {
         throw runtime_error("Se esperaba '}' para cerrar el cuerpo del else.");
     }
 
-
-    return new ElseIfStatement(ElseIfStatement::ELSE, nullptr, else_body, nullptr);
+    int else_id = next_if_id++;
+    return new ElseIfStatement(ElseIfStatement::ELSE, nullptr, else_body, nullptr, else_id, if_id);
 }
 
 Stm* Parser::parseWhileStatement() {
@@ -554,34 +546,21 @@ Stm* Parser::parseWhileStatement() {
 }
 Stm* Parser::parseForStatement() {
 
-
     if (!match(Token::LEFT_PAREN)) {
         cout << "Error: se esperaba '('." << endl;
         exit(1);
     }
-
-
     VarDec* init = parseVarDec();
-    
-    
-
     if (!match(Token::SEMICOLON)) {
         cout << "Error: se esperaba ';'." << endl;
         exit(1);
     }
-
-
-
     Exp* e1 = parseExpression();
-
     if (!match(Token::SEMICOLON)) {
         cout << "Error: se esperaba ';'." << endl;
         exit(1);
     }
-
-
     Exp* e2 = parseExpression();
-
     if (!match(Token::RIGHT_PAREN)) {
         cout << "Error: se esperaba ')'." << endl;
         exit(1);

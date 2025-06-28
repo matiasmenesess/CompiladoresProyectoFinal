@@ -48,8 +48,8 @@ private:
     Stm* parsePrintfStatement();
     Stm* parseExpressionStatement();
     Stm* parseVarDeclaration();
-    Stm* parseElseStatement();
-    Stm* parseElseIfStatement();
+    Stm* parseElseStatement(int parentId);
+    Stm* parseElseIfStatement(int parentId);
 
     VarDec* parseVarDec();
     VarDecList* parseVarDecList();

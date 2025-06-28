@@ -172,6 +172,8 @@ Token* Scanner::nextToken() {
             token = new Token(Token::CHAR, word);
         } else if (word == "void") {
             token = new Token(Token::VOID, word);
+        }else if (word == "bool") {
+            token = new Token(Token::BOOL, word);
         } else if (word == "struct") {
             token = new Token(Token::STRUCT, word);
         }else if (word == "if") {
@@ -226,7 +228,7 @@ Token* Scanner::nextToken() {
             } else {
                 return new Token(Token::MINUS, '-');
             }
-
+        
         case '*':
             current++;
             if (current < input.length() && input[current] == '=') {
@@ -351,6 +353,8 @@ Token* Scanner::nextToken() {
         case '.':
             current++;
             return new Token(Token::DOT, '.');
+
+       
         default:
             current++;
             return new Token(Token::ERROR, c);

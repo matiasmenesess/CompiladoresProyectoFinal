@@ -260,7 +260,7 @@ int main() {
     char* mensaje = ""Hola mundo!"";
     int x = 5 / 1;
     int* ptr = &x;
-    struct Persona p = ""Juan"";
+    struct Persona p = {""Juan"", 20};
     printf("Mensaje: %s\n", mensaje);
     printf("Factorial de %d es %d\n", x, factorial(x));
     printf("Persona: %s, %d anos\n", p.nombre, p.edad);

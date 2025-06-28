@@ -1,4 +1,4 @@
-Contenido del archivo (182 caracteres):
+Contenido del archivo (481 caracteres):
 ----------------------------------------
 #include <stdio.h>
 
@@ -8,6 +8,25 @@ int main() {
     bool f = true;
     bool g = false;
     if (f && g){
+        if (1>8){
+            printf("Resultado: %d\n", z);
+
+        }else{
+            printf("Resultado: %d\n", z);
+
+        }
+
+    }
+    else if (f || g){
+        if (1>8){
+            printf("Resultado: %d\n", z);
+
+        }else{
+            printf("Resultado: %d\n", z);
+
+        }
+
+    }else{
         printf("Resultado: %d\n", z);
 
     }
@@ -36,15 +55,15 @@ ASSIGN('=')
 INCREMENT('++')
 IDENTIFIER('y')
 SEMICOLON(';')
-IDENTIFIER('bool')
+BOOL('bool')
 IDENTIFIER('f')
 ASSIGN('=')
-IDENTIFIER('true')
+TRUE('')
 SEMICOLON(';')
-IDENTIFIER('bool')
+BOOL('bool')
 IDENTIFIER('g')
 ASSIGN('=')
-IDENTIFIER('false')
+FALSE('')
 SEMICOLON(';')
 IF('if')
 LEFT_PAREN('(')
@@ -52,6 +71,67 @@ IDENTIFIER('f')
 LOGICAL_AND('&&')
 IDENTIFIER('g')
 RIGHT_PAREN(')')
+LEFT_BRACE('{')
+IF('if')
+LEFT_PAREN('(')
+NUMBER('1')
+GREATER_THAN('>')
+NUMBER('8')
+RIGHT_PAREN(')')
+LEFT_BRACE('{')
+PRINTF('printf')
+LEFT_PAREN('(')
+FORMAT_STRING('"Resultado: %d\n"')
+COMMA(',')
+IDENTIFIER('z')
+RIGHT_PAREN(')')
+SEMICOLON(';')
+RIGHT_BRACE('}')
+ELSE('else')
+LEFT_BRACE('{')
+PRINTF('printf')
+LEFT_PAREN('(')
+FORMAT_STRING('"Resultado: %d\n"')
+COMMA(',')
+IDENTIFIER('z')
+RIGHT_PAREN(')')
+SEMICOLON(';')
+RIGHT_BRACE('}')
+RIGHT_BRACE('}')
+ELSE_IF('else if')
+LEFT_PAREN('(')
+IDENTIFIER('f')
+LOGICAL_OR('||')
+IDENTIFIER('g')
+RIGHT_PAREN(')')
+LEFT_BRACE('{')
+IF('if')
+LEFT_PAREN('(')
+NUMBER('1')
+GREATER_THAN('>')
+NUMBER('8')
+RIGHT_PAREN(')')
+LEFT_BRACE('{')
+PRINTF('printf')
+LEFT_PAREN('(')
+FORMAT_STRING('"Resultado: %d\n"')
+COMMA(',')
+IDENTIFIER('z')
+RIGHT_PAREN(')')
+SEMICOLON(';')
+RIGHT_BRACE('}')
+ELSE('else')
+LEFT_BRACE('{')
+PRINTF('printf')
+LEFT_PAREN('(')
+FORMAT_STRING('"Resultado: %d\n"')
+COMMA(',')
+IDENTIFIER('z')
+RIGHT_PAREN(')')
+SEMICOLON(';')
+RIGHT_BRACE('}')
+RIGHT_BRACE('}')
+ELSE('else')
 LEFT_BRACE('{')
 PRINTF('printf')
 LEFT_PAREN('(')
@@ -71,5 +151,35 @@ Scanner completado exitosamente
 === FASE 2: PARSER ===
 Iniciando parser...
 
+Programa parseado exitosamente
 
-Error durante el analisis: Se esperaba ';' despues de la expresion.
+=== FASE 3: VISITANTE DE IMPRESION ===
+#include <stdio.h>
+
+
+int main() {
+    int y = 5;
+    int z = ++y;
+    bool f = true;
+    bool g = false;
+    if (f && g) {
+        if (1 > 8) {
+            printf("Resultado: %d\n", z);
+        } else {
+            printf("Resultado: %d\n", z);
+        }
+    }else if (f || g) {
+        if (1 > 8) {
+            printf("Resultado: %d\n", z);
+        } else {
+            printf("Resultado: %d\n", z);
+        }
+    } else {
+        printf("Resultado: %d\n", z);
+    }
+    return 0;
+}
+
+Impresion del programa completada.
+
+=== ANALISIS COMPLETADO EXITOSAMENTE ===

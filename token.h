@@ -76,7 +76,10 @@ public:
 
         MAIN,
         PRINTF,
-
+        TRUE,
+        FALSE,
+        BOOL,
+        BIT_AND,
         END_OF_FILE,
         ERROR,
         UNKNOWN

@@ -24,6 +24,7 @@ class NumberExp;
 class BoolExp;
 class CharExp;
 class StringExp;
+class BoolExp;
 class IdentifierExp;
 class FunctionCallExp;
 class ArrayAccessExp;
@@ -49,7 +50,10 @@ class FunctionList;
 class MainFunction;
 class StructDeclaration;
 class StructDeclarationList;
+class ArrayInitializerExp;
 class Program;
+
+
 class Visitor {
 public:
 
@@ -72,7 +76,7 @@ public:
     virtual int visit(ArrayAccessExp* exp) = 0;
     virtual int visit(MemberAccessExp* exp) = 0;
     virtual int visit(ParenExp* exp) = 0;
-
+    virtual int visit(ArrayInitializerExp* exp) = 0;
     // Statements
     virtual void visit(PrintfStatement* stm) = 0;
     virtual void visit(IfStatement* stm) = 0;
@@ -123,6 +127,7 @@ public:
     int visit(ArrayAccessExp* exp) ;
     int visit(MemberAccessExp* exp) ;
     int visit(ParenExp* exp) ;
+    int visit(ArrayInitializerExp* exp) ;
 
     void visit(PrintfStatement* stm) ;
     void visit(IfStatement* stm) ;
@@ -151,10 +156,8 @@ public:
 class GenCodeVisitor : public Visitor {
 public:
      std::ostream& out;
-
     Environment* env;
     int cantidad = 1;
-
     void gencode(Program* program);
     void visit(Include* inc) ;
     void visit(IncludeList* incList) ;
@@ -163,7 +166,6 @@ public:
     int visit(AssignExp* exp) ;
     int visit(UnaryExp* exp) ;
     int visit(NumberExp* exp) ;
-    int visit(BoolExp* exp) ;
     int visit(CharExp* exp) ;
     int visit(StringExp* exp) ;
     int visit(IdentifierExp* exp) ;
@@ -171,6 +173,8 @@ public:
     int visit(ArrayAccessExp* exp) ;
     int visit(MemberAccessExp* exp) ;
     int visit(ParenExp* exp) ;
+    int visit(BoolExp* exp) ;
+    int visit(ArrayInitializerExp* exp) ;
 
     void visit(PrintfStatement* stm) ;
     void visit(IfStatement* stm) ;
@@ -195,6 +199,8 @@ public:
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
 };
+
+
 /*
 
 class TypeChecker : public Visitor {
