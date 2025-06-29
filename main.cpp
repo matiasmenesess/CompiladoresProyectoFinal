@@ -33,6 +33,9 @@ int main(int argc, const char *argv[]){
         cout << "Parseando..." << endl;
         Program *program = parser.parseProgram();
         cout << "Parseo exitoso" << endl;
+        cout << "Print visitor"<< endl;
+        PrintVisitor printVisitor;
+        printVisitor.imprimir(program);
         string inputFile(argv[1]);
         size_t dotPos = inputFile.find_last_of('.');
         string baseName = (dotPos == string::npos) ? inputFile : inputFile.substr(0, dotPos);

@@ -473,7 +473,13 @@ void PrintVisitor::visit(GlobalVarDecList* global_vardec_list) {
 
 void PrintVisitor::visit(Parameter* param) {
     param->type->accept(this);
+    if(param->is_reference) {
+        cout << "&";
+    }
     cout << " " << param->name;
+     if(param->type->is_array) {
+        cout << "[]";
+    }
 }
 
 void PrintVisitor::visit(ParameterList* param_list) {
@@ -522,6 +528,7 @@ void PrintVisitor::visit(Function* func) {
     printIndent();
     cout << "}" << endl << endl;
 }
+
 void PrintVisitor::visit(FunctionList* func_list) {
     for (auto& func : func_list->functions) {
         func->accept(this);
@@ -651,45 +658,48 @@ void GenCodeVisitor::gencode(Program* program) {
     out << "print_fmt: .string \"%ld\\n\"" << endl;
 
     // Generar variables globales
-    if (program->global_declarations)
+    if (program->global_declarations) {
         program->global_declarations->accept(this);
+    }
 
     out << ".text" << endl;
     out << ".globl main" << endl;
 
-    if (program->functions)
+    // Generar funciones primero
+    if (program->functions) {
         program->functions->accept(this);
+    }
 
+    // Generar main
     out << "main:" << endl;
     out << "    pushq %rbp" << endl;
     out << "    movq %rsp, %rbp" << endl;
 
-    int total_vars = 0;
+    // Espacio para variables locales
+    int stack_space = 0;
     if (program->main_function && program->main_function->body && program->main_function->body->vardecs) {
         for (auto vardec : program->main_function->body->vardecs->vardecs) {
-            total_vars += vardec->vars.size();
+            stack_space += vardec->vars.size() * 8;
         }
     }
 
-    if (total_vars > 0) {
-        out << "    subq $" << (total_vars * 8) << ", %rsp" << endl;
+    if (stack_space > 0) {
+        out << "    subq $" << stack_space << ", %rsp" << endl;
     }
 
-    // Agregar nivel para main
     env->add_level();
-
-    if (program->main_function)
+    if (program->main_function) {
         program->main_function->accept(this);
-
-    // Remover nivel de main
+    }
     env->remove_level();
 
+    // Retorno de main
     out << "    movl $0, %eax" << endl;
     out << "    leave" << endl;
     out << "    ret" << endl;
+    
     out << ".section .note.GNU-stack,\"\",@progbits" << endl;
 }
-
 // --- Expresiones ---
 
 int GenCodeVisitor::visit(NumberExp* exp) {
@@ -1028,28 +1038,43 @@ int GenCodeVisitor::visit(ArrayInitializerExp* exp) {
 
 
 void GenCodeVisitor::visit(PrintfStatement* stm) {
-    // Preparar argumentos para printf
-    for (int i = stm->arguments.size() - 1; i >= 0; --i) {
-        stm->arguments[i]->accept(this);
-        out << "    pushq %rax" << endl;
-    }
-    // Generar un label único para el formato
+    // Generar string de formato
     static int fmt_count = 0;
-    std::string fmt_label = "printf_fmt_" + std::to_string(fmt_count++);
+    string fmt_label = "printf_fmt_" + to_string(fmt_count++);
+    
     out << ".section .rodata" << endl;
-    out << fmt_label << ": .string \"" << stm->format_string << "\"" << endl;
+    out << fmt_label << ": .string " << stm->format_string  << endl;
     out << ".text" << endl;
-
+    
+    // Cargar dirección del formato
     out << "    leaq " << fmt_label << "(%rip), %rdi" << endl;
-    out << "    movl $0, %eax" << endl;  // No hay argumentos vectoriales
+    
+    // Procesar argumentos
+    const char* arg_regs[] = {"%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+    int reg_index = 0;
+    int stack_args = 0;
+    
+    for (auto arg : stm->arguments) {
+        arg->accept(this);  // Resultado en %rax
+        
+        if (reg_index < 5) {
+            out << "    movq %rax, " << arg_regs[reg_index] << endl;
+            reg_index++;
+        } else {
+            out << "    pushq %rax" << endl;
+            stack_args++;
+        }
+    }
+    
+    // Para variádicas, RAX = número de registros vectoriales usados (0)
+    out << "    movl $0, %eax" << endl;
     out << "    call printf" << endl;
-
-    // Limpiar stack
-    if (stm->arguments.size() > 0) {
-        out << "    addq $" << (stm->arguments.size() * 8) << ", %rsp" << endl;
+    
+    // Limpiar argumentos de pila
+    if (stack_args > 0) {
+        out << "    addq $" << (stack_args * 8) << ", %rsp" << endl;
     }
 }
-
 void GenCodeVisitor::visit(IfStatement* stm) {
     if (!stm) return;
 
@@ -1173,13 +1198,7 @@ void GenCodeVisitor::visit(ExpressionStatement* stm) {
         stm->expression->accept(this);
 }
 
-void GenCodeVisitor::visit(ReturnStatement* stm) {
-    if (stm->return_value)
-        stm->return_value->accept(this);
 
-    out << "    leave" << endl;
-    out << "    ret" << endl;
-}
 
 void GenCodeVisitor::visit(VarDec* stm) {
 
@@ -1312,127 +1331,87 @@ void GenCodeVisitor::visit(Function* func) {
     out << "    pushq %rbp" << endl;
     out << "    movq %rsp, %rbp" << endl;
 
-    // Calcular espacio necesario para variables locales
+    // Calcular espacio para variables locales
     int stack_space = 0;
     if (func->body && func->body->vardecs) {
         for (auto vardec : func->body->vardecs->vardecs) {
-            for (auto var : vardec->vars) {
-                stack_space += 8; // Todos los tipos ocupan 8 bytes (incluyendo char/bool por alineación)
-            }
+            stack_space += vardec->vars.size() * 8;
         }
     }
-
-    // Reservar espacio en stack
+    
     if (stack_space > 0) {
         out << "    subq $" << stack_space << ", %rsp" << endl;
     }
 
-    out << "    pushq %rbx" << endl;
-    out << "    pushq %r12" << endl;
-    out << "    pushq %r13" << endl;
-    out << "    pushq %r14" << endl;
-    out << "    pushq %r15" << endl;
-
-    FunctionInfo info;
-    info.return_type = func->return_type->type_name;
-    info.stack_size = stack_space + 40; // 5 registros * 8 bytes
+    // Guardar parámetros en el stack si es necesario
     if (func->parameters) {
+        const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
         for (size_t i = 0; i < func->parameters->parameters.size(); ++i) {
-            auto param = func->parameters->parameters[i];
-
-            if (param->is_reference) {
-                if (i < 6) {
-                    static const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-                    out << "    movq " << regs[i] << ", " << (i * 8) << "(%rbp)\n";
-                    env->add_var(param->name, (i * 8), param->type->type_name, true, false);
-                } else {
-                    int offset = 16 + (i - 6) * 8; // 16 por callq + push %rbp
-                    env->add_var(param->name, offset, param->type->type_name, true, false);
-                }
-            } else {
-                FunctionParamInfo param_info;
-                param_info.type = param->type->type_name;
-                param_info.is_pointer = param->type->is_pointer;
-                param_info.is_array = param->type->is_array;
-                param_info.offset = 0;
-                param_info.reg_index = (i < 6) ? i : -1;
-                info.params.push_back(param_info);
-            }
+            int offset = -8 * (i + 1);  // Parámetros en posiciones negativas desde rbp
+            out << "    movq " << regs[i] << ", " << offset << "(%rbp)" << endl;
+            
+            // Registrar variable en el entorno
+            env->add_var(func->parameters->parameters[i]->name, 
+                        offset,
+                        func->parameters->parameters[i]->type->type_name,
+                        func->parameters->parameters[i]->type->is_pointer,
+                        func->parameters->parameters[i]->type->is_array);
         }
     }
-    env->add_function(func->name, info);
 
-    if (func->parameters) {
-        func->parameters->accept(this);
-    }
-
+    // Generar cuerpo de la función
     env->add_level();
     if (func->body) {
         func->body->accept(this);
     }
     env->remove_level();
 
-    out << "    popq %r15" << endl;
-    out << "    popq %r14" << endl;
-    out << "    popq %r13" << endl;
-    out << "    popq %r12" << endl;
-    out << "    popq %rbx" << endl;
+    // Epílogo
+    out << "    leave" << endl;
+    out << "    ret" << endl;
+}
+void GenCodeVisitor::visit(ReturnStatement* stm) {
+    if (stm->return_value)
+        stm->return_value->accept(this);
 
     out << "    leave" << endl;
     out << "    ret" << endl;
 }
 
 int GenCodeVisitor::visit(FunctionCallExp* exp) {
-    if (!env->has_function(exp->function_name)) {
-        cerr << "Error: Función '" << exp->function_name << "' no declarada" << endl;
-        exit(1);
-    }
-    auto func_info = env->get_function(exp->function_name);
-
+    // Preparar argumentos
+    const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
     int stack_args = 0;
+    
     for (int i = 0; i < exp->arguments.size(); ++i) {
-        auto& param_info = func_info.params[i];
-        bool is_ref = param_info.is_pointer || param_info.is_array; // o tu flag de referencia
-
-        if (is_ref) {
-            // Solo soporta paso de variables locales por referencia
-            if (auto id = dynamic_cast<IdentifierExp*>(exp->arguments[i])) {
-                int var_offset = env->lookup(id->name).offset;
-                out << "    leaq " << var_offset << "(%rbp), %rax\n";
-            } else {
-                cerr << "Error: Solo se puede pasar variables por referencia/array\n";
-                exit(1);
-            }
-        } else {
-            exp->arguments[i]->accept(this);
-        }
-
+        exp->arguments[i]->accept(this); // Código del argumento en %rax
+        
         if (i < 6) {
-            static const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-            out << "    movq %rax, " << regs[i] << "\n";
+            out << "    movq %rax, " << regs[i] << endl;  // Primeros 6 en registros
         } else {
-            out << "    pushq %rax\n";
+            out << "    pushq %rax" << endl;  // Resto en pila
             stack_args++;
         }
     }
-
+    
+    // Alineación de pila (16-byte boundary)
     if ((stack_args % 2) != 0) {
         out << "    subq $8, %rsp" << endl;
     }
-
+    
     out << "    call " << exp->function_name << endl;
-
+    
+    // Limpiar argumentos de la pila
     if (stack_args > 0) {
-        out << "    addq $" << (stack_args * 8)<< ", %rsp" << endl;
+        out << "    addq $" << (stack_args * 8) << ", %rsp" << endl;
     }
-
+    
+    // Restaurar alineación si se ajustó
     if ((stack_args % 2) != 0) {
         out << "    addq $8, %rsp" << endl;
     }
-
     return 0;
 }
-
 void GenCodeVisitor::visit(FunctionList* funcList) {
     for (auto func : funcList->functions) {
         func->accept(this);

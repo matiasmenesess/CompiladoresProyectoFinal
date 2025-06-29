@@ -1,0 +1,6 @@
+Inicio del main
+Archivo leído correctamente
+Parseando...
+Parseo exitoso
+Generando código...
+Error durante la ejecución: std::bad_alloc
