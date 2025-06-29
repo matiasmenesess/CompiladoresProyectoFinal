@@ -5,6 +5,7 @@ print_fmt: .string "%ld\n"
 main:
     pushq %rbp
     movq %rsp, %rbp
+# Cantidad de globales: 0
 .section .rodata
 printf_fmt_0: .string "Iniciando bucle for:\n"
 .text

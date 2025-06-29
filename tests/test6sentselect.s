@@ -5,7 +5,8 @@ print_fmt: .string "%ld\n"
 main:
     pushq %rbp
     movq %rsp, %rbp
-    subq $8, %rsp
+    subq $16, %rsp
+# Cantidad de globales: 0
     movq $5, %rax
     movq %rax, -8(%rbp)  # contador
 .section .rodata
@@ -42,7 +43,7 @@ printf_fmt_1: .string "%d...\n"
     subq %rcx, %rax
     pushq %rax
     popq %rax
-    movq %rax, -8(%rbp)  # contador = valor
+    movq %rax, -8(%rbp)  # contador
     jmp .Lwhile1
 .Lendwhile2:
 .section .rodata
@@ -52,9 +53,6 @@ printf_fmt_2: .string "¡Despegue!\n"
     movl $0, %eax
     call printf
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

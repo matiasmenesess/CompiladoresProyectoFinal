@@ -1,13 +1,17 @@
 #include <stdio.h>
 
+
+
 int suma(int& a, int b) {
-    a = a + b;
+    a = a+b;
     return a;
 }
 
 int main() {
-    int a = 22;
-    int b = 3;
+    int a = 10;
+    int c = 30;
+    printf("Entero: %d, Caracter: %c\n", c, 'c');
+    int b = 20;
     int resultado = suma(a, b);
     printf("La suma es: %d\n", a);
     return 0;

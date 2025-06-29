@@ -22,7 +22,7 @@ int IncludeList::accept(Visitor *visitor) {
 }
 
 int Type::accept(Visitor *visitor) {
-    visitor->visit(this);
+     visitor->visit(this);
     return 0;
 }
 
@@ -133,6 +133,7 @@ int GlobalVarDecList::accept(Visitor *visitor) {
     return 0;
 }
 
+
 int Parameter::accept(Visitor *visitor) {
     visitor->visit(this);
     return 0;
@@ -167,6 +168,7 @@ int MainFunction::accept(Visitor *visitor) {
     visitor->visit(this);
     return 0;
 }
+
 
 int StructDeclaration::accept(Visitor *visitor) {
     visitor->visit(this);
@@ -294,6 +296,7 @@ int PrintVisitor::visit(MemberAccessExp* exp) {
     return 0;
 }
 
+
 int PrintVisitor::visit(ParenExp* exp) {
     cout << "(";
     exp->inner->accept(this);
@@ -386,7 +389,7 @@ void PrintVisitor::visit(ForStatement* stm) {
     printIndent();
     cout << "for (";
     if (stm->init) {
-        stm->init->type->accept(this);
+        stm->init->types[0]->accept(this);
         cout << " ";
         for (size_t i = 0; i < stm->init->vars.size(); ++i) {
             cout << stm->init->vars[i];
@@ -433,19 +436,19 @@ void PrintVisitor::visit(ReturnStatement* stm) {
 
 void PrintVisitor::visit(VarDec* vardec) {
     printIndent();
-    vardec->type->accept(this);
-    cout << " ";
     for (size_t i = 0; i < vardec->vars.size(); ++i) {
-        cout << vardec->vars[i];
-        if (!vardec->initializers.empty() && i < vardec->initializers.size()) {
+        if (i < vardec->types.size() && vardec->types[i]) {
+            vardec->types[i]->accept(this); // <-- Esto imprime el tipo
+        } else {
+            cout << "/*tipo?*/";
+        }
+        cout << " " << vardec->vars[i];
+        if (!vardec->initializers.empty() && i < vardec->initializers.size() && vardec->initializers[i]) {
             cout << " = ";
             vardec->initializers[i]->accept(this);
         }
-        if (i < vardec->vars.size() - 1) {
-            cout << ", ";
-        }
+        cout << ";" << endl;
     }
-    cout << ";" << endl;
 }
 
 void PrintVisitor::visit(VarDecList* vardec_list) {
@@ -497,17 +500,20 @@ void PrintVisitor::visit(StatementList* stm_list) {
     }
 }
 
+
+
 void PrintVisitor::visit(Body* b) {
-    if (b->vardecs) {
-        b->vardecs->accept(this);
+    if (b->elements.empty()) {
+        cout << "/* Empty body */" << endl;
+        return;
     }
-    if (b->slist) {
-        b->slist->accept(this);
+    for (auto& elem : b->elements) {
+        elem->accept(this);
     }
 }
 
 void PrintVisitor::visit(Function* func) {
-    if (!func) return;  // Verificación de null
+    if (!func) return; 
 
     printIndent();
     if (func->return_type) {
@@ -554,7 +560,7 @@ void PrintVisitor::visit(StructDeclaration* struct_decl) {
     if (struct_decl->members) {
         for (auto member : struct_decl->members->vardecs) {
             printIndent();
-            member->type->accept(this);
+            member->types[0]->accept(this);
             cout << " ";
             for (size_t i = 0; i < member->vars.size(); ++i) {
                 cout << member->vars[i];
@@ -588,8 +594,6 @@ void PrintVisitor::imprimir(Program* program) {
         program->includes->accept(this);
         cout << endl;
     }
-
-
 
     // Print global declarations
     if (program->global_declarations) {
@@ -656,12 +660,15 @@ void TypeChecker::visit(PrintfStatement *stm) {
 void GenCodeVisitor::gencode(Program* program) {
     out << ".data" << endl;
     out << "print_fmt: .string \"%ld\\n\"" << endl;
+    int stack_space = 0;
 
     // Generar variables globales
     if (program->global_declarations) {
-        program->global_declarations->accept(this);
-    }
+        for (auto dec : program->global_declarations->global_vardecs) {
+            out << dec->var_name << ": .quad 0" << endl;
+        }
 
+    }
     out << ".text" << endl;
     out << ".globl main" << endl;
 
@@ -676,15 +683,30 @@ void GenCodeVisitor::gencode(Program* program) {
     out << "    movq %rsp, %rbp" << endl;
 
     // Espacio para variables locales
-    int stack_space = 0;
-    if (program->main_function && program->main_function->body && program->main_function->body->vardecs) {
-        for (auto vardec : program->main_function->body->vardecs->vardecs) {
-            stack_space += vardec->vars.size() * 8;
+    if (program->main_function && program->main_function->body) {
+        for (auto elem : program->main_function->body->elements) {
+            if (auto vardec = dynamic_cast<VarDec*>(elem)) {
+                stack_space += vardec->vars.size() * 8;
+            }
         }
     }
+    if (stack_space % 16 != 0) stack_space += 8;
 
     if (stack_space > 0) {
         out << "    subq $" << stack_space << ", %rsp" << endl;
+    }
+
+    // *** Inicialización de variables globales ***
+    if (program->global_declarations) {
+        out << "# Cantidad de globales: " << program->global_declarations->global_vardecs.size() << endl;
+
+        for (auto dec : program->global_declarations->global_vardecs) {
+            out<<"# Variablles globales inicializadas" <<dec->var_name << endl;
+            if (dec->initializer) {
+                dec->initializer->accept(this); // genera instrucciones para calcular el valor en %rax
+                out << "    movq %rax, " << dec->var_name << "(%rip)" << endl;
+            }
+        }
     }
 
     env->add_level();
@@ -693,11 +715,8 @@ void GenCodeVisitor::gencode(Program* program) {
     }
     env->remove_level();
 
-   
-    
     out << ".section .note.GNU-stack,\"\",@progbits" << endl;
 }
-// --- Expresiones ---
 
 int GenCodeVisitor::visit(NumberExp* exp) {
     out << "    movq $" << exp->value << ", %rax" << endl;
@@ -734,11 +753,121 @@ int GenCodeVisitor::visit(IdentifierExp* exp) {
         out << "    movq (" << regs[info.reg_index] << "), %rax  # Valor de " << exp->name << endl;
     } else if (info.reg_index >= 0) {
         out << "    movq " << regs[info.reg_index] << ", %rax  # Valor de " << exp->name << endl;
-    } else {
+    } else if (info.offset != 0) {
         out << "    movq " << info.offset << "(%rbp), %rax  # " << exp->name << endl;
+    } else {
+        // GLOBAL VARIABLE
+        out << "    movq " << exp->name << "(%rip), %rax  # " << exp->name << endl;
     }
     return 0;
 }
+
+
+int GenCodeVisitor::visit(AssignExp* exp) {
+    // Evaluar lado derecho
+    exp->right->accept(this);
+    out << "    pushq %rax" << endl;
+
+    // Lado izquierdo
+    if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
+        VarInfo info = env->lookup(id->name);
+        out << "    popq %rax" << endl;
+        const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+        if (info.is_reference && info.reg_index >= 0) {
+            out << "    movq %rax, (" << regs[info.reg_index] << ")  # " << id->name << " (por referencia)" << endl;
+        } else if (info.reg_index >= 0) {
+            out << "    movq %rax, " << regs[info.reg_index] << "  # " << id->name << " (por valor en registro)" << endl;
+        } else if (info.offset != 0) {
+            out << "    movq %rax, " << info.offset << "(%rbp)  # " << id->name << endl;
+        } else {
+            // GLOBAL VARIABLE
+            out << "    movq %rax, " << id->name << "(%rip)  # global " << id->name << endl;
+        }
+    } else {
+        cerr << "Error: Asignación a expresión no identificador" << endl;
+        exit(1);
+    }
+    return 0;
+}
+
+int GenCodeVisitor::visit(UnaryExp* exp) {
+    exp->uexp->accept(this);
+
+    switch (exp->op) {
+        case NEGACION_OP:
+            out << "    testq %rax, %rax" << endl;
+            out << "    movl $0, %ecx" << endl;
+            out << "    sete %cl" << endl;
+            out << "    movq %rcx, %rax" << endl;
+            break;
+        case UNARY_MINUS_OP:
+            out << "    negq %rax" << endl;
+            break;
+        case UNARY_PLUS_OP:
+            // No hace nada, el valor ya está en %rax
+            break;
+        case PLUS_PLUS_OP: {
+            if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
+                if (!env->check(id->name)) {
+                    cerr << "Error: Variable no declarada: " << id->name << endl;
+                    exit(1);
+                }
+                int offset = env->lookup(id->name).offset;
+                if (exp->is_prefix) {
+                
+                    // ++var
+                    out << "    incq %rax" << endl;
+                    out << "    movq %rax, " << offset << "(%rbp)" << endl;
+                } else {
+                    // var++
+                    out << "    movq %rax, %rcx" << endl;
+                    out << "    incq %rcx" << endl;
+                    out << "    movq %rcx, " << offset << "(%rbp)" << endl;
+                }
+            }
+            break;
+        }
+        case MINUS_MINUS_OP: {
+            if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
+                if (!env->check(id->name)) {
+                    cerr << "Error: Variable no declarada: " << id->name << endl;
+                    exit(1);
+                }
+                int offset = env->lookup(id->name).offset;
+                if (exp->is_prefix) {
+                    // --var
+                    out << "    decq %rax" << endl;
+                    out << "    movq %rax, " << offset << "(%rbp)" << endl;
+                } else {
+                    // var--
+                    out << "    movq %rax, %rcx" << endl;
+                    out << "    decq %rcx" << endl;
+                    out << "    movq %rcx, " << offset << "(%rbp)" << endl;
+                }
+            }
+            break;
+        }
+        case ADDRESS_OF_OP: {
+            if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
+                if (!env->check(id->name)) {
+                    cerr << "Error: Variable no declarada: " << id->name << endl;
+                    exit(1);
+                }
+                int offset = env->lookup(id->name).offset;
+                out << "    leaq " << offset << "(%rbp), %rax  # &" << id->name << endl;
+            }
+            break;
+        }
+        case DEREFERENCE_OP:
+            out << "    movq (%rax), %rax  # *ptr" << endl;
+            break;
+        default:
+            out << "    # Operador unario no implementado: " << exp->op << endl;
+            break;
+    }
+    return 0;
+}
+
 int GenCodeVisitor::visit(BinaryExp* exp) {
     // Evaluar operando izquierdo
     exp->left->accept(this);
@@ -887,108 +1016,6 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
     return 0;
 }
 
-int GenCodeVisitor::visit(AssignExp* exp) {
-    // Evaluar lado derecho
-    exp->right->accept(this);
-    out << "    pushq %rax" << endl;
-
-    // Lado izquierdo
-    if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
-        VarInfo info = env->lookup(id->name);
-        out << "    popq %rax" << endl;
-        const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-        if (info.is_reference && info.reg_index >= 0) {
-            // Asignar a través de la dirección en el registro
-            out << "    movq %rax, (" << regs[info.reg_index] << ")  # " << id->name << " (por referencia)" << endl;
-        } else if (info.reg_index >= 0) {
-            out << "    movq %rax, " << regs[info.reg_index] << "  # " << id->name << " (por valor en registro)" << endl;
-        } else {
-            out << "    movq %rax, " << info.offset << "(%rbp)  # " << id->name << endl;
-        }
-    } else {
-        cerr << "Error: Asignación a expresión no identificador" << endl;
-        exit(1);
-    }
-    return 0;
-}
-int GenCodeVisitor::visit(UnaryExp* exp) {
-    exp->uexp->accept(this);
-
-    switch (exp->op) {
-        case NEGACION_OP:
-            out << "    testq %rax, %rax" << endl;
-            out << "    movl $0, %ecx" << endl;
-            out << "    sete %cl" << endl;
-            out << "    movq %rcx, %rax" << endl;
-            break;
-        case UNARY_MINUS_OP:
-            out << "    negq %rax" << endl;
-            break;
-        case UNARY_PLUS_OP:
-            // No hace nada, el valor ya está en %rax
-            break;
-        case PLUS_PLUS_OP: {
-            if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
-                if (!env->check(id->name)) {
-                    cerr << "Error: Variable no declarada: " << id->name << endl;
-                    exit(1);
-                }
-                int offset = env->lookup(id->name).offset;
-                if (exp->is_prefix) {
-                
-                    // ++var
-                    out << "    incq %rax" << endl;
-                    out << "    movq %rax, " << offset << "(%rbp)" << endl;
-                } else {
-                    // var++
-                    out << "    movq %rax, %rcx" << endl;
-                    out << "    incq %rcx" << endl;
-                    out << "    movq %rcx, " << offset << "(%rbp)" << endl;
-                }
-            }
-            break;
-        }
-        case MINUS_MINUS_OP: {
-            if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
-                if (!env->check(id->name)) {
-                    cerr << "Error: Variable no declarada: " << id->name << endl;
-                    exit(1);
-                }
-                int offset = env->lookup(id->name).offset;
-                if (exp->is_prefix) {
-                    // --var
-                    out << "    decq %rax" << endl;
-                    out << "    movq %rax, " << offset << "(%rbp)" << endl;
-                } else {
-                    // var--
-                    out << "    movq %rax, %rcx" << endl;
-                    out << "    decq %rcx" << endl;
-                    out << "    movq %rcx, " << offset << "(%rbp)" << endl;
-                }
-            }
-            break;
-        }
-        case ADDRESS_OF_OP: {
-            if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
-                if (!env->check(id->name)) {
-                    cerr << "Error: Variable no declarada: " << id->name << endl;
-                    exit(1);
-                }
-                int offset = env->lookup(id->name).offset;
-                out << "    leaq " << offset << "(%rbp), %rax  # &" << id->name << endl;
-            }
-            break;
-        }
-        case DEREFERENCE_OP:
-            out << "    movq (%rax), %rax  # *ptr" << endl;
-            break;
-        default:
-            out << "    # Operador unario no implementado: " << exp->op << endl;
-            break;
-    }
-    return 0;
-}
-
 
 int GenCodeVisitor::visit(ArrayAccessExp* exp) {
     // Evaluar índice
@@ -1086,6 +1113,7 @@ void GenCodeVisitor::visit(PrintfStatement* stm) {
         out << "    addq $" << (stack_args * 8) << ", %rsp" << endl;
     }
 }
+
 void GenCodeVisitor::visit(IfStatement* stm) {
     if (!stm) return;
 
@@ -1157,6 +1185,7 @@ void GenCodeVisitor::visit(ElseIfStatement* stm) {
         }
     }
 }
+
 void GenCodeVisitor::visit(WhileStatement* stm) {
     int label_start = cantidad++;
     int label_end = cantidad++;
@@ -1202,20 +1231,15 @@ void GenCodeVisitor::visit(ForStatement* stm) {
     out << ".Lendfor" << label_end << ":" << endl;
 }
 
-
-
 void GenCodeVisitor::visit(ExpressionStatement* stm) {
     if (stm->expression)
         stm->expression->accept(this);
 }
 
-
-
 void GenCodeVisitor::visit(VarDec* stm) {
-
     for (size_t i = 0; i < stm->vars.size(); ++i) {
         string var_name = stm->vars[i];
-        Type* var_type = stm->type;
+        Type* var_type = stm->types[i];
         bool is_char = (var_type->type_name == "char");
         bool is_bool = (var_type->type_name == "bool");
         bool is_ptr = var_type->is_pointer;
@@ -1283,11 +1307,8 @@ void GenCodeVisitor::visit(VarDecList* stm) {
         vardec->accept(this);
     }
 }
-void GenCodeVisitor::visit(GlobalVarDec* dec) {
-    out << ".data" << endl;
-    out << dec->var_name << ": .quad 0" << endl; // Puedes cambiar 0 por el valor inicial si lo tienes
-    out << ".text" << endl;
 
+void GenCodeVisitor::visit(GlobalVarDec* dec) {
     bool is_ptr = dec->type->is_pointer;
     bool is_array = dec->type->is_array;
     env->add_var(dec->var_name, 0, dec->type->type_name, is_ptr, is_array, -1); // offset 0 para globals
@@ -1319,21 +1340,31 @@ void GenCodeVisitor::visit(StatementList* stm) {
 }
 
 void GenCodeVisitor::visit(Body* b) {
-    int current_offset = -8; // Empieza en -8 para la primera variable local
+    int current_offset = -8; // Comenzar desde -8 para variables locales
 
-    if (b->vardecs) {
-        for (auto vardec : b->vardecs->vardecs) {
-            for (auto& var : vardec->vars) {
-                env->add_var(var, current_offset, vardec->type->type_name, vardec->type->is_pointer, vardec->type->is_array);
+    // 1. Registrar variables locales en el environment
+    for (auto elem : b->elements) {
+        if (auto vardec = dynamic_cast<VarDec*>(elem)) {
+            for (size_t i = 0; i < vardec->vars.size(); ++i) {
+                env->add_var(
+                    vardec->vars[i],
+                    current_offset,
+                    vardec->types[i]->type_name,
+                    vardec->types[i]->is_pointer,
+                    vardec->types[i]->is_array
+                );
                 current_offset -= 8; // Siguiente variable, más abajo en el stack
             }
         }
     }
 
-    // 2. Ahora sí, genera código para inicializaciones y sentencias
-    if (b->vardecs) b->vardecs->accept(this);
-    if (b->slist) b->slist->accept(this);
+    // 2. Generar código para inicializaciones y sentencias en orden
+    for (auto elem : b->elements) {
+        elem->accept(this);
+    }
 }
+
+
 void GenCodeVisitor::visit(Function* func) {
     // Prologo
     out << ".globl " << func->name << endl;
@@ -1343,9 +1374,11 @@ void GenCodeVisitor::visit(Function* func) {
 
     // Espacio para variables locales
     int stack_space = 0;
-    if (func->body && func->body->vardecs) {
-        for (auto vardec : func->body->vardecs->vardecs) {
-            stack_space += vardec->vars.size() * 8;
+    if (func->body) {
+        for (auto elem : func->body->elements) {
+            if (auto vardec = dynamic_cast<VarDec*>(elem)) {
+                stack_space += vardec->vars.size() * 8;
+            }
         }
     }
     if (stack_space > 0) {
@@ -1427,7 +1460,6 @@ int GenCodeVisitor::visit(FunctionCallExp* exp) {
         }
     }
 
-    // Alineación de pila (16-byte boundary)
     if ((stack_args % 2) != 0) {
         out << "    subq $8, %rsp" << endl;
     }
@@ -1465,13 +1497,13 @@ void GenCodeVisitor::visit(StructDeclaration* structDecl) {
         for (auto member : structDecl->members->vardecs) {
             // Determinar el tamaño del tipo del miembro
             int member_size = 8; // Tamaño por defecto (64 bits)
-            if (member->type->type_name == "char" || member->type->type_name == "bool") {
+            if (member->types[0]->type_name == "char" || member->types[0]->type_name == "bool") {
                 member_size = 1;
-            } else if (member->type->type_name == "int") {
+            } else if (member->types[0]->type_name == "int") {
                 member_size = 4;
-            } else if (env->has_struct(member->type->type_name)) {
+            } else if (env->has_struct(member->types[0]->type_name)) {
                 // Si es otro struct, obtener su tamaño total
-                member_size = env->get_struct_size(member->type->type_name);
+                member_size = env->get_struct_size(member->types[0]->type_name);
             }
 
             // Aplicar alineación (normalmente al tamaño de palabra)
@@ -1479,13 +1511,13 @@ void GenCodeVisitor::visit(StructDeclaration* structDecl) {
             offset = (offset + alignment - 1) & ~(alignment - 1);
 
             for (auto& var : member->vars) {
-                info.fields[var] = {member->type->type_name, member->type->is_pointer, member->type->is_array};
+                info.fields[var] = {member->types[0]->type_name, member->types[0]->is_pointer, member->types[0]->is_array};
                 info.offsets[var] = offset;
 
                 // Para arrays, usar el tamaño especificado o marcarlo como array sin tamaño
-                if (member->type->is_array) {
-                    if (member->type->array_size) {
-                        member->type->array_size->accept(this);
+                if (member->types[0]->is_array) {
+                    if (member->types[0]->array_size) {
+                        member->types[0]->array_size->accept(this);
                         out << "    imulq $" << member_size << ", %rax" << endl;
                         out << "    movq %rax, %rcx" << endl;
                         member_size = -1; // Marcador para array con tamaño dinámico
@@ -1509,6 +1541,7 @@ void GenCodeVisitor::visit(StructDeclaration* structDecl) {
         out << "#   " << field.first << " : offset " << field.second << endl;
     }
 }
+
 void GenCodeVisitor::visit(StructDeclarationList* structList) {
     for (auto structDecl : structList->structs) {
         structDecl->accept(this);

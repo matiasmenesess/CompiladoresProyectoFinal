@@ -6,8 +6,7 @@ print_fmt: .string "%ld\n"
 factorial:
     pushq %rbp
     movq %rsp, %rbp
-    movq %rdi, -8(%rbp)
-    movq -8(%rbp), %rax  # n
+    movq %rdi, %rax  # Valor de n
     pushq %rax
     movq $1, %rax
     movq %rax, %rcx
@@ -22,9 +21,9 @@ factorial:
     leave
     ret
 .Lelse2:
-    movq -8(%rbp), %rax  # n
+    movq %rdi, %rax  # Valor de n
     pushq %rax
-    movq -8(%rbp), %rax  # n
+    movq %rdi, %rax  # Valor de n
     pushq %rax
     movq $1, %rax
     movq %rax, %rcx
@@ -37,12 +36,11 @@ factorial:
     imulq %rcx, %rax
     leave
     ret
-    leave
-    ret
 main:
     pushq %rbp
     movq %rsp, %rbp
-    subq $8, %rsp
+    subq $16, %rsp
+# Cantidad de globales: 0
     movq $5, %rax
     movq %rax, %rdi
     call factorial
@@ -56,9 +54,6 @@ printf_fmt_0: .string "Factorial de 5 es: %d\n"
     movl $0, %eax
     call printf
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

@@ -178,11 +178,13 @@ ExpressionStatement::~ExpressionStatement() { delete expression; }
 ReturnStatement::ReturnStatement(Exp* value) : return_value(value) {}
 ReturnStatement::~ReturnStatement() { delete return_value; }
 
-VarDec::VarDec(Type* type, vector<string> vars) :
-    type(type), vars(vars) {}
+VarDec::VarDec(std::vector<Type*> types, vector<string> vars) :
+    types(types), vars(vars) {}
+
+    
 void VarDec::add_initializer(Exp* init) { initializers.push_back(init); }
 VarDec::~VarDec() {
-    delete type;
+    for (auto type : types) delete type;
     for (auto init : initializers) delete init;
 }
 
@@ -220,11 +222,9 @@ StatementList::~StatementList() {
     for (auto stm : stms) delete stm;
 }
 
-Body::Body(VarDecList* vardecs, StatementList* stms) :
-    vardecs(vardecs), slist(stms) {}
+Body::Body(vector<BlockElement*> elements) : elements(std::move(elements)) {}
 Body::~Body() {
-    delete vardecs;
-    delete slist;
+    for (auto elem : elements) delete elem;
 }
 
 Function::Function(Type* ret_type, string name, ParameterList* params, Body* body) :

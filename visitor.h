@@ -63,7 +63,7 @@ public:
     virtual void visit(Include* inc) = 0;
     virtual void visit(IncludeList* incList) = 0;
     virtual void visit(Type* type) = 0;
-
+    
     virtual int visit(BinaryExp* exp) = 0;
     virtual int visit(AssignExp* exp) = 0;
     virtual int visit(UnaryExp* exp) = 0;
@@ -85,7 +85,6 @@ public:
     virtual void visit(ForStatement* stm) = 0;
     virtual void visit(ExpressionStatement* stm) = 0;
     virtual void visit(ReturnStatement* stm) = 0;
-
     // Declarations
     virtual void visit(VarDec* stm) = 0;
     virtual void visit(VarDecList* stm) = 0;
@@ -136,7 +135,6 @@ public:
     void visit(ForStatement* stm) ;
     void visit(ExpressionStatement* stm) ;
     void visit(ReturnStatement* stm) ;
-
     void visit(VarDec* stm) ;
     void visit(VarDecList* stm) ;
     void visit(GlobalVarDec* dec) ;
@@ -188,7 +186,6 @@ public:
     void visit(ForStatement* stm) ;
     void visit(ExpressionStatement* stm) ;
     void visit(ReturnStatement* stm) ;
-
     void visit(VarDec* stm) ;
     void visit(VarDecList* stm) ;
     void visit(GlobalVarDec* dec) ;

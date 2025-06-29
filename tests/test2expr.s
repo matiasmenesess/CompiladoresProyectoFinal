@@ -6,6 +6,7 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $32, %rsp
+# Cantidad de globales: 0
     movq $10, %rax
     movq %rax, -8(%rbp)  # a
     movq $2, %rax
@@ -34,9 +35,6 @@ printf_fmt_0: .string "Resultado: %d\n"
     movl $0, %eax
     call printf
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

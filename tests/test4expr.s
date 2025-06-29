@@ -6,6 +6,7 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $32, %rsp
+# Cantidad de globales: 0
     movq $3, %rax
     imulq $8, %rax  # Elementos * 8 bytes
     movq %rax, %rcx  # Guardar tamaño total

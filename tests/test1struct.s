@@ -6,8 +6,7 @@ print_fmt: .string "%ld\n"
 factorial:
     pushq %rbp
     movq %rsp, %rbp
-    movq %rdi, -8(%rbp)
-    movq -8(%rbp), %rax  # n
+    movq %rdi, %rax  # Valor de n
     pushq %rax
     movq $1, %rax
     movq %rax, %rcx
@@ -23,9 +22,9 @@ factorial:
     ret
     jmp .Lendif3
 .Lelse2:
-    movq -8(%rbp), %rax  # n
+    movq %rdi, %rax  # Valor de n
     pushq %rax
-    movq -8(%rbp), %rax  # n
+    movq %rdi, %rax  # Valor de n
     pushq %rax
     movq $1, %rax
     movq %rax, %rcx
@@ -39,12 +38,11 @@ factorial:
     leave
     ret
 .Lendif3:
-    leave
-    ret
 main:
     pushq %rbp
     movq %rsp, %rbp
     subq $32, %rsp
+# Cantidad de globales: 0
 .section .rodata
 string_1: .string ""Hola mundo!""
 .text

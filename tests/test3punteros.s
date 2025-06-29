@@ -6,6 +6,7 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $16, %rsp
+# Cantidad de globales: 0
     movq $20, %rax
     movq %rax, -8(%rbp)  # y
     movq -8(%rbp), %rax  # y

@@ -1,33 +1,39 @@
 .data
 print_fmt: .string "%ld\n"
-.data
 resta: .quad 0
-.text
-.data
 maximo: .quad 0
-.text
 .text
 .globl main
 .globl suma
 suma:
     pushq %rbp
     movq %rsp, %rbp
-    movq %rdi, -8(%rbp)
-    movq %rsi, -16(%rbp)
-    movq -8(%rbp), %rax  # a
+    movq %rdi, %rax  # Valor de a
     pushq %rax
-    movq -16(%rbp), %rax  # b
+    movq %rsi, %rax  # Valor de b
     movq %rax, %rcx
     popq %rax
     addq %rcx, %rax
     leave
     ret
-    leave
-    ret
 main:
     pushq %rbp
     movq %rsp, %rbp
-    subq $8, %rsp
+    subq $16, %rsp
+# Cantidad de globales: 2
+# Variablles globales inicializadasresta
+    movq $11, %rax
+    negq %rax
+    movq %rax, resta(%rip)
+# Variablles globales inicializadasmaximo
+    movq $100, %rax
+    pushq %rax
+    movq $2, %rax
+    movq %rax, %rcx
+    popq %rax
+    cqo
+    idivq %rcx
+    movq %rax, maximo(%rip)
     movq $5, %rax
     movq %rax, %rdi
     movq $3, %rax
@@ -43,9 +49,6 @@ printf_fmt_0: .string "La suma es: %d\n"
     movl $0, %eax
     call printf
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

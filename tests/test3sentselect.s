@@ -5,7 +5,8 @@ print_fmt: .string "%ld\n"
 main:
     pushq %rbp
     movq %rsp, %rbp
-    subq $8, %rsp
+    subq $16, %rsp
+# Cantidad de globales: 0
     movq $98, %rax
     movb %al, -8(%rbp)  # c
     # Padding de 7 bytes para alineación
@@ -55,9 +56,6 @@ printf_fmt_2: .string "Es otro caracter\n"
     call printf
 .Lendif3:
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

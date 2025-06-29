@@ -6,6 +6,7 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $16, %rsp
+# Cantidad de globales: 0
     movq $1, %rax
     movq %rax, -8(%rbp)  # a
     movq $0, %rax
@@ -49,9 +50,6 @@ printf_fmt_0: .string "Al menos una condicion es verdadera\n"
     call printf
 .Lelse2:
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

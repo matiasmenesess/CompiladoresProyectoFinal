@@ -1,14 +1,17 @@
 #include <stdio.h>
 
-int resta = -11;
-int maximo = 100/2;
 
-int suma(void a, char b) {
-    return a + b;
+
+int suma(int& a, int b) {
+    a +=b;
+    return a;
 }
 
 int main() {
+    int a = 10;
+    printf("Entero: %d, Caracter: %c\n", a, 'a');
+    int b = 20;
     int resultado = suma(5, 3);
-    printf("La suma es: %d\n", resultado);
+    printf("La suma es: %d\n", a);
     return 0;
 }

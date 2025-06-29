@@ -290,6 +290,78 @@ MainFunction* Parser::parseMainFunction() {
 
 }
 
+ParameterList* Parser::parseParameterList() {
+    ParameterList* params = new ParameterList();
+    if (!check(Token::RIGHT_PAREN)) {
+        do {
+            params->add(parseParameter());
+            if (check(Token::COMMA)) {
+            }
+        } while (match(Token::COMMA));
+    }
+    return params;
+}
+
+Parameter* Parser::parseParameter() {
+    Type* type = parseType();
+    if (!check(Token::IDENTIFIER)) {
+        throw runtime_error("Se esperaba un nombre para el parametro.");
+    }
+    cout<<"tipo encontrado para el parametro: " << type->type_name << " " << type->is_pointer << " " << type->is_array << " " << type->is_reference << endl;
+    string name = current->text;
+    advance();
+
+    if (match(Token::LEFT_BRACKET)) {
+        cout<<"array\n";
+        Exp* array_size = nullptr;
+        if (!check(Token::RIGHT_BRACKET)) {
+            array_size = parseExpression();
+        }
+        if (!match(Token::RIGHT_BRACKET)) {
+            throw runtime_error("Se esperaba ']' después del tamaño del array.");
+        }
+        cout<<"array\n";
+        type = new Type(type->type_name, false, true, array_size, type->is_reference);
+    }
+    bool is_ref = type->is_reference;
+    cout<<"is_ref: " << is_ref << endl;
+    return new Parameter(type, name, is_ref);
+}
+
+Body* Parser::parseBody() {
+    std::vector<BlockElement*> elements;
+
+    while (!check(Token::RIGHT_BRACE) && !isAtEnd()) {
+        if (check(Token::INT) || check(Token::CHAR) || check(Token::STRUCT) || check(Token::BOOL)) {
+            VarDec* vardec = parseVarDec();
+            if (!match(Token::SEMICOLON)) {
+                throw runtime_error("Se esperaba ';' despues de la declaracion de variable.");
+            }
+            elements.push_back(vardec);
+        } else {
+            Stm* stm = parseStatement();
+            elements.push_back(stm);
+        }
+    }
+    return new Body(elements);
+}
+
+
+VarDecList* Parser::parseVarDecList() {
+    VarDecList* vardecs = new VarDecList();
+
+    while (check(Token::INT) || check(Token::CHAR) || check(Token::STRUCT) || check(Token::BOOL)) {
+
+        vardecs->add(parseVarDec());
+        if (!match(Token::SEMICOLON)) {
+            throw runtime_error("Se esperaba ';' despues de la declaracion de variable.");
+        }
+
+
+
+    }
+    return vardecs;
+}
 Type* Parser::parseType() {
     string typeName;
 
@@ -330,7 +402,7 @@ Type* Parser::parseType() {
         advance();
     }
 
-    
+
     if (isPointer && isReference) {
         cerr << "Error: un parámetro no puede ser puntero y referencia al mismo tiempo." << endl;
         exit(1);
@@ -340,69 +412,13 @@ Type* Parser::parseType() {
     return new Type(typeName, isPointer, false, nullptr, isReference);
 }
 
-ParameterList* Parser::parseParameterList() {
-    ParameterList* params = new ParameterList();
-    if (!check(Token::RIGHT_PAREN)) {
-        do {
-            params->add(parseParameter());
-            if (check(Token::COMMA)) {
-            }
-        } while (match(Token::COMMA));
-    }
-    return params;
-}
-
-Parameter* Parser::parseParameter() {
-    Type* type = parseType();
-    if (!check(Token::IDENTIFIER)) {
-        throw runtime_error("Se esperaba un nombre para el parametro.");
-    }
-    cout<<"tipo encontrado para el parametro: " << type->type_name << " " << type->is_pointer << " " << type->is_array << " " << type->is_reference << endl;
-    string name = current->text;
-    advance();
-
-    if (match(Token::LEFT_BRACKET)) {
-        cout<<"array\n";
-        Exp* array_size = nullptr;
-        if (!check(Token::RIGHT_BRACKET)) {
-            array_size = parseExpression();
-        }
-        if (!match(Token::RIGHT_BRACKET)) {
-            throw runtime_error("Se esperaba ']' después del tamaño del array.");
-        }
-        cout<<"array\n";
-        type = new Type(type->type_name, false, true, array_size, type->is_reference);
-    }
-    bool is_ref = type->is_reference;
-    cout<<"is_ref: " << is_ref << endl;
-    return new Parameter(type, name, is_ref);
-}
-
-Body* Parser::parseBody() {
-    VarDecList* var_decs = parseVarDecList();
-    StatementList* stm_list = parseStatementList();
-    return new Body(var_decs, stm_list);
-}
-VarDecList* Parser::parseVarDecList() {
-    VarDecList* vardecs = new VarDecList();
-
-    while (check(Token::INT) || check(Token::CHAR) || check(Token::STRUCT) || check(Token::BOOL)) {
-
-        vardecs->add(parseVarDec());
-        if (!match(Token::SEMICOLON)) {
-            throw runtime_error("Se esperaba ';' despues de la declaracion de variable.");
-        }
-
-
-
-    }
-    return vardecs;
-}
 
 VarDec* Parser::parseVarDec() {
-    Type* type = parseType();
+    Type* base_type = parseType();
     vector<string> vars;
     vector<Exp*> initializers;
+    vector<Type*> types;
+
     do {
         if (!check(Token::IDENTIFIER)) {
             throw runtime_error("Se esperaba un identificador.");
@@ -410,14 +426,24 @@ VarDec* Parser::parseVarDec() {
         string name = current->text;
         advance();
         vars.push_back(name);
-        Type* btype = type;
+
+        Type* var_type = new Type(
+            base_type->type_name,
+            base_type->is_pointer,
+            base_type->is_array,
+            base_type->array_size,
+            base_type->is_reference
+        );
+
         if (match(Token::LEFT_BRACKET)) {
             Exp* array_size = parseExpression();
             if (!match(Token::RIGHT_BRACKET)) {
                 throw runtime_error("Se esperaba ']' después del tamaño del array.");
             }
-            type = new Type(btype->type_name, false, true, array_size);
+            var_type = new Type(base_type->type_name, false, true, array_size, base_type->is_reference);
         }
+        types.push_back(var_type);
+
         if (match(Token::ASSIGN)) {
             if (check(Token::LEFT_BRACE)) {
                 advance();
@@ -430,15 +456,16 @@ VarDec* Parser::parseVarDec() {
                 initializers.push_back(new ArrayInitializerExp(inits));
             } else {
                 initializers.push_back(parseExpression());
-            }        } else {
+            }
+        } else {
             initializers.push_back(nullptr);
         }
-        if (check(Token::COMMA)) {
-        }
     } while (match(Token::COMMA));
-    VarDec* vd = new VarDec(type, vars);
-    for(auto init : initializers) {
-        if(init) vd->add_initializer(init);
+
+    // Si tu VarDec solo acepta un Type*, puedes usar el primero (pero lo ideal es vector<Type*>)
+    VarDec* vd = new VarDec(types, vars);
+    for (auto init : initializers) {
+        vd->add_initializer(init);
     }
     return vd;
 }

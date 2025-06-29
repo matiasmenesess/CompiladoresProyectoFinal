@@ -5,7 +5,8 @@ print_fmt: .string "%ld\n"
 main:
     pushq %rbp
     movq %rsp, %rbp
-    subq $8, %rsp
+    subq $16, %rsp
+# Cantidad de globales: 0
     leaq array_1(%rip), %rax
 .section .rodata
 string_2: .string ""C Programming""
@@ -30,9 +31,6 @@ printf_fmt_0: .string "Libro: %s, Publicado en: %d\n"
     movl $0, %eax
     call printf
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

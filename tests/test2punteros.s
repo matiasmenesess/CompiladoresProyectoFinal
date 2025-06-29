@@ -6,6 +6,7 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $16, %rsp
+# Cantidad de globales: 0
     movq $10, %rax
     movq %rax, -8(%rbp)  # x
     movq -8(%rbp), %rax  # x
@@ -20,9 +21,6 @@ printf_fmt_0: .string "La direccion de x es: %p\n"
     movl $0, %eax
     call printf
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

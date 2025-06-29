@@ -217,11 +217,16 @@ public:
     int accept(Visitor *visitor);
     ~ParenExp();
 };
-
-class Stm {
+class BlockElement {
 public:
-    virtual ~Stm() = 0;
+    virtual ~BlockElement() {}
     virtual int accept(Visitor* visitor) = 0;
+};
+
+class Stm : public BlockElement {
+public:
+     virtual ~Stm() = 0;
+     virtual int accept(Visitor* visitor) = 0;
 };
 
 
@@ -303,12 +308,12 @@ public:
     int accept(Visitor *visitor) ;
 };
 
-class VarDec : public Stm {
+class VarDec : public BlockElement {
 public:
-    Type* type;
+    std::vector<Type*> types;
     vector<string> vars;
     vector<Exp*> initializers;
-    VarDec(Type* type, vector<string> vars);
+    VarDec(vector<Type*> types, vector<string> vars);
     void add_initializer(Exp* init);
     ~VarDec();
     int accept(Visitor* visitor) ;
@@ -373,9 +378,9 @@ public:
 
 class Body {
 public:
-    VarDecList* vardecs;
-    StatementList* slist;
-    Body(VarDecList* vardecs, StatementList* stms);
+    std::vector<BlockElement*> elements;
+
+    Body(vector<BlockElement*> elements);
     ~Body();
     int accept(Visitor* visitor) ;
 };
@@ -444,8 +449,8 @@ public:
     FunctionList* functions;
     MainFunction* main_function;    
         int countVars() const {
-        if (main_function && main_function->body && main_function->body->vardecs)
-            return main_function->body->vardecs->vardecs.size();
+        if (main_function && main_function->body && main_function->body->elements.size()>0)
+            return main_function->body->elements.size();
         return 0;
     }
 
