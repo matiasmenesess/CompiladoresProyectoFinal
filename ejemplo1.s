@@ -14,6 +14,10 @@ suma:
     movq %rax, %rcx
     popq %rax
     addq %rcx, %rax
+    pushq %rax
+    popq %rax
+    movq %rax, -8(%rbp)  # a = valor
+    movq -8(%rbp), %rax  # a
     leave
     ret
     leave
@@ -22,7 +26,7 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $24, %rsp
-    movq $5, %rax
+    movq $22, %rax
     movq %rax, -8(%rbp)  # a
     movq $3, %rax
     movq %rax, -16(%rbp)  # b
@@ -36,7 +40,7 @@ main:
 printf_fmt_0: .string "La suma es: %d\n"
 .text
     leaq printf_fmt_0(%rip), %rdi
-    movq -24(%rbp), %rax  # resultado
+    movq -8(%rbp), %rax  # a
     movq %rax, %rsi
     movl $0, %eax
     call printf

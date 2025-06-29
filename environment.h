@@ -23,9 +23,11 @@ struct VarInfo {
     string type;
     bool is_pointer;
     bool is_array;
-    int valor; // Valor actual (útil para interpretación o debug)
+    bool is_reference;
 };
 struct FunctionParamInfo : public VarInfo {
+    std::string name;
+    bool is_reference = false; 
     int reg_index;
 };
 struct FunctionInfo {
@@ -65,12 +67,15 @@ public:
     }
 
     // Añadir una variable
-    void add_var(const string& var, int offset, const string& type, bool is_ptr = false, bool is_array = false, int valor = 0) {
+    void add_var(const string& var, int offset, const string& type, 
+        bool is_ptr = false, 
+        bool is_array = false, 
+        bool is_reference=false) {
         if (levels.empty()) {
             cout << "Environment sin niveles: no se pueden agregar variables" << endl;
             exit(0);
         }
-        VarInfo info = {offset, type, is_ptr, is_array, valor};
+        VarInfo info = {offset, type, is_ptr, is_array, is_reference};
         levels.back()[var] = info;
     }
 
@@ -83,13 +88,7 @@ public:
         return false;
     }
 
-    // Actualizar el valor de una variable
-    bool update(const string& x, int v) {
-        int idx = search_rib(x);
-        if (idx < 0) return false;
-        levels[idx][x].valor = v;
-        return true;
-    }
+    
 
     // Verificar si una variable está declarada
     bool check(const string& x) {
@@ -136,6 +135,54 @@ public:
         }
         return functions[name];
     }
+    vector<FunctionParamInfo> get_function_params(const string& name) {
+        if (!has_function(name)) {
+            cout << "Función no declarada: " << name << endl;
+            exit(0);
+        }
+        return functions[name].params;
+    }
+    int get_function_stack_size(const string& name) {
+        if (!has_function(name)) {
+            cout << "Función no declarada: " << name << endl;
+            exit(0);
+        }
+        return functions[name].stack_size;
+    }
+    void set_function_stack_size(const string& name, int size) {
+        if (!has_function(name)) {
+            cout << "Función no declarada: " << name << endl;
+            exit(0);
+        }
+        functions[name].stack_size = size;
+    }
+    // Verificar si una función está declarada
+    bool has_function_declared(const string& name) {
+        return functions.find(name) != functions.end();
+    }
+    // Obtener el tipo de retorno de una función
+    string get_function_return_type(const string& name) {
+        if (!has_function(name)) {
+            cout << "Función no declarada: " << name << endl;
+            exit(0);
+        }
+        return functions[name].return_type;
+    }
+    // Obtener el offset de un parámetro de función
+    int get_function_param_offset(const string& func_name, const string& param_name) {
+        if (!has_function(func_name)) {
+            cout << "Función no declarada: " << func_name << endl;
+            exit(0);
+        }
+        const auto& params = functions[func_name].params;
+        for (const auto& param : params) {
+            if (param.name == param_name) {
+                return param.offset;
+            }
+        }
+        cout << "Parámetro no encontrado: " << param_name << " en función " << func_name << endl;
+        exit(0);
+    }   
 
     // Structs
     int get_struct_size(const std::string& name) {

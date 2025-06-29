@@ -731,13 +731,20 @@ int GenCodeVisitor::visit(IdentifierExp* exp) {
         cerr << "Error: Variable no declarada: " << exp->name << endl;
         exit(1);
     }
-
-    // Obtener offset de la variable desde el environment
-    int offset = env->lookup(exp->name).offset;
-    out << "    movq " << offset << "(%rbp), %rax  # " << exp->name << endl;
+    
+    VarInfo info = env->lookup(exp->name);
+    
+    if (info.is_reference) {
+        // Para referencias, cargar dirección y luego valor
+        out << "    movq " << info.offset << "(%rbp), %rax  # Dirección de " << exp->name << endl;
+        out << "    movq (%rax), %rax  # Valor de " << exp->name << endl;
+    } else {
+        // Para variables normales, cargar valor directamente
+        out << "    movq " << info.offset << "(%rbp), %rax  # " << exp->name << endl;
+    }
+    
     return 0;
 }
-
 int GenCodeVisitor::visit(BinaryExp* exp) {
     // Evaluar operando izquierdo
     exp->left->accept(this);
@@ -887,20 +894,36 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
 }
 
 int GenCodeVisitor::visit(AssignExp* exp) {
+    // Evaluar lado derecho
     exp->right->accept(this);
-
+    out << "    pushq %rax" << endl;
+    
+    // Manejar el lado izquierdo
     if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
         if (!env->check(id->name)) {
             cerr << "Error: Variable no declarada: " << id->name << endl;
             exit(1);
         }
-        int offset = env->lookup(id->name).offset;
-        out << "    movq %rax, " << offset << "(%rbp)  # " << id->name << " = valor" << endl;
+        
+        VarInfo info = env->lookup(id->name);
+        out << "    popq %rax" << endl;
+        
+        if (info.is_reference) {
+            // Para referencias, cargar la dirección y asignar a través de ella
+            out << "    movq " << info.offset << "(%rbp), %rcx  # Dirección de " << id->name << endl;
+            out << "    movq %rax, (%rcx)  # Asignar a través de referencia" << endl;
+        } else {
+            // Para variables normales, asignar directamente
+            out << "    movq %rax, " << info.offset << "(%rbp)  # " << id->name << " = valor" << endl;
+        }
+    } else {
+        // Otros tipos de asignación
+        cerr << "Error: Asignación a expresión no identificador" << endl;
+        exit(1);
     }
-
+    
     return 0;
 }
-
 int GenCodeVisitor::visit(UnaryExp* exp) {
     exp->uexp->accept(this);
 
@@ -925,6 +948,7 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
                 }
                 int offset = env->lookup(id->name).offset;
                 if (exp->is_prefix) {
+                
                     // ++var
                     out << "    incq %rax" << endl;
                     out << "    movq %rax, " << offset << "(%rbp)" << endl;
@@ -1343,21 +1367,44 @@ void GenCodeVisitor::visit(Function* func) {
         out << "    subq $" << stack_space << ", %rsp" << endl;
     }
 
+    // Crear información de la función para el environment
+    FunctionInfo func_info;
+    func_info.return_type = func->return_type->type_name;
+    func_info.stack_size = stack_space;
+
     // Guardar parámetros en el stack si es necesario
     if (func->parameters) {
         const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
         for (size_t i = 0; i < func->parameters->parameters.size(); ++i) {
+            auto param = func->parameters->parameters[i];
             int offset = -8 * (i + 1);  // Parámetros en posiciones negativas desde rbp
-            out << "    movq " << regs[i] << ", " << offset << "(%rbp)" << endl;
             
-            // Registrar variable en el entorno
-            env->add_var(func->parameters->parameters[i]->name, 
-                        offset,
-                        func->parameters->parameters[i]->type->type_name,
-                        func->parameters->parameters[i]->type->is_pointer,
-                        func->parameters->parameters[i]->type->is_array);
+            if (!param->is_reference) {
+                out << "    movq " << regs[i] << ", " << offset << "(%rbp)" << endl;
+            }            
+            // Registrar variable en el entorno con is_reference correcto
+            env->add_var(param->name, 
+                       offset,
+                       param->type->type_name,
+                       param->type->is_pointer,
+                       param->type->is_array,
+                       param->is_reference);  // Agregar flag is_reference
+            
+            // Guardar información del parámetro para FunctionInfo
+            FunctionParamInfo param_info;
+            param_info.offset = offset;
+            param_info.name = param->name;
+            param_info.type = param->type->type_name;
+            param_info.is_pointer = param->type->is_pointer;
+            param_info.is_array = param->type->is_array;
+            param_info.is_reference = param->is_reference;
+            param_info.reg_index = (i < 6) ? i : -1;
+            func_info.params.push_back(param_info);
         }
     }
+    
+    // Registrar la función en el environment
+    env->add_function(func->name, func_info);
 
     // Generar cuerpo de la función
     env->add_level();
@@ -1370,6 +1417,7 @@ void GenCodeVisitor::visit(Function* func) {
     out << "    leave" << endl;
     out << "    ret" << endl;
 }
+
 void GenCodeVisitor::visit(ReturnStatement* stm) {
     if (stm->return_value)
         stm->return_value->accept(this);
@@ -1379,37 +1427,59 @@ void GenCodeVisitor::visit(ReturnStatement* stm) {
 }
 
 int GenCodeVisitor::visit(FunctionCallExp* exp) {
-    // Preparar argumentos
+    if (!env->has_function(exp->function_name)) {
+        cerr << "Error: Función '" << exp->function_name << "' no declarada" << endl;
+        exit(1);
+    }
+    auto func_info = env->get_function(exp->function_name);
+    
     const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
     int stack_args = 0;
     
     for (int i = 0; i < exp->arguments.size(); ++i) {
-        exp->arguments[i]->accept(this); // Código del argumento en %rax
+        auto& param_info = func_info.params[i];
         
-        if (i < 6) {
-            out << "    movq %rax, " << regs[i] << endl;  // Primeros 6 en registros
+        if (param_info.is_reference) {
+            if (auto id = dynamic_cast<IdentifierExp*>(exp->arguments[i])) {
+                int var_offset = env->lookup(id->name).offset;
+                out << "    leaq " << var_offset << "(%rbp), %rax  # Dirección de " << id->name << endl;
+            } else if (auto unary = dynamic_cast<UnaryExp*>(exp->arguments[i])) {
+                if (unary->op == DEREFERENCE_OP) {
+                    unary->uexp->accept(this);
+                }
+            } else {
+                cerr << "Error: Argumento por referencia debe ser variable" << endl;
+                exit(1);
+            }
         } else {
-            out << "    pushq %rax" << endl;  // Resto en pila
+            exp->arguments[i]->accept(this);
+        }
+
+        if (i < 6) {
+            out << "    movq %rax, " << regs[i] << "\n";
+        } else {
+            out << "    pushq %rax\n";
             stack_args++;
         }
     }
-    
+
     // Alineación de pila (16-byte boundary)
     if ((stack_args % 2) != 0) {
         out << "    subq $8, %rsp" << endl;
     }
-    
+
     out << "    call " << exp->function_name << endl;
-    
+
     // Limpiar argumentos de la pila
     if (stack_args > 0) {
         out << "    addq $" << (stack_args * 8) << ", %rsp" << endl;
     }
-    
+
     // Restaurar alineación si se ajustó
     if ((stack_args % 2) != 0) {
         out << "    addq $8, %rsp" << endl;
     }
+
     return 0;
 }
 void GenCodeVisitor::visit(FunctionList* funcList) {

@@ -27,13 +27,60 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="casi">
+      <change afterPath="$PROJECT_DIR$/correccion.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ejemplo1.s" beforeDir="false" afterPath="$PROJECT_DIR$/ejemplo1.s" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ejemplo1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ejemplo1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/environment.h" beforeDir="false" afterPath="$PROJECT_DIR$/environment.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/parser.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Expression/test4expr.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Expression/test4expr.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test1declvar.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test1declvar.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test2declvar.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test2declvar.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test3declvar.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/DeclVar/test3declvar.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Expression/test1expr.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Expression/test2expr.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Expression/test3expr.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Expression/test4expr.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test1func.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test1func.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test2func.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test3func.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Funciones/test3func.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test1punteros.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test1punteros.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test2punteros.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test2punteros.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test3punteros.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test3punteros.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test4punteros.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test4punteros.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test5punteros.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Punteros/test5punteros.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test1sentselect.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test1sentselect.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test2sentselect.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test2sentselect.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test3sentselect.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test3sentselect.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test4sentselect.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test4sentselect.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test5sentselect.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test5sentselect.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test6sentselect.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/SenContSelec/test6sentselect.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test1struct.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test1struct.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test2struct.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test2struct.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test3struct.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test3struct.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test4struct.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test4struct.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test5struct.s" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Struct/test5struct.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/visitor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visitor.h" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +211,7 @@
       <workItem from="1751001177696" duration="881000" />
       <workItem from="1751046560997" duration="661000" />
       <workItem from="1751136445986" duration="2422000" />
-      <workItem from="1751143050812" duration="11161000" />
+      <workItem from="1751143050812" duration="15255000" />
     </task>
     <task id="LOCAL-00001" summary="f">
       <option name="closed" value="true" />
