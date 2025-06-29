@@ -1,13 +1,14 @@
-.data
-print_fmt: .string "%ld\n"
-.text
-.globl main
-.globl llenar
-llenar:
-    pushq %rbp
-    movq %rsp, %rbp
-    pushq %rbx
-    pushq %r12
-    pushq %r13
-    pushq %r14
-    pushq %r15
+Inicio del main
+Archivo leído correctamente
+Parseando...
+Tipo: void, Puntero: 0, Referencia: 0
+Tipo: int, Puntero: 0, Referencia: 0
+array
+array
+Tipo: int, Puntero: 0, Referencia: 0
+Tipo: int, Puntero: 0, Referencia: 0
+Tipo: int, Puntero: 0, Referencia: 0
+Tipo: int, Puntero: 0, Referencia: 0
+Parseo exitoso
+Generando código...
+Variable no declarada: i

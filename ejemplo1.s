@@ -6,20 +6,16 @@ print_fmt: .string "%ld\n"
 suma:
     pushq %rbp
     movq %rsp, %rbp
-    movq %rdi, -8(%rbp)
-    movq %rsi, -16(%rbp)
-    movq -8(%rbp), %rax  # a
+    movq (%rdi), %rax  # Valor de a
     pushq %rax
-    movq -16(%rbp), %rax  # b
+    movq %rsi, %rax  # Valor de b
     movq %rax, %rcx
     popq %rax
     addq %rcx, %rax
     pushq %rax
     popq %rax
-    movq %rax, -8(%rbp)  # a = valor
-    movq -8(%rbp), %rax  # a
-    leave
-    ret
+    movq %rax, (%rdi)  # a (por referencia)
+    movq (%rdi), %rax  # Valor de a
     leave
     ret
 main:
@@ -30,7 +26,7 @@ main:
     movq %rax, -8(%rbp)  # a
     movq $3, %rax
     movq %rax, -16(%rbp)  # b
-    movq -8(%rbp), %rax  # a
+    leaq -8(%rbp), %rax  # Dirección de a
     movq %rax, %rdi
     movq -16(%rbp), %rax  # b
     movq %rax, %rsi
@@ -45,9 +41,6 @@ printf_fmt_0: .string "La suma es: %d\n"
     movl $0, %eax
     call printf
     movq $0, %rax
-    leave
-    ret
-    movl $0, %eax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

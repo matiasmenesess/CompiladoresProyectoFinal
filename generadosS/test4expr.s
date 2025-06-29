@@ -1,8 +1,10 @@
-.data
-print_fmt: .string "%ld\n"
-.text
-.globl main
-main:
-    pushq %rbp
-    movq %rsp, %rbp
-    subq $32, %rsp
+Inicio del main
+Archivo leído correctamente
+Parseando...
+Tipo: int, Puntero: 0, Referencia: 0
+Tipo: int, Puntero: 0, Referencia: 0
+Tipo: int, Puntero: 1, Referencia: 0
+Tipo: int, Puntero: 0, Referencia: 0
+Tipo: int, Puntero: 0, Referencia: 0
+Parseo exitoso
+Generando código...

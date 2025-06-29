@@ -329,13 +329,15 @@ Type* Parser::parseType() {
         }
         advance();
     }
+
+    
     if (isPointer && isReference) {
         cerr << "Error: un parámetro no puede ser puntero y referencia al mismo tiempo." << endl;
         exit(1);
     }
     cout<< "Tipo: " << typeName << ", Puntero: " << isPointer << ", Referencia: " << isReference << endl;
 
-    return new Type(typeName, isPointer, isReference, nullptr);
+    return new Type(typeName, isPointer, false, nullptr, isReference);
 }
 
 ParameterList* Parser::parseParameterList() {
@@ -355,10 +357,10 @@ Parameter* Parser::parseParameter() {
     if (!check(Token::IDENTIFIER)) {
         throw runtime_error("Se esperaba un nombre para el parametro.");
     }
+    cout<<"tipo encontrado para el parametro: " << type->type_name << " " << type->is_pointer << " " << type->is_array << " " << type->is_reference << endl;
     string name = current->text;
     advance();
 
-    // Ahora parsea si es un array
     if (match(Token::LEFT_BRACKET)) {
         cout<<"array\n";
         Exp* array_size = nullptr;
@@ -372,6 +374,7 @@ Parameter* Parser::parseParameter() {
         type = new Type(type->type_name, false, true, array_size, type->is_reference);
     }
     bool is_ref = type->is_reference;
+    cout<<"is_ref: " << is_ref << endl;
     return new Parameter(type, name, is_ref);
 }
 
