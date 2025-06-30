@@ -2,9 +2,9 @@
 
 
 
-int suma(int& a, int b) {
-    a++;
-    return a;
+int suma(int& c, int b) {
+    c++;
+    return c;
 }
 
 int main() {

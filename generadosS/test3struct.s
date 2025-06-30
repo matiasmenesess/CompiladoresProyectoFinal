@@ -1,13 +1,8 @@
 Inicio del main
 Archivo leído correctamente
+Scanner completado exitosamente
+
 Parseando...
-Tipo: int, Puntero: 0, Referencia: 0
-Tipo: int, Puntero: 0, Referencia: 0
-Tipo: struct Punto, Puntero: 0, Referencia: 0
-Tipo: int, Puntero: 0, Referencia: 0
-Tipo: int, Puntero: 0, Referencia: 0
-Tipo: int, Puntero: 0, Referencia: 0
-Tipo: struct Rectangulo, Puntero: 0, Referencia: 0
 Parseo exitoso
 Imprimiendo el AST...
 #include <stdio.h>
@@ -33,3 +28,4 @@ int main() {
     return 0;
 }
 Generando código...
+Generando codigo ensamblador en tests/test3struct.s

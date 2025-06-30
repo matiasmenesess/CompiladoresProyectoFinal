@@ -9,6 +9,5 @@ void llenar(int arr[], int n) {
 int main() {
     int datos[10];
     llenar(datos, 10);
-
     return 0;
 }

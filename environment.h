@@ -25,7 +25,7 @@ struct VarInfo {
     bool is_array;
     bool is_reference;
     int reg_index = -1;
-    bool is_global = false; // Indica si es una variable global
+    bool is_global = false; 
 };
 struct FunctionParamInfo : public VarInfo {
     std::string name;
@@ -41,6 +41,7 @@ struct FunctionInfo {
 
 class Environment {
 private:
+    int current_offset = 0;
     vector<unordered_map<string, VarInfo>> levels; // Almacena toda la info de la variable
     unordered_map<string, FunctionInfo> functions;
     unordered_map<string, StructInfo> structs;
@@ -56,10 +57,19 @@ private:
         return -1;
     }
 public:
+
     Environment() {}
 
     void clear() {
         levels.clear();
+    }
+
+    int get_current_offset(){
+        return current_offset;
+    }
+    
+    void set_current_offset(int offset){
+        current_offset = offset;
     }
 
     // Añadir un nuevo nivel
@@ -101,6 +111,15 @@ public:
     bool check(const string& x) {
         int idx = search_rib(x);
         return (idx >= 0);
+    }
+
+    bool isSave(const string& x){
+        int idx = search_rib(x);
+        if (idx < 0) {
+            return false;
+        }
+        return true;
+
     }
 
     // Obtener la información de una variable

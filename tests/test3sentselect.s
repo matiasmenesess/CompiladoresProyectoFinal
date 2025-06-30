@@ -6,15 +6,17 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $16, %rsp
-# Cantidad de globales: 0
+#offset calculado de -8 para la variable c
     movq $98, %rax
     movb %al, -8(%rbp)  # c
     # Padding de 7 bytes para alineación
+# Cargando valor de c 0 -1
     movq -8(%rbp), %rax  # c
     pushq %rax
     movq $97, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: ==
     cmpq %rcx, %rax
     movl $0, %eax
     sete %al
@@ -29,11 +31,13 @@ printf_fmt_0: .string "Es 'a'\n"
     call printf
     jmp .Lendif3
 .Lelse2:
+# Cargando valor de c 0 -1
     movq -8(%rbp), %rax  # c
     pushq %rax
     movq $98, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: ==
     cmpq %rcx, %rax
     movl $0, %eax
     sete %al

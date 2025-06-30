@@ -6,32 +6,38 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $16, %rsp
-# Cantidad de globales: 0
+#offset calculado de -8 para la variable a
+#offset calculado de -16 para la variable b
     movq $1, %rax
     movq %rax, -8(%rbp)  # a
     movq $0, %rax
     movq %rax, -16(%rbp)  # b
+# Cargando valor de a 0 -1
     movq -8(%rbp), %rax  # a
     pushq %rax
     movq $1, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: ==
     cmpq %rcx, %rax
     movl $0, %eax
     sete %al
     movzbq %al, %rax
     pushq %rax
+# Cargando valor de b 0 -1
     movq -16(%rbp), %rax  # b
     pushq %rax
     movq $1, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: ==
     cmpq %rcx, %rax
     movl $0, %eax
     sete %al
     movzbq %al, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: ||
     testq %rax, %rax
     jnz .Ltrue1
     testq %rcx, %rcx

@@ -204,6 +204,8 @@ public:
     void visit(MainFunction* mainFunc) ;
     void visit(StructDeclaration* structDecl) ;
     void visit(StructDeclarationList* structList) ;
+
+    int calcular_stack_body(Body* body);
 };
 
 

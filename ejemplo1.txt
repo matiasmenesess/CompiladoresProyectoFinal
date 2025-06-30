@@ -1,14 +1,9 @@
 #include <stdio.h>
 
-struct Persona {
-    char* nombre;
-    int edad;
-};
-
-
 int main() {
-
-    struct Persona p = {"Juan", 20};
-    printf("Persona: %s, %d anos\n", p.nombre, p.edad);
+    int a = 1, b = 0;
+    if (a == 1 || b == 1) {
+        printf("Al menos una condicion es verdadera\n");
+    }
     return 0;
 }

@@ -311,7 +311,6 @@ Parameter* Parser::parseParameter() {
     advance();
 
     if (match(Token::LEFT_BRACKET)) {
-        cout<<"array\n";
         Exp* array_size = nullptr;
         if (!check(Token::RIGHT_BRACKET)) {
             array_size = parseExpression();
@@ -319,8 +318,11 @@ Parameter* Parser::parseParameter() {
         if (!match(Token::RIGHT_BRACKET)) {
             throw runtime_error("Se esperaba ']' después del tamaño del array.");
         }
-        cout<<"array\n";
-        type = new Type(type->type_name, false, true, array_size, type->is_reference);
+        Type* t = new Type(type->type_name, true, true, array_size, true);
+        cout<<"array pasado por "<<t->is_reference<<endl;
+
+    
+        return new Parameter(t, name, true);
     }
     bool is_ref = type->is_reference;
     return new Parameter(type, name, is_ref);

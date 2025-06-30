@@ -6,13 +6,14 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $16, %rsp
-# Cantidad de globales: 0
+#offset calculado de -8 para la variable a
     movq $10, %rax
     movq %rax, -8(%rbp)  # a
 .section .rodata
 printf_fmt_0: .string "Entero: %d, Caracter: %c\n"
 .text
     leaq printf_fmt_0(%rip), %rdi
+# Cargando valor de a 0 -1
     movq -8(%rbp), %rax  # a
     movq %rax, %rsi
     movq $97, %rax

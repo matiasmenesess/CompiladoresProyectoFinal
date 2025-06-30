@@ -6,9 +6,13 @@ main:
     pushq %rbp
     movq %rsp, %rbp
     subq $32, %rsp
-# Cantidad de globales: 0
+#offset calculado de -8 para la variable y
+#offset calculado de -16 para la variable z
+#offset calculado de -24 para la variable f
+#offset calculado de -32 para la variable g
     movq $5, %rax
     movq %rax, -8(%rbp)  # y
+# Cargando valor de y 0 -1
     movq -8(%rbp), %rax  # y
     incq %rax
     movq %rax, -8(%rbp)
@@ -21,11 +25,14 @@ main:
     movb %al, -32(%rbp)  # g
     andb $1, -32(%rbp)  # Asegurar 0/1
     # Padding de 7 bytes para alineación
+# Cargando valor de f 0 -1
     movq -24(%rbp), %rax  # f
     pushq %rax
+# Cargando valor de g 0 -1
     movq -32(%rbp), %rax  # g
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: &&
     testq %rax, %rax
     jz .Lfalse1
     testq %rcx, %rcx
@@ -41,6 +48,7 @@ main:
     movq $8, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: >
     cmpq %rcx, %rax
     movl $0, %eax
     setg %al
@@ -51,6 +59,7 @@ main:
 printf_fmt_0: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_0(%rip), %rdi
+# Cargando valor de z 0 -1
     movq -16(%rbp), %rax  # z
     movq %rax, %rsi
     movl $0, %eax
@@ -61,6 +70,7 @@ printf_fmt_0: .string "Resultado: %d\n"
 printf_fmt_1: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_1(%rip), %rdi
+# Cargando valor de z 0 -1
     movq -16(%rbp), %rax  # z
     movq %rax, %rsi
     movl $0, %eax
@@ -68,11 +78,14 @@ printf_fmt_1: .string "Resultado: %d\n"
 .Lendif3:
     jmp .Lendif7
 .Lelse6:
+# Cargando valor de f 0 -1
     movq -24(%rbp), %rax  # f
     pushq %rax
+# Cargando valor de g 0 -1
     movq -32(%rbp), %rax  # g
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: ||
     testq %rax, %rax
     jnz .Ltrue3
     testq %rcx, %rcx
@@ -88,6 +101,7 @@ printf_fmt_1: .string "Resultado: %d\n"
     movq $8, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: >
     cmpq %rcx, %rax
     movl $0, %eax
     setg %al
@@ -98,6 +112,7 @@ printf_fmt_1: .string "Resultado: %d\n"
 printf_fmt_2: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_2(%rip), %rdi
+# Cargando valor de z 0 -1
     movq -16(%rbp), %rax  # z
     movq %rax, %rsi
     movl $0, %eax
@@ -108,6 +123,7 @@ printf_fmt_2: .string "Resultado: %d\n"
 printf_fmt_3: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_3(%rip), %rdi
+# Cargando valor de z 0 -1
     movq -16(%rbp), %rax  # z
     movq %rax, %rsi
     movl $0, %eax
@@ -119,6 +135,7 @@ printf_fmt_3: .string "Resultado: %d\n"
 printf_fmt_4: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_4(%rip), %rdi
+# Cargando valor de z 0 -1
     movq -16(%rbp), %rax  # z
     movq %rax, %rsi
     movl $0, %eax

@@ -1,105 +1,66 @@
 .data
 print_fmt: .string "%ld\n"
+# Miembro de estructura: nombre (tipo: char, offset: 0, tamaño: 1)
+# Miembro de estructura: edad (tipo: int, offset: 8, tamaño: 4)
+#   edad : offset 8
+#   nombre : offset 0
 .text
 .globl main
-.globl factorial
-factorial:
-    pushq %rbp
-    movq %rsp, %rbp
-    movq %rdi, %rax  # Valor de n
-    pushq %rax
-    movq $1, %rax
-    movq %rax, %rcx
-    popq %rax
-    cmpq %rcx, %rax
-    movl $0, %eax
-    setle %al
-    movzbq %al, %rax
-    testq %rax, %rax
-    jz .Lelse2
-    movq $1, %rax
-    leave
-    ret
-    jmp .Lendif3
-.Lelse2:
-    movq %rdi, %rax  # Valor de n
-    pushq %rax
-    movq %rdi, %rax  # Valor de n
-    pushq %rax
-    movq $1, %rax
-    movq %rax, %rcx
-    popq %rax
-    subq %rcx, %rax
-    movq %rax, %rdi
-    call factorial
-    movq %rax, %rcx
-    popq %rax
-    imulq %rcx, %rax
-    leave
-    ret
-.Lendif3:
 main:
     pushq %rbp
     movq %rsp, %rbp
-    subq $32, %rsp
-# Cantidad de globales: 0
+    subq $48, %rsp
+#offset calculado de -8 para la variable mensaje
+#offset calculado de -16 para la variable x
+#offset calculado de -24 para la variable ptr
+#offset calculado de -40 para la variable p
 .section .rodata
-string_1: .string ""Hola mundo!""
+string_1: .string "Hola mundo!"
 .text
     leaq string_1(%rip), %rax
-    movb %al, -8(%rbp)  # mensaje
+    movq %rax, -8(%rbp)  # mensaje
     # Padding de 7 bytes para alineación
     movq $5, %rax
     pushq %rax
     movq $1, %rax
     movq %rax, %rcx
     popq %rax
+    # Operación binaria: /
     cqo
     idivq %rcx
     movq %rax, -16(%rbp)  # x
+# Cargando valor de x 0 -1
     movq -16(%rbp), %rax  # x
     leaq -16(%rbp), %rax  # &x
     movq %rax, -24(%rbp)  # ptr
-    leaq array_2(%rip), %rax
+#offset se paso con -40
 .section .rodata
-string_3: .string ""Juan""
+string_2: .string "Juan"
 .text
-    leaq string_3(%rip), %rax
-    movq %rax, 0(%rbp)  # Inicializando elemento 0
+    leaq string_2(%rip), %rax
+    movq %rax, -40(%rbp)  # Inicializando miembro nombre
     movq $20, %rax
-    movq %rax, 8(%rbp)  # Inicializando elemento 1
-    movq %rax, -32(%rbp)  # p
+    movq %rax, -32(%rbp)  # Inicializando miembro edad
 .section .rodata
 printf_fmt_0: .string "Mensaje: %s\n"
 .text
     leaq printf_fmt_0(%rip), %rdi
+# Cargando valor de mensaje 0 -1
     movq -8(%rbp), %rax  # mensaje
     movq %rax, %rsi
     movl $0, %eax
     call printf
 .section .rodata
-printf_fmt_1: .string "Factorial de %d es %d\n"
+printf_fmt_1: .string "Persona: %s, %d anos\n"
 .text
     leaq printf_fmt_1(%rip), %rdi
-    movq -16(%rbp), %rax  # x
+    movq -40(%rbp), %rax  # nombre de struct local
     movq %rax, %rsi
-    movq -16(%rbp), %rax  # x
-    movq %rax, %rdi
-    call factorial
+    movq -32(%rbp), %rax  # edad de struct local
     movq %rax, %rdx
     movl $0, %eax
     call printf
-.section .rodata
-printf_fmt_2: .string "Persona: %s, %d anos\n"
-.text
-    leaq printf_fmt_2(%rip), %rdi
-    movq -32(%rbp), %rax  # p
-    addq $8, %rax  # offset del miembro nombre
-    movq (%rax), %rax
-    movq %rax, %rsi
-    movq -32(%rbp), %rax  # p
-    addq $8, %rax  # offset del miembro edad
-    movq (%rax), %rax
-    movq %rax, %rdx
-    movl $0, %eax
-    call printf
+    movq $0, %rax
+    leave
+    ret
+.section .note.GNU-stack,"",@progbits
