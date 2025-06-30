@@ -612,8 +612,6 @@ int GenCodeVisitor::visit(ArrayInitializerExp* exp) {
 }
 
 
-
-
 void GenCodeVisitor::visit(PrintfStatement* stm) {
     // Generar string de formato
     static int fmt_count = 0;
@@ -753,9 +751,8 @@ void GenCodeVisitor::visit(ForStatement* stm) {
             for (size_t i = 0; i < vardec->vars.size(); ++i) {
                 std::string var_name = vardec->vars[i];
                 Type* var_type = vardec->types[i];
-                int size = (var_type->type_name == "int") ? 4 : 8; // ajusta según el tipo
-                int alignment = 8;
-                current_offset -= ((size + alignment - 1) / alignment) * alignment;
+                int size = 8;
+                current_offset -= size;
                 env->add_var(var_name, current_offset, var_type->type_name, var_type->is_pointer, var_type->is_array, var_type->is_reference, -1, false);
                 env->set_current_offset(current_offset);
             }
