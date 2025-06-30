@@ -7,7 +7,7 @@ struct Persona {
 
 
 int main() {
-    char* mensaje = "Hola mundo!";
+    char* mensaje = "Hola mundo";
     int x = 5 / 1;
     int* ptr = &x;
     struct Persona p = {"Juan", 20};

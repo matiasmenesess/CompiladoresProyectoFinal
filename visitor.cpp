@@ -9,8 +9,6 @@
 #include <unordered_map>
 #include <algorithm>
 #include <iterator>
-#include <typeinfo>
-
 using namespace std;
 
 // Accept methods implementations
@@ -443,11 +441,11 @@ void PrintVisitor::visit(ReturnStatement* stm) {
 
 void PrintVisitor::visit(Type* type) {
     cout << type->type_name;
-    if (type->is_pointer && !type->is_array) {
+    if (type->is_pointer) {
         cout << "*";
     }
   
-    if (type->is_reference && !type->is_array) {
+    if (type->is_reference) {
         cout << "&";
     }
 }
@@ -503,7 +501,7 @@ void PrintVisitor::visit(GlobalVarDecList* global_vardec_list) {
 
 void PrintVisitor::visit(Parameter* param) {
     param->type->accept(this);
-    if(param->is_reference && param->type->is_array == false) {
+    if(param->is_reference) {
         cout << "&";
     }
     cout << " " << param->name;
@@ -684,85 +682,7 @@ void TypeChecker::visit(PrintfStatement *stm) {
 
 
 int GenCodeVisitor::calcular_stack_body(Body* body) {
-    int stack = 0;
-    for (auto elem : body->elements) {
-        // Variables locales
-        if (auto vardec = dynamic_cast<VarDec*>(elem)) {
-            for (size_t i = 0; i < vardec->vars.size(); ++i) {
-                int var_size = 8;
-                std::string tname = vardec->types[i]->type_name;
-                if (tname == "char" || tname == "bool")
-                    var_size = 1;
-                else if (tname == "int")
-                    var_size = 4;
-                // Si es struct
-                else if (tname.find("struct") == 0) {
-                    std::string struct_name = tname.substr(7);
-                    // Aquí debes tener una función para obtener el tamaño del struct
-                    var_size = env->get_struct_size(struct_name);
-                }
-                // Alinea a 8 bytes
-                if (var_size < 8) var_size = 8;
-                stack += var_size;
-            }
-        }
-        // ForStatement
-        else if (auto forstm = dynamic_cast<ForStatement*>(elem)) {
-            // Suma el stack de la inicialización del for (si es VarDec)
-            if (forstm->init) {
-                if (auto vardec = dynamic_cast<VarDec*>(forstm->init)) {
-                    for (size_t i = 0; i < vardec->vars.size(); ++i) {
-                        int var_size = 8;
-                        std::string tname = vardec->types[i]->type_name;
-                        if (tname == "char" || tname == "bool")
-                            var_size = 1;
-                        else if (tname == "int")
-                            var_size = 4;
-                        else if (tname.find("struct") == 0) {
-                            std::string struct_name = tname.substr(7);
-                            var_size = env->get_struct_size(struct_name);
-                        }
-                        if (var_size < 8) var_size = 8;
-                        stack += var_size;
-                    }
-                }
-            }
-            // Suma el stack de todo el cuerpo del for
-            if (forstm->b)
-                stack += calcular_stack_body(forstm->b);
-        }
-        // IfStatement
-        else if (auto ifstm = dynamic_cast<IfStatement*>(elem)) {
-            if (ifstm->statements)
-                stack += calcular_stack_body(ifstm->statements);
-            if (ifstm->elsChain) {
-                // Puede ser ElseIfStatement o IfStatement
-                if (auto elseif = dynamic_cast<ElseIfStatement*>(ifstm->elsChain)) {
-                    if (elseif->body)
-                        stack += calcular_stack_body(elseif->body);
-                    if (elseif->nextChain) {
-                        // Recursivo para else-if en cadena
-                        if (auto nextElseIf = dynamic_cast<ElseIfStatement*>(elseif->nextChain)) {
-                            if (nextElseIf->body)
-                                stack += calcular_stack_body(nextElseIf->body);
-                        }
-                    }
-                }
-            }
-        }
-        // WhileStatement
-        else if (auto whilestm = dynamic_cast<WhileStatement*>(elem)) {
-            if (whilestm->b)
-                stack += calcular_stack_body(whilestm->b);
-        }
-        // Bloques anidados
-        else if (auto body2 = dynamic_cast<Body*>(elem)) {
-            stack += calcular_stack_body(body2);
-        }
-    }
-    return stack;
 }
-
 
 void GenCodeVisitor::gencode(Program* program) {
     out << ".data" << endl;
@@ -831,7 +751,6 @@ void GenCodeVisitor::gencode(Program* program) {
     out << ".section .note.GNU-stack,\"\",@progbits" << endl;
 }
 
-
 int GenCodeVisitor::visit(NumberExp* exp) {
     out << "    movq $" << exp->value << ", %rax" << endl;
     return exp->value;
@@ -863,6 +782,7 @@ int GenCodeVisitor::visit(IdentifierExp* exp) {
         exit(0);
     }
     const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+    out << "# Cargando valor de " << exp->name << " " << info.is_reference << " " << info.reg_index << endl;
     if (info.is_reference && info.reg_index >= 0) {
         out << "    movq (" << regs[info.reg_index] << "), %rax  # Valor de* " << exp->name << endl;
     } else if (info.reg_index >= 0) {
@@ -1281,6 +1201,9 @@ int GenCodeVisitor::visit(ArrayInitializerExp* exp) {
     return 0;
 }
 
+
+
+
 void GenCodeVisitor::visit(PrintfStatement* stm) {
     // Generar string de formato
     static int fmt_count = 0;
@@ -1411,30 +1334,15 @@ void GenCodeVisitor::visit(WhileStatement* stm) {
 void GenCodeVisitor::visit(ForStatement* stm) {
     int label_start = cantidad++;
     int label_end = cantidad++;
-    out << "# For loop: " << label_start << endl;
+
     // Inicialización
-     if (stm->init) {
-        out << " # debug de init" << endl;
-        if (auto vardec = dynamic_cast<VarDec*>(stm->init)) {
-            int current_offset = env->get_current_offset();
-            for (size_t i = 0; i < vardec->vars.size(); ++i) {
-                std::string var_name = vardec->vars[i];
-                Type* var_type = vardec->types[i];
-                int size = (var_type->type_name == "int") ? 4 : 8; // ajusta según el tipo
-                int alignment = 8;
-                current_offset -= ((size + alignment - 1) / alignment) * alignment;
-                env->add_var(var_name, current_offset, var_type->type_name, var_type->is_pointer, var_type->is_array, var_type->is_reference, -1, false);
-                env->set_current_offset(current_offset);
-            }
-        }
+    if (stm->init)
         stm->init->accept(this);
-    }
-    out << "  # Etiqueta de inicio del for" << endl;
+
     out << ".Lfor" << label_start << ":" << endl;
 
     // Condición
     if (stm->condition) {
-        out<<"# entra a la condicion "<<endl;
         stm->condition->accept(this);
         out << "    testq %rax, %rax" << endl;
         out << "    jz .Lendfor" << label_end << endl;
@@ -1461,21 +1369,18 @@ void GenCodeVisitor::visit(VarDec* stm) {
     for (size_t i = 0; i < stm->vars.size(); ++i) {
         string var_name = stm->vars[i];
         Type* var_type = stm->types[i];
+        bool is_char = (var_type->type_name == "char");
+        bool is_bool = (var_type->type_name == "bool");
+        bool is_ptr = var_type->is_pointer;
         bool is_array = var_type->is_array;
-        
         bool is_reference = var_type->is_reference;
 
-        bool is_char = (var_type->type_name == "char");
-
-        bool is_bool = (var_type->type_name == "bool");
-
-        bool is_ptr = var_type->is_pointer;
         bool is_int = (var_type->type_name=="int");
         int var_size = is_char || is_bool ? 1 : (is_int? 4:0);
 
-        string mov_inst;
+        string mov_inst="";
         
-        string reg;
+        string reg="";
 
         if ((is_char || is_bool) && !is_ptr) {
             mov_inst = "movb";
@@ -1488,33 +1393,31 @@ void GenCodeVisitor::visit(VarDec* stm) {
 
             reg = "%rax";
         }
-     
         int current_offset = env->lookup(var_name).offset;
         if (is_array && var_type->array_size) {
             var_type->array_size->accept(this);
 
             if (is_char) {
-                out << "    # Reservando arreglo de char[" << var_type->array_size << "]"<<endl;
+                out << "    # Reservando arreglo de char[" << var_type->array_size << "]\n";
             } else {
-                out << "    imulq $8, %rax  # Elementos * 8 bytes"<<endl;
+                out << "    imulq $8, %rax  # Elementos * 8 bytes\n";
             }
 
-            out << "    movq %rax, %rcx  # Guardar tamaño total"<<endl;
-            out << "    subq %rcx, %rsp  # Reservar espacio en stack"<<endl;
-            out << "    movq %rsp, " << current_offset << "(%rbp)  # Guardar puntero al arreglo"<<endl;
+            out << "    movq %rax, %rcx  # Guardar tamaño total\n";
+            out << "    subq %rcx, %rsp  # Reservar espacio en stack\n";
+            out << "    movq %rsp, " << current_offset << "(%rbp)  # Guardar puntero al arreglo\n";
 
             if (stm->initializers[i]) {
                 stm->initializers[i]->accept(this);
             } else {
-                out << "    movq %rsp, %rdi"<<endl;
-                out << "    xorq %rax, %rax"<<endl;
-                out << "    rep stosb"<<endl;
+                out << "    movq %rsp, %rdi\n";
+                out << "    xorq %rax, %rax\n";
+                out << "    rep stosb\n";
             }
 
             current_offset -= 16;
             continue;
         }
-
 
         env->add_var(var_name, current_offset, var_type->type_name, is_ptr, is_array,is_reference, -1,false);
         int current = env->lookup(var_name).offset;
@@ -1523,16 +1426,16 @@ void GenCodeVisitor::visit(VarDec* stm) {
         }
         else if (stm->initializers[i]) {
             stm->initializers[i]->accept(this);
-            out << "    " << mov_inst << " " << reg << ", " << current_offset << "(%rbp)  # " << var_name << endl;
+            out << "    " << mov_inst << " " << reg << ", " << current_offset << "(%rbp)  # " << var_name << "\n";
 
             if (is_bool) {
-                out << "    andb $1, " << current_offset << "(%rbp)  # Asegurar 0/1"<<endl;
+                out << "    andb $1, " << current_offset << "(%rbp)  # Asegurar 0/1\n";
             }
         } else {
             if (is_ptr) {
-                out << "    movq $0, " << current_offset << "(%rbp)  # NULL para puntero"<<endl;
+                out << "    movq $0, " << current_offset << "(%rbp)  # NULL para puntero\n";
             } else {
-                out << "    " << mov_inst << " $0, " << current_offset << "(%rbp)  # Inicializar a 0"<<endl;
+                out << "    " << mov_inst << " $0, " << current_offset << "(%rbp)  # Inicializar a 0\n";
             }
         }
 
@@ -1541,7 +1444,7 @@ void GenCodeVisitor::visit(VarDec* stm) {
             int padding = (8 - (abs(current_offset) % 8) % 8);
             if (padding > 0) {
                 current_offset -= padding;
-                out << "    # Padding de " << padding << " bytes para alineación"<<endl;
+                out << "    # Padding de " << padding << " bytes para alineación\n";
             }
         }
     }
@@ -1586,9 +1489,7 @@ void GenCodeVisitor::visit(StatementList* stm) {
 }
 
 void GenCodeVisitor::visit(Body* b) {
-
-
-    int current_offset = 0;
+       int current_offset = 0;
     for (auto elem : b->elements) {
         if (auto vardec = dynamic_cast<VarDec*>(elem)) {
             for (size_t i = 0; i < vardec->vars.size(); ++i) {
@@ -1605,22 +1506,18 @@ void GenCodeVisitor::visit(Body* b) {
                     vardec->types[i]->is_pointer,
                     vardec->types[i]->is_array
                 );
-                env->set_current_offset(current_offset);
                 out<<"#offset calculado de "<<current_offset<<" para la variable "<<vardec->vars[i]<<endl;
             }
         }
     }
     // 2. Generar código para inicializaciones y sentencias en orden
     for (auto elem : b->elements) {
-
         elem->accept(this);
     }
 }
 
 
 void GenCodeVisitor::visit(Function* func) {
-        out << "# [DEBUG] Entrando a función: " << func->name << std::endl;
-
     // Prologo
     out << ".globl " << func->name << endl;
     out << func->name << ":" << endl;
@@ -1661,8 +1558,7 @@ void GenCodeVisitor::visit(Function* func) {
           << " reg_index: " << param_info.reg_index
           << " offset: " << 0
           << " is_global: false" 
-          <<" is pointer: " << (param->type->is_pointer ? "true" : "false")
-          << " is_reference: " << (param->is_reference)
+          << " is_reference: " << (param->is_reference ? "true" : "false")
           << endl;
         }
     }
