@@ -27,7 +27,7 @@ int GenCodeVisitor::calcular_stack_body(Body* body) {
                     std::string struct_name = tname.substr(7);
                     var_size = env->get_struct_size(struct_name);
                 }
-                else if (tname == "charr" && vardec->types[i]->is_pointer){
+                else if (tname == "char" && vardec->types[i]->is_pointer){
                     var_size=1;
                 }
                 if (var_size < 8) var_size = 8;
@@ -195,13 +195,16 @@ int GenCodeVisitor::visit(IdentifierExp* exp) {
     } else if (info.reg_index >= 0) {
         out << "    movq " << regs[info.reg_index] << ", %rax  # Valor de " << exp->name << endl;
     } else if (!info.is_global) {
-        out << "    movq " << info.offset << "(%rbp), %rax  # " << exp->name << endl;
+        if (info.type == "int" && !info.is_pointer) {
+            out << "    movl " << info.offset << "(%rbp), %eax  # " << exp->name << endl;
+        } else {
+            out << "    movq " << info.offset << "(%rbp), %rax  # " << exp->name << endl;
+        }
     } else {
         out << "    movq " << exp->name << "(%rip), %rax  # " << exp->name << endl;
     }
     return 0;
 }
-
 
 int GenCodeVisitor::visit(AssignExp* exp) {
 
@@ -785,7 +788,7 @@ void GenCodeVisitor::visit(ExpressionStatement* stm) {
         stm->expression->accept(this);
 }
 
-int GenCodeVisitor::visit(VarDec* stm) {
+void GenCodeVisitor::visit(VarDec* stm) {
     for (size_t i = 0; i < stm->vars.size(); ++i) {
         string var_name = stm->vars[i];
         Type* var_type = stm->types[i];
@@ -796,7 +799,7 @@ int GenCodeVisitor::visit(VarDec* stm) {
         bool is_reference = var_type->is_reference;
 
 
-                bool is_int = (var_type->type_name == "int");
+        bool is_int = (var_type->type_name == "int");
         
         int var_size;
         string mov_inst;
@@ -811,7 +814,7 @@ int GenCodeVisitor::visit(VarDec* stm) {
             mov_inst = "movl";
             reg = "%eax";
         } else {
-            var_size = 8;
+            var_size = 4;
             mov_inst = "movq";
             reg = "%rax";
         };
@@ -841,7 +844,7 @@ int GenCodeVisitor::visit(VarDec* stm) {
             continue;
         }
 
-        env->add_var(var_name, current_offset, var_type->type_name, is_ptr, is_array, is_reference, -1, false);
+        env->add_var(var_name, current_offset, var_type->type_name, is_ptr, is_array,is_reference, -1,false);
         int current = env->lookup(var_name).offset;
         if (auto struct_init = dynamic_cast<StructInitializerExp*>(stm->initializers[i])) {
             struct_init->accept(this, current);
@@ -870,7 +873,6 @@ int GenCodeVisitor::visit(VarDec* stm) {
             }
         }
     }
-    return 0;
 }
 
 void GenCodeVisitor::visit(VarDecList* stm) {
