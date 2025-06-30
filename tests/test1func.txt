@@ -3,7 +3,7 @@
 
 
 int suma(int& a, int b) {
-    a +=b;
+    a++;
     return a;
 }
 
@@ -11,7 +11,7 @@ int main() {
     int a = 10;
     printf("Entero: %d, Caracter: %c\n", a, 'a');
     int b = 20;
-    int resultado = suma(5, 3);
+    int resultado = suma(a, b);
     printf("La suma es: %d\n", a);
     return 0;
 }

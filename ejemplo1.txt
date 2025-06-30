@@ -1,18 +1,14 @@
 #include <stdio.h>
 
+struct Persona {
+    char* nombre;
+    int edad;
+};
 
-
-int suma(int& a, int b) {
-    a = a+b;
-    return a;
-}
 
 int main() {
-    int a = 10;
-    int c = 30;
-    printf("Entero: %d, Caracter: %c\n", c, 'c');
-    int b = 20;
-    int resultado = suma(a, b);
-    printf("La suma es: %d\n", a);
+
+    struct Persona p = {"Juan", 20};
+    printf("Persona: %s, %d anos\n", p.nombre, p.edad);
     return 0;
 }

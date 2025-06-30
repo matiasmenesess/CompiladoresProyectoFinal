@@ -30,6 +30,7 @@ class FunctionCallExp;
 class ArrayAccessExp;
 class MemberAccessExp;
 class ParenExp;
+class StructInitializerExp;
 
 class PrintfStatement;
 class IfStatement;
@@ -77,6 +78,7 @@ public:
     virtual int visit(MemberAccessExp* exp) = 0;
     virtual int visit(ParenExp* exp) = 0;
     virtual int visit(ArrayInitializerExp* exp) = 0;
+    virtual int visit(StructInitializerExp* exp) = 0;
     // Statements
     virtual void visit(PrintfStatement* stm) = 0;
     virtual void visit(IfStatement* stm) = 0;
@@ -127,7 +129,7 @@ public:
     int visit(MemberAccessExp* exp) ;
     int visit(ParenExp* exp) ;
     int visit(ArrayInitializerExp* exp) ;
-
+    int visit(StructInitializerExp* exp) ;
     void visit(PrintfStatement* stm) ;
     void visit(IfStatement* stm) ;
     void visit(ElseIfStatement* stm) ;
@@ -178,6 +180,8 @@ public:
     int visit(ParenExp* exp) ;
     int visit(BoolExp* exp) ;
     int visit(ArrayInitializerExp* exp) ;
+    int visit(StructInitializerExp* exp, int base_offset = 0); ;
+    int visit(StructInitializerExp* exp) override;
 
     void visit(PrintfStatement* stm) ;
     void visit(IfStatement* stm) ;

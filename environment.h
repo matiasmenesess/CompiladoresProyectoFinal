@@ -25,6 +25,7 @@ struct VarInfo {
     bool is_array;
     bool is_reference;
     int reg_index = -1;
+    bool is_global = false; // Indica si es una variable global
 };
 struct FunctionParamInfo : public VarInfo {
     std::string name;
@@ -68,17 +69,20 @@ public:
     }
 
     // Añadir una variable
-    void add_var(const string& var, int offset, const string& type, 
+    void add_var(const string& var,
+         int offset, 
+         const string& type, 
         bool is_ptr = false, 
         bool is_array = false, 
         bool is_reference=false,
-        int reg_index = -1
+        int reg_index = -1,
+        bool is_global = false
         ) {
         if (levels.empty()) {
             cout << "Environment sin niveles: no se pueden agregar variables" << endl;
             exit(0);
         }
-        VarInfo info = {offset, type, is_ptr, is_array, is_reference, reg_index};
+        VarInfo info = {offset, type, is_ptr, is_array, is_reference, reg_index, is_global};
         levels.back()[var] = info;
     }
 

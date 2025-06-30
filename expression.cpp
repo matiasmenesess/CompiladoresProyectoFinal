@@ -256,6 +256,16 @@ StructDeclarationList::~StructDeclarationList() {
     for (auto decl : structs) delete decl;
 }
 
+StructInitializerExp::StructInitializerExp(const string& name) : struct_name(name) {}
+void StructInitializerExp::add_member(const string& member_name, Exp* value) {
+    members.emplace_back(member_name, value);
+}
+StructInitializerExp::~StructInitializerExp() {
+    for (auto& member : members) delete member.second; // delete Exp pointers
+}
+
+
+
 Program::Program(IncludeList* includes,
                 GlobalVarDecList* globals,
                 StructDeclarationList* structs,

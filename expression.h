@@ -433,6 +433,20 @@ public:
     int accept(Visitor* visitor) ;
 };
 
+
+class StructInitializerExp :public Exp {
+public:
+    string struct_name;
+    vector<pair<string, Exp*>> members; // member name and value
+    StructInitializerExp(const string& name);
+    void add_member(const string& member_name, Exp* value);
+    int accept(GenCodeVisitor* visitor, int base_offset){
+        return visitor->visit(this, base_offset);
+    }
+
+    int accept(Visitor* visitor);
+    ~StructInitializerExp();
+};
 class ArrayInitializerExp: public Exp {
 public:
     vector<Exp*> elements;

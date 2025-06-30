@@ -307,7 +307,6 @@ Parameter* Parser::parseParameter() {
     if (!check(Token::IDENTIFIER)) {
         throw runtime_error("Se esperaba un nombre para el parametro.");
     }
-    cout<<"tipo encontrado para el parametro: " << type->type_name << " " << type->is_pointer << " " << type->is_array << " " << type->is_reference << endl;
     string name = current->text;
     advance();
 
@@ -324,7 +323,6 @@ Parameter* Parser::parseParameter() {
         type = new Type(type->type_name, false, true, array_size, type->is_reference);
     }
     bool is_ref = type->is_reference;
-    cout<<"is_ref: " << is_ref << endl;
     return new Parameter(type, name, is_ref);
 }
 
@@ -407,7 +405,6 @@ Type* Parser::parseType() {
         cerr << "Error: un parámetro no puede ser puntero y referencia al mismo tiempo." << endl;
         exit(1);
     }
-    cout<< "Tipo: " << typeName << ", Puntero: " << isPointer << ", Referencia: " << isReference << endl;
 
     return new Type(typeName, isPointer, false, nullptr, isReference);
 }
@@ -436,7 +433,11 @@ VarDec* Parser::parseVarDec() {
         );
 
         if (match(Token::LEFT_BRACKET)) {
-            Exp* array_size = parseExpression();
+            Exp* array_size = nullptr;
+            // Permitir corchetes vacíos para inicialización tipo C: int arr[] = { ... }
+            if (!check(Token::RIGHT_BRACKET)) {
+                array_size = parseExpression();
+            }
             if (!match(Token::RIGHT_BRACKET)) {
                 throw runtime_error("Se esperaba ']' después del tamaño del array.");
             }
@@ -453,7 +454,18 @@ VarDec* Parser::parseVarDec() {
                     inits.push_back(parseExpression());
                 }
                 if (!match(Token::RIGHT_BRACE)) throw runtime_error("Se esperaba '}' para cerrar la lista de inicializadores.");
-                initializers.push_back(new ArrayInitializerExp(inits));
+        
+                if (var_type->is_array) {
+                    initializers.push_back(new ArrayInitializerExp(inits));
+                } else if (var_type->type_name.rfind("struct ", 0) == 0) { // empieza con "struct "
+                    std::string struct_name = var_type->type_name.substr(7); // quita "struct "
+                    StructInitializerExp* structInit = new StructInitializerExp(struct_name);
+                    for (auto* exp : inits)
+                        structInit->add_member("", exp); // El nombre real se asocia en semántica
+                    initializers.push_back(structInit);
+                } else {
+                    throw runtime_error("Inicialización con llaves no válida para este tipo.");
+                }
             } else {
                 initializers.push_back(parseExpression());
             }
