@@ -682,6 +682,83 @@ void TypeChecker::visit(PrintfStatement *stm) {
 
 
 int GenCodeVisitor::calcular_stack_body(Body* body) {
+    int stack = 0;
+    for (auto elem : body->elements) {
+        // Variables locales
+        if (auto vardec = dynamic_cast<VarDec*>(elem)) {
+            for (size_t i = 0; i < vardec->vars.size(); ++i) {
+                int var_size = 8;
+                std::string tname = vardec->types[i]->type_name;
+                if (tname == "char" || tname == "bool")
+                    var_size = 1;
+                else if (tname == "int")
+                    var_size = 4;
+                // Si es struct
+                else if (tname.find("struct") == 0) {
+                    std::string struct_name = tname.substr(7);
+                    // Aquí debes tener una función para obtener el tamaño del struct
+                    var_size = env->get_struct_size(struct_name);
+                }
+                // Alinea a 8 bytes
+                if (var_size < 8) var_size = 8;
+                stack += var_size;
+            }
+        }
+        // ForStatement
+        else if (auto forstm = dynamic_cast<ForStatement*>(elem)) {
+            // Suma el stack de la inicialización del for (si es VarDec)
+            if (forstm->init) {
+                if (auto vardec = dynamic_cast<VarDec*>(forstm->init)) {
+                    for (size_t i = 0; i < vardec->vars.size(); ++i) {
+                        int var_size = 8;
+                        std::string tname = vardec->types[i]->type_name;
+                        if (tname == "char" || tname == "bool")
+                            var_size = 1;
+                        else if (tname == "int")
+                            var_size = 4;
+                        else if (tname.find("struct") == 0) {
+                            std::string struct_name = tname.substr(7);
+                            var_size = env->get_struct_size(struct_name);
+                        }
+                        if (var_size < 8) var_size = 8;
+                        stack += var_size;
+                    }
+                }
+            }
+            // Suma el stack de todo el cuerpo del for
+            if (forstm->b)
+                stack += calcular_stack_body(forstm->b);
+        }
+        // IfStatement
+        else if (auto ifstm = dynamic_cast<IfStatement*>(elem)) {
+            if (ifstm->statements)
+                stack += calcular_stack_body(ifstm->statements);
+            if (ifstm->elsChain) {
+                // Puede ser ElseIfStatement o IfStatement
+                if (auto elseif = dynamic_cast<ElseIfStatement*>(ifstm->elsChain)) {
+                    if (elseif->body)
+                        stack += calcular_stack_body(elseif->body);
+                    if (elseif->nextChain) {
+                        // Recursivo para else-if en cadena
+                        if (auto nextElseIf = dynamic_cast<ElseIfStatement*>(elseif->nextChain)) {
+                            if (nextElseIf->body)
+                                stack += calcular_stack_body(nextElseIf->body);
+                        }
+                    }
+                }
+            }
+        }
+        // WhileStatement
+        else if (auto whilestm = dynamic_cast<WhileStatement*>(elem)) {
+            if (whilestm->b)
+                stack += calcular_stack_body(whilestm->b);
+        }
+        // Bloques anidados
+        else if (auto body2 = dynamic_cast<Body*>(elem)) {
+            stack += calcular_stack_body(body2);
+        }
+    }
+    return stack;
 }
 
 void GenCodeVisitor::gencode(Program* program) {
@@ -1376,23 +1453,10 @@ void GenCodeVisitor::visit(VarDec* stm) {
         bool is_reference = var_type->is_reference;
 
         bool is_int = (var_type->type_name=="int");
-        int var_size = is_char || is_bool ? 1 : (is_int? 4:0);
 
-        string mov_inst="";
-        
-        string reg="";
-
-        if ((is_char || is_bool) && !is_ptr) {
-            mov_inst = "movb";
-            reg = "%al";
-        } else if (is_int && !is_ptr) {
-            mov_inst = "movl";
-            reg = "%eax";
-        } else {
-            mov_inst = "movq";
-
-            reg = "%rax";
-        }
+        int var_size = is_char || is_bool && !is_ptr ? 1 : 8;
+        string mov_inst = is_char || is_bool && !is_ptr ? "movb" : "movq";
+        string reg = is_char || is_bool && !is_ptr ? "%al" : "%rax";
         int current_offset = env->lookup(var_name).offset;
         if (is_array && var_type->array_size) {
             var_type->array_size->accept(this);

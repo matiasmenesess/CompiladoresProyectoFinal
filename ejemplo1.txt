@@ -1,21 +1,13 @@
 #include <stdio.h>
 
-struct Persona {
-    char* nombre;
-    int edad;
-};
-
+void llenar(int arr[], int n) {
+    for (int i = 0; i < n; ++i) {
+        arr[i] = i;
+    }
+}
 
 int main() {
-    char* mensaje = "Hola mundo";
-    int x = 5 / 1;
-    int* ptr = &x;
-    struct Persona p = {"Juan", 20};
-
-    printf("Mensaje: %s\n", mensaje);
-    printf("Persona: %s, %d anos\n", p.nombre, p.edad);
-
-
-
+    int datos[10];
+    llenar(datos, 10);
     return 0;
 }
