@@ -28,7 +28,12 @@
   <component name="ChangeListManager">
     <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="casi">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/correc.s" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ejemplo1.s" beforeDir="false" afterPath="$PROJECT_DIR$/ejemplo1.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ejemplo1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ejemplo1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main" beforeDir="false" afterPath="$PROJECT_DIR$/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test1struct.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test1struct.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/visitor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/visitor.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -130,6 +135,11 @@
   }
 }</component>
   <component name="RunManager" selected="CMake Application.ProyectoCompi">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ProyectoCompi" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="ejemplo1.txt" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ProyectoCompi" TARGET_NAME="ProyectoCompi" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ProyectoCompi" RUN_TARGET_NAME="ProyectoCompi">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -161,7 +171,7 @@
       <workItem from="1751046560997" duration="661000" />
       <workItem from="1751136445986" duration="2422000" />
       <workItem from="1751143050812" duration="58387000" />
-      <workItem from="1751255403349" duration="18355000" />
+      <workItem from="1751255403349" duration="23003000" />
     </task>
     <task id="LOCAL-00001" summary="f">
       <option name="closed" value="true" />

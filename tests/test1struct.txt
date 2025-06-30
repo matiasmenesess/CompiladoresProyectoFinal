@@ -15,7 +15,5 @@ int main() {
     printf("Mensaje: %s\n", mensaje);
     printf("Persona: %s, %d anos\n", p.nombre, p.edad);
 
-
-
     return 0;
 }

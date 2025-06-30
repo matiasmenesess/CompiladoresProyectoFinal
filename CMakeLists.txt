@@ -17,4 +17,5 @@ add_executable(ProyectoCompi main.cpp
         visitor.cpp
         visitor.h
         environment.h
+        gencode.cpp
 )
