@@ -447,6 +447,7 @@ public:
     int accept(Visitor* visitor);
     ~StructInitializerExp();
 };
+
 class ArrayInitializerExp: public Exp {
 public:
     vector<Exp*> elements;

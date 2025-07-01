@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Compilador C - Editor Avanzado</title>
+    
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #4ade80;
+            --error: #f87171;
+            --warning: #fbbf24;
+            --dark: #0f172a;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --white: #ffffff;
+            
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: -1;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #f093fb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            min-height: 70vh;
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        }
+
+        .panel-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .panel-title i {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .panel-body {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #22c55e 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            min-width: 250px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dropdown:hover .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-item h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--white);
+        }
+
+        .dropdown-item p {
+            font-size: 0.8rem;
+            color: var(--gray-400);
+            line-height: 1.4;
+        }
+
+        .editor-container {
+            flex: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+        }
+
+        .output-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 0.25rem;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-area {
+            flex: 1;
+            background: var(--gray-900);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            color: var(--gray-300);
+            position: relative;
+        }
+
+        .output-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.error {
+            background: var(--error);
+        }
+
+        .status-dot.warning {
+            background: var(--warning);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .theme-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-btn.active {
+            border-color: var(--white);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-monokai { background: #272822; }
+        .theme-dracula { background: #282a36; }
+        .theme-material { background: #263238; }
+
+        .success-message {
+            color: var(--success);
+        }
+
+        .error-message {
+            color: var(--error);
+        }
+
+        .warning-message {
+            color: var(--warning);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .panel {
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .panel-body {
+                padding: 1rem;
+            }
+            
+            .toolbar {
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-code"></i> Compilador C Avanzado</h1>
+            <p>Compilador moderno con soporte para structs, punteros y generación de código x86-64</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Panel del Editor -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-edit"></i>
+                        Editor de Código
+                    </div>
+                    <div class="theme-selector">
+                        <span style="font-size: 0.8rem; margin-right: 0.5rem;">Tema:</span>
+                        <div class="theme-btn theme-monokai active" onclick="changeTheme('monokai')" title="Monokai"></div>
+                        <div class="theme-btn theme-dracula" onclick="changeTheme('dracula')" title="Dracula"></div>
+                        <div class="theme-btn theme-material" onclick="changeTheme('material-darker')" title="Material"></div>
+                    </div>
+                </div>
+                
+                <div class="panel-body">
+                    <div class="toolbar">
+                        <button class="btn btn-primary" onclick="compileAndRun()" id="compileBtn">
+                            <i class="fas fa-play"></i>
+                            Compilar y Ejecutar
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="compileOnly()" id="compileOnlyBtn">
+                            <i class="fas fa-cog"></i>
+                            Solo Compilar
+                        </button>
+                        
+                        <button class="btn btn-secondary" onclick="clearEditor()">
+                            <i class="fas fa-trash"></i>
+                            Limpiar
+                        </button>
+                        
+                        <div class="dropdown">
+                            <button class="btn btn-success">
+                                <i class="fas fa-book"></i>
+                                Ejemplos
+                            </button>
+                            <div class="dropdown-content" id="examples-dropdown">
+                                <!-- Se llena dinámicamente -->
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="downloadCode()">
+                            <i class="fas fa-download"></i>
+                            Descargar
+                        </button>
+                    </div>
+                    
+                    <div class="editor-container">
+                        <textarea id="code-editor">int main() {
+    int x = 42;
+    int y = x + 8;
+    return y;
+}</textarea>
+                    </div>
+                </div>
+                
+                <div class="status-bar">
+                    <div class="status-indicator">
+                        <div class="status-dot" id="status-dot"></div>
+                        <span id="status-text">Listo</span>
+                    </div>
+                    <div>
+                        <span id="stats">Líneas: 4 | Caracteres: 67</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Resultados -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-terminal"></i>
+                        Resultados de Compilación
+                    </div>
+                    <div style="font-size: 0.8rem; opacity: 0.7;" id="execution-time"></div>
+                </div>
+                
+                <div class="panel-body">
+                    <div class="output-tabs">
+                        <div class="tab active" onclick="switchTab('assembly')">
+                            <i class="fas fa-microchip"></i>
+                            Assembly
+                        </div>
+                        <div class="tab" onclick="switchTab('execution')">
+                            <i class="fas fa-play-circle"></i>
+                            Ejecución
+                        </div>
+                        <div class="tab" onclick="switchTab('compiler')">
+                            <i class="fas fa-cog"></i>
+                            Compilador
+                        </div>
+                    </div>
+
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Compilando código...</div>
+                    </div>
+
+                    <div id="assembly-tab" class="tab-content active">
+                        <div id="assembly-output" class="output-area">
+# El código assembly x86-64 aparecerá aquí después de compilar
+# 
+# Tu compilador generará instrucciones como:
+# .data
+# .text
+# .globl main
+# main:
+#     pushq %rbp
+#     movq %rsp, %rbp
+#     ...
+
+¡Haz clic en "Compilar y Ejecutar" para ver el resultado!
+                        </div>
+                    </div>
+
+                    <div id="execution-tab" class="tab-content">
+                        <div id="execution-output" class="output-area">
+# Resultados de la ejecución del programa
+#
+# Aquí verás:
+# - Código de salida del programa
+# - Salida estándar (stdout)
+# - Errores de ejecución (stderr)
+# - Tiempo de ejecución
+
+¡Compila tu código para ver los resultados!
+                        </div>
+                    </div>
+
+                    <div id="compiler-tab" class="tab-content">
+                        <div id="compiler-output" class="output-area">
+# Mensajes del compilador
+#
+# Aquí aparecerán:
+# - Mensajes de debug del compilador
+# - Información sobre variables declaradas
+# - Cálculos de offsets
+# - Errores de compilación si los hay
+
+Esperando compilación...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+    
+    <script>
+        let editor;
+        let currentTheme = 'monokai';
+        const API_BASE = window.location.origin;
+
+        // Inicializar editor
+        document.addEventListener('DOMContentLoaded', function() {
+            editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+                mode: 'text/x-csrc',
+                theme: currentTheme,
+                lineNumbers: true,
+                indentUnit: 4,
+                tabSize: 4,
+                lineWrapping: true,
+                autoCloseBrackets: true,
+                matchBrackets: true,
+                extraKeys: {
+                    'Ctrl-Space': 'autocomplete',
+                    'F11': fullscreen,
+                    'Esc': exitFullscreen
+                }
+            });
+
+            editor.on('changes', updateStats);
+            loadExamples();
+            updateStats();
+        });
+
+        function updateStats() {
+            const content = editor.getValue();
+            const lines = content.split('\n').length;
+            const chars = content.length;
+            document.getElementById('stats').textContent = `Líneas: ${lines} | Caracteres: ${chars}`;
+        }
+
+        function changeTheme(theme) {
+            currentTheme = theme;
+            editor.setOption('theme', theme);
+            
+            // Actualizar botones de tema
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.theme-${theme.replace('-', '')}`).classList.add('active');
+        }
+
+        function switchTab(tabName) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar pestaña seleccionada
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+        }
+
+        async function compileAndRun() {
+            await compile(false);
+        }
+
+        async function compileOnly() {
+            await compile(true);
+        }
+
+        async function compile(compileOnly = false) {
+            const code = editor.getValue().trim();
+            
+            if (!code) {
+                updateStatus('Por favor ingrese código para compilar', 'error');
+                return;
+            }
+
+            // Deshabilitar botones
+            document.getElementById('compileBtn').disabled = true;
+            document.getElementById('compileOnlyBtn').disabled = true;
+            
+            // Mostrar loading
+            showLoading(true);
+            updateStatus('Compilando...', 'warning');
+            
+            const startTime = Date.now();
+
+            try {
+                const response = await fetch(`${API_BASE}/compile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        source_code: code,
+                        compile_only: compileOnly
+                    })
+                });
+
+                const data = await response.json();
+                const totalTime = Date.now() - startTime;
+
+                if (data.success) {
+                    handleSuccess(data, totalTime, compileOnly);
+                } else {
+                    handleError(data);
+                }
+
+            } catch (error) {
+                handleNetworkError(error);
+            } finally {
+                showLoading(false);
+                document.getElementById('compileBtn').disabled = false;
+                document.getElementById('compileOnlyBtn').disabled = false;
+            }
+        }
+
+        function handleSuccess(data, totalTime, compileOnly) {
+            updateStatus('✅ Compilación exitosa', 'success');
+            
+            // Mostrar assembly
+            document.getElementById('assembly-output').textContent = 
+                data.assembly_code || '# No se generó código assembly';
+            
+            // Mostrar resultado de ejecución
+            if (!compileOnly && data.execution_result) {
+                const exec = data.execution_result;
+                let output = '';
+                
+                if (exec.executed) {
+                    output += `🚀 PROGRAMA EJECUTADO\n`;
+                    output += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+                    
+                    if (exec.stdout) {
+                        output += `📤 SALIDA ESTÁNDAR:\n${exec.stdout}\n\n`;
+                    }
+                    
+                    if (exec.stderr) {
+                        output += `⚠️  ERRORES:\n${exec.stderr}\n\n`;
+                    }
+                    
+                    output += `📊 ESTADÍSTICAS:\n`;
+                    output += `   Código de salida: ${exec.return_code}\n`;
+                    if (exec.execution_time) {
+                        output += `   Tiempo de ejecución: ${exec.execution_time.toFixed(3)}s\n`;
+                    }
+                } else {
+                    output += `❌ ERROR DE EJECUCIÓN\n`;
+                    output += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+                    output += exec.stderr || exec.gcc_error || 'Error desconocido';
+                }
+                
+                document.getElementById('execution-output').textContent = output;
+            } else if (compileOnly) {
+                document.getElementById('execution-output').textContent = 
+                    '⚙️ SOLO COMPILACIÓN\n━━━━━━━━━━━━━━━━━━━━\n\nNo se ejecutó el programa.\nUsa "Compilar y Ejecutar" para ver los resultados.';
+            }
+            
+            // Mostrar salida del compilador
+            document.getElementById('compiler-output').textContent = 
+                data.compiler_output || '✅ Compilación completada sin mensajes adicionales';
+            
+            // Actualizar tiempo
+            const timeInfo = [];
+            if (data.compilation_time) {
+                                timeInfo.push(`Compilación: ${data.compilation_time.toFixed(3)}s`);
+                            }
+                            if (data.execution_time) {
+                                timeInfo.push(`Ejecución: ${data.execution_time.toFixed(3)}s`);
+                            }
+                            document.getElementById('execution-time').textContent = timeInfo.join(' | ');
+                        }
+                
+                        function handleError(data) {
+                            updateStatus('❌ Error de compilación', 'error');
+                            document.getElementById('assembly-output').textContent = '# No se generó código assembly';
+                            document.getElementById('execution-output').textContent = data.error_message || 'Error desconocido';
+                            document.getElementById('compiler-output').textContent = data.compiler_output || '';
+                            document.getElementById('execution-time').textContent = '';
+                        }
+                
+                        function handleNetworkError(error) {
+                            updateStatus('❌ Error de red o del servidor', 'error');
+                            document.getElementById('assembly-output').textContent = '# No se pudo conectar con el backend';
+                            document.getElementById('execution-output').textContent = error.toString();
+                            document.getElementById('compiler-output').textContent = '';
+                            document.getElementById('execution-time').textContent = '';
+                        }
+                
+                        function showLoading(show) {
+                            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+                        }
+                
+                        function updateStatus(message, type = 'success') {
+                            const statusText = document.getElementById('status-text');
+                            const statusDot = document.getElementById('status-dot');
+                            statusText.textContent = message;
+                            statusDot.className = 'status-dot';
+                            if (type === 'success') statusDot.classList.add('success');
+                            else if (type === 'error') statusDot.classList.add('error');
+                            else if (type === 'warning') statusDot.classList.add('warning');
+                        }
+                
+                        function clearEditor() {
+                            editor.setValue('');
+                            updateStatus('Editor limpio', 'success');
+                            document.getElementById('assembly-output').textContent = '';
+                            document.getElementById('execution-output').textContent = '';
+                            document.getElementById('compiler-output').textContent = '';
+                            document.getElementById('execution-time').textContent = '';
+                            updateStats();
+                        }
+                
+                        function downloadCode() {
+                            const code = editor.getValue();
+                            const blob = new Blob([code], {type: 'text/x-csrc'});
+                            const a = document.createElement('a');
+                            a.href = URL.createObjectURL(blob);
+                            a.download = 'codigo.c';
+                            a.click();
+                            URL.revokeObjectURL(a.href);
+                        }
+                
+                        // Ejemplos dinámicos
+                        async function loadExamples() {
+                            try {
+                                const res = await fetch(`${API_BASE}/examples`);
+                                const data = await res.json();
+                                const dropdown = document.getElementById('examples-dropdown');
+                                dropdown.innerHTML = '';
+                                for (const key in data) {
+                                    const example = data[key];
+                                    const item = document.createElement('div');
+                                    item.className = 'dropdown-item';
+                                    item.innerHTML = `<h4>${example.name}</h4><p>${example.description}</p>`;
+                                    item.onclick = () => {
+                                        editor.setValue(example.code);
+                                        updateStatus(`Ejemplo cargado: ${example.name}`, 'success');
+                                        updateStats();
+                                    };
+                                    dropdown.appendChild(item);
+                                }
+                            } catch (e) {
+                                // No cargar ejemplos si falla
+                            }
+                        }
+                
+                        // Fullscreen helpers (opcional)
+                        function fullscreen(cm) {
+                            cm.setOption("fullScreen", true);
+                        }
+                        function exitFullscreen(cm) {
+                            cm.setOption("fullScreen", false);
+                        }
+                    </script>
+                </body>
+                </html>                

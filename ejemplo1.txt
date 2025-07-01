@@ -1,17 +1,6 @@
-#include <stdio.h>
-
-
-
-int suma(int& c, int b) {
-    c++;
-    return c;
-}
-
 int main() {
-    int a = 10;
-    printf("Entero: %d, Caracter: %c\n", a, 'a');
-    int b = 20;
-    int resultado = suma(a, b);
-    printf("La suma es: %d\n", a);
+    int x = 42;
+    int y = x + 8;
+    printf("hola\n");
     return 0;
 }
