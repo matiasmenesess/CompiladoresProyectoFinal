@@ -7,12 +7,10 @@
 #include <utility>
 using namespace  std;
 
-// ImpValue implementation
 ImpValue::ImpValue(string tipo, int valor, bool bol) : tipo(tipo), valor(valor), bool_value(bol) {}
 ImpValue::ImpValue() : tipo(""), valor(0), bool_value(false) {}
 ImpValue::~ImpValue() {}
 
-// Exp 
 Exp::~Exp() {}
 
 string Exp::binopToChar(BinaryOp op) {
@@ -261,7 +259,7 @@ void StructInitializerExp::add_member(const string& member_name, Exp* value) {
     members.emplace_back(member_name, value);
 }
 StructInitializerExp::~StructInitializerExp() {
-    for (auto& member : members) delete member.second; // delete Exp pointers
+    for (auto& member : members) delete member.second; 
 }
 
 
