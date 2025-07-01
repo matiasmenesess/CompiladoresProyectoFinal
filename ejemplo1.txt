@@ -1,15 +1,19 @@
 #include <stdio.h>
 
-
-
+struct Persona {
+    char* nombre;
+    int edad;
+};
 
 
 int main() {
-    int x ;
-    x = 10;
-    for (int i = 0; i < 10; i++) {
-        x = x+i;
-    }
-    printf("El valor de x es: %d\n", x);
+    char* mensaje = "Hola mundo";
+    int x = 5 / 1;
+    int* ptr = &x;
+    struct Persona p = {"Juan", 20};
+
+    printf("Mensaje: %s\n", mensaje);
+    printf("Persona: %s, %d anos\n", p.nombre, p.edad);
+
     return 0;
 }

@@ -17,19 +17,23 @@ int GenCodeVisitor::calcular_stack_body(Body* body) {
         // Variables locales
         if (auto vardec = dynamic_cast<VarDec*>(elem)) {
             for (size_t i = 0; i < vardec->vars.size(); ++i) {
-                int var_size = 8;
+                int var_size = 8;  // Por defecto 64 bits
                 std::string tname = vardec->types[i]->type_name;
-                if (tname == "char" || tname == "bool")
+                
+                // Tamaños específicos para 64 bits
+                if (vardec->types[i]->is_pointer) {
+                    var_size = 8;  // Todos los punteros en 64 bits = 8 bytes
+                }
+                else if (tname == "char" || tname == "bool")
                     var_size = 1;
                 else if (tname == "int")
-                    var_size = 4;
+                    var_size = 8;  // int en 64 bits = 8 bytes
                 else if (tname.find("struct") == 0) {
                     std::string struct_name = tname.substr(7);
                     var_size = env->get_struct_size(struct_name);
                 }
-                else if (tname == "char" && vardec->types[i]->is_pointer){
-                    var_size=1;
-                }
+                
+                // Asegurar alineación a 8 bytes para 64 bits
                 if (var_size < 8) var_size = 8;
                 stack += var_size;
             }
@@ -40,16 +44,22 @@ int GenCodeVisitor::calcular_stack_body(Body* body) {
             if (forstm->init) {
                 if (auto vardec = dynamic_cast<VarDec*>(forstm->init)) {
                     for (size_t i = 0; i < vardec->vars.size(); ++i) {
-                        int var_size = 8;
+                        int var_size = 8;  // Por defecto 64 bits
                         std::string tname = vardec->types[i]->type_name;
-                        if (tname == "char" || tname == "bool")
+                        
+                        if (vardec->types[i]->is_pointer) {
+                            var_size = 8;  // Punteros = 8 bytes en 64 bits
+                        }
+                        else if (tname == "char" || tname == "bool")
                             var_size = 1;
                         else if (tname == "int")
-                            var_size = 8;
+                            var_size = 8;  // int en 64 bits = 8 bytes
                         else if (tname.find("struct") == 0) {
                             std::string struct_name = tname.substr(7);
                             var_size = env->get_struct_size(struct_name);
                         }
+                        
+                        // Alineación a 8 bytes
                         if (var_size < 8) var_size = 8;
                         stack += var_size;
                     }
@@ -90,7 +100,6 @@ int GenCodeVisitor::calcular_stack_body(Body* body) {
     }
     return stack;
 }
-
 void GenCodeVisitor::gencode(Program* program) {
     out << ".data" << endl;
     out << "print_fmt: .string \"%ld\\n\"" << endl;
