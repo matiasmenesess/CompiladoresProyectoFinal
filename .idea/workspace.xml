@@ -26,7 +26,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="casi" />
+    <list default="true" id="6554c763-b25c-4a5f-b177-df01c9f570d5" name="Changes" comment="casi">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ejemplo1.s" beforeDir="false" afterPath="$PROJECT_DIR$/ejemplo1.s" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ejemplo1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ejemplo1.txt" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -136,11 +140,6 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="CMake Application.ProyectoCompi" />
       <item itemvalue="CMake Application.TESTCOMPI" />
@@ -163,7 +162,8 @@
       <workItem from="1751136445986" duration="2422000" />
       <workItem from="1751143050812" duration="58387000" />
       <workItem from="1751255403349" duration="35343000" />
-      <workItem from="1751342060277" duration="11481000" />
+      <workItem from="1751342060277" duration="16241000" />
+      <workItem from="1751398250648" duration="339000" />
     </task>
     <task id="LOCAL-00001" summary="f">
       <option name="closed" value="true" />

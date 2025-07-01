@@ -1,6 +1,16 @@
+#include <stdio.h>
+
 int main() {
     int x = 42;
-    int y = x + 8;
-    printf("hola\n");
+    int *ptr = &x;
+    int *pptr = ptr;
+
+    printf("Valor de x: %d\n", x);
+    printf("Valor usando *ptr: %d\n", *ptr);
+    printf("Valor usando **pptr: %d\n", *pptr);
+
+    **pptr = 99;
+    printf("Nuevo valor de x: %d\n", x);
+
     return 0;
 }
