@@ -1,19 +1,18 @@
 #include <stdio.h>
 
-struct Persona {
-    char* nombre;
-    int edad;
-};
+void arreglar() {
+    for (int i = 0; i < 10; i++) {
+        int l = 8;
+        for (int J = 0; J < 10; J++) {
+             printf("hola\n");
+             l+=8;
+        }
+        printf("probando el l: %d \n", l);
 
+    }
+}
 
 int main() {
-    char* mensaje = "Hola mundo";
-    int x = 5 / 1;
-    int* ptr = &x;
-    struct Persona p = {"Juan", 20};
-
-    printf("Mensaje: %s\n", mensaje);
-    printf("Persona: %s, %d anos\n", p.nombre, p.edad);
-
+    arreglar();
     return 0;
 }

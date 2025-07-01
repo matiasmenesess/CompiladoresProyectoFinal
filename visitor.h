@@ -196,7 +196,7 @@ public:
     void visit(GlobalVarDecList* decList) ;
     void visit(Parameter* param) ;
     void visit(ParameterList* paramList) ;
-
+    void get_member_address(MemberAccessExp* exp);
     void visit(StatementList* stm) ;
     void visit(Body* b) ;
     void visit(Function* func) ;
