@@ -5,10 +5,11 @@
 
 
 int main() {
+    int x ;
+    x = 10;
     for (int i = 0; i < 10; i++) {
-        for (int J = 0; J < 10; J++) {
-             printf("hola\n");
-        }
+        x = x+i;
     }
-        return 0;
+    printf("El valor de x es: %d\n", x);
+    return 0;
 }

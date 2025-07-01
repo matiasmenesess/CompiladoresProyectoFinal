@@ -45,7 +45,7 @@ int GenCodeVisitor::calcular_stack_body(Body* body) {
                         if (tname == "char" || tname == "bool")
                             var_size = 1;
                         else if (tname == "int")
-                            var_size = 4;
+                            var_size = 8;
                         else if (tname.find("struct") == 0) {
                             std::string struct_name = tname.substr(7);
                             var_size = env->get_struct_size(struct_name);
@@ -195,11 +195,7 @@ int GenCodeVisitor::visit(IdentifierExp* exp) {
     } else if (info.reg_index >= 0) {
         out << "    movq " << regs[info.reg_index] << ", %rax  # Valor de " << exp->name << endl;
     } else if (!info.is_global) {
-        if (info.type == "int" && !info.is_pointer) {
-            out << "    movl " << info.offset << "(%rbp), %eax  # " << exp->name << endl;
-        } else {
-            out << "    movq " << info.offset << "(%rbp), %rax  # " << exp->name << endl;
-        }
+        out << "    movq " << info.offset << "(%rbp), %rax  # " << exp->name << endl;
     } else {
         out << "    movq " << exp->name << "(%rip), %rax  # " << exp->name << endl;
     }
@@ -294,7 +290,7 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
     switch (exp->op) {
         case NEGACION_OP:
             out << "    testq %rax, %rax" << endl;
-            out << "    movl $0, %ecx" << endl;
+            out << "    movq $0, %rcx" << endl;
             out << "    sete %cl" << endl;
             out << "    movq %rcx, %rax" << endl;
             break;
@@ -329,24 +325,13 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
                 }
             } else if (!info.is_global) {
                 int offset = info.offset;
-                if (info.type == "int" && !info.is_pointer) {
-                    if (exp->is_prefix) {
-                        out << "    incl %eax" << endl;
-                        out << "    movl %eax, " << offset << "(%rbp)" << endl;
-                    } else {
-                        out << "    movl %eax, %ecx" << endl;
-                        out << "    incl %ecx" << endl;
-                        out << "    movl %ecx, " << offset << "(%rbp)" << endl;
-                    }
+                if (exp->is_prefix) {
+                    out << "    incq %rax" << endl;
+                    out << "    movq %rax, " << offset << "(%rbp)" << endl;
                 } else {
-                    if (exp->is_prefix) {
-                        out << "    incq %rax" << endl;
-                        out << "    movq %rax, " << offset << "(%rbp)" << endl;
-                    } else {
-                        out << "    movq %rax, %rcx" << endl;
-                        out << "    incq %rcx" << endl;
-                        out << "    movq %rcx, " << offset << "(%rbp)" << endl;
-                    }
+                    out << "    movq %rax, %rcx" << endl;
+                    out << "    incq %rcx" << endl;
+                    out << "    movq %rcx, " << offset << "(%rbp)" << endl;
                 }
             }else {
                 // global
@@ -442,16 +427,16 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
     switch (exp->op) {
         case PLUS_OP:
             exp->left->accept(this);    // %rax = left
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);   // %rax = right
-            out << "    addl %edx, %eax" << endl;
+            out << "    addq %rdx, %rax" << endl;
             break;
         case MINUS_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    subl %eax, %edx" << endl;
-            out << "    movl %edx, %eax" << endl;
+            out << "    subq %rax, %rdx" << endl;
+            out << "    movq %rdx, %rax" << endl;
             break;
         case MULT_OP:
             exp->left->accept(this);
@@ -913,10 +898,7 @@ void GenCodeVisitor::visit(VarDec* stm) {
         current_offset -= var_size;
         if (var_size < 8) {
             int padding = (8 - (abs(current_offset) % 8) % 8);
-            if (padding > 0) {
-                current_offset -= padding;
-                out << "    # Padding de " << padding << " bytes para alineación\n";
-            }
+           
         }
     }
 }
