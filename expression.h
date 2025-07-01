@@ -333,7 +333,7 @@ class GlobalVarDec {
 public:
     Type* type;
     string var_name;
-    Exp* initializer; // for global initialization
+    Exp* initializer; 
     GlobalVarDec(Type* type, string name, Exp* init = nullptr);
     ~GlobalVarDec();
     int accept(Visitor* visitor) ;
@@ -437,7 +437,7 @@ public:
 class StructInitializerExp :public Exp {
 public:
     string struct_name;
-    vector<pair<string, Exp*>> members; // member name and value
+    vector<pair<string, Exp*>> members; 
     StructInitializerExp(const string& name);
     void add_member(const string& member_name, Exp* value);
     int accept(GenCodeVisitor* visitor, int base_offset){

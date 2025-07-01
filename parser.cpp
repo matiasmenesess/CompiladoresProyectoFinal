@@ -95,7 +95,6 @@ Program* Parser::parseProgram() {
 
     GlobalVarDecList* globals = parseGlobalDeclarations();
     skipComments();
-    // GlobalVarDecList* globals = nullptr;
     
 
     StructDeclarationList* structs = parseStructDeclarations();
@@ -436,7 +435,6 @@ VarDec* Parser::parseVarDec() {
 
         if (match(Token::LEFT_BRACKET)) {
             Exp* array_size = nullptr;
-            // Permitir corchetes vacíos para inicialización tipo C: int arr[] = { ... }
             if (!check(Token::RIGHT_BRACKET)) {
                 array_size = parseExpression();
             }
@@ -459,11 +457,11 @@ VarDec* Parser::parseVarDec() {
         
                 if (var_type->is_array) {
                     initializers.push_back(new ArrayInitializerExp(inits));
-                } else if (var_type->type_name.rfind("struct ", 0) == 0) { // empieza con "struct "
-                    std::string struct_name = var_type->type_name.substr(7); // quita "struct "
+                } else if (var_type->type_name.rfind("struct ", 0) == 0) { 
+                    std::string struct_name = var_type->type_name.substr(7); 
                     StructInitializerExp* structInit = new StructInitializerExp(struct_name);
                     for (auto* exp : inits)
-                        structInit->add_member("", exp); // El nombre real se asocia en semántica
+                        structInit->add_member("", exp); 
                     initializers.push_back(structInit);
                 } else {
                     throw runtime_error("Inicialización con llaves no válida para este tipo.");
@@ -476,7 +474,6 @@ VarDec* Parser::parseVarDec() {
         }
     } while (match(Token::COMMA));
 
-    // Si tu VarDec solo acepta un Type*, puedes usar el primero (pero lo ideal es vector<Type*>)
     VarDec* vd = new VarDec(types, vars);
     for (auto init : initializers) {
         vd->add_initializer(init);
@@ -688,7 +685,6 @@ Stm* Parser::parseExpressionStatement() {
     return new ExpressionStatement(exp);
 }
 
-// Expression parsing
 Exp* Parser::parseExpression() {
     return parseAssignment();
 }
@@ -764,7 +760,7 @@ Exp* Parser::parseComparison() {
 
         }
 
-        advance(); // Consumir el operador
+        advance();
 
         Exp* right = parseAdditive();
         expr = new BinaryExp(expr, right, op);
@@ -786,7 +782,7 @@ Exp* Parser::parseEquality() {
 
         }
 
-        advance(); // Consumir el operador
+        advance();
 
         Exp* right = parseComparison();
         expr = new BinaryExp(expr, right, op);

@@ -14,9 +14,9 @@ struct FieldInfo {
 };
 
 struct StructInfo {
-    std::unordered_map<std::string, FieldInfo> fields; // nombre_campo -> info de campo
-    std::unordered_map<std::string, int> offsets;      // nombre_campo -> offset en bytes
-    int size = 0;                                      // tamaño total del struct
+    std::unordered_map<std::string, FieldInfo> fields; 
+    std::unordered_map<std::string, int> offsets;      
+    int size = 0;
 };
 struct VarInfo {
     int offset;
@@ -42,7 +42,7 @@ struct FunctionInfo {
 class Environment {
 private:
     int current_offset = 0;
-    vector<unordered_map<string, VarInfo>> levels; // Almacena toda la info de la variable
+    vector<unordered_map<string, VarInfo>> levels; 
     unordered_map<string, FunctionInfo> functions;
     unordered_map<string, StructInfo> structs;
 
@@ -72,13 +72,11 @@ public:
         current_offset = offset;
     }
 
-    // Añadir un nuevo nivel
     void add_level() {
         unordered_map<string, VarInfo> new_level;
         levels.push_back(new_level);
     }
 
-    // Añadir una variable
     void add_var(const string& var,
          int offset, 
          const string& type, 
@@ -96,7 +94,6 @@ public:
         levels.back()[var] = info;
     }
 
-    // Remover un nivel
     bool remove_level() {
         if (!levels.empty()) {
             levels.pop_back();
@@ -106,8 +103,6 @@ public:
     }
 
     
-
-    // Verificar si una variable está declarada
     bool check(const string& x) {
         int idx = search_rib(x);
         return (idx >= 0);
@@ -122,7 +117,6 @@ public:
 
     }
 
-    // Obtener la información de una variable
     VarInfo lookup(const string& x) {
         int idx = search_rib(x);
         if (idx < 0) {
@@ -132,12 +126,10 @@ public:
         return levels[idx][x];
     }
 
-    // Obtener el tipo de una variable
     string lookup_type(const string& x) {
         return lookup(x).type;
     }
 
-    // Verificar el tipo de una variable antes de asignar un valor
     bool typecheck(const string& var, const string& expected_type) {
         string actual_type = lookup_type(var);
         if (actual_type != expected_type) {
@@ -147,7 +139,6 @@ public:
         return true;
     }
 
-    // Funciones
     void add_function(const string& name, const FunctionInfo& info) {
         functions[name] = info;
     }
@@ -182,11 +173,9 @@ public:
         }
         functions[name].stack_size = size;
     }
-    // Verificar si una función está declarada
     bool has_function_declared(const string& name) {
         return functions.find(name) != functions.end();
     }
-    // Obtener el tipo de retorno de una función
     string get_function_return_type(const string& name) {
         if (!has_function(name)) {
             cout << "Función no declarada: " << name << endl;
@@ -194,7 +183,6 @@ public:
         }
         return functions[name].return_type;
     }
-    // Obtener el offset de un parámetro de función
     int get_function_param_offset(const string& func_name, const string& param_name) {
         if (!has_function(func_name)) {
             cout << "Función no declarada: " << func_name << endl;
@@ -210,7 +198,6 @@ public:
         exit(0);
     }   
 
-    // Structs
     int get_struct_size(const std::string& name) {
         if (!has_struct(name)) {
             std::cout << "Struct no declarado: " << name << std::endl;

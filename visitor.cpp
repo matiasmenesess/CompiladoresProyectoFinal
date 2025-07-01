@@ -11,7 +11,6 @@
 #include <iterator>
 using namespace std;
 
-// Accept methods implementations
 int Include::accept(Visitor *visitor) {
     visitor->visit(this);
     return 0;
@@ -185,8 +184,6 @@ int StructInitializerExp::accept(Visitor *visitor) {
     return visitor->visit(this);
 }
 
-//Print Visitor implementation
-//Print Visitor implementation
 
 void PrintVisitor::visit(Include* inc) {
     cout << "#include "
@@ -326,7 +323,6 @@ void PrintVisitor::visit(PrintfStatement* stm) {
 void PrintVisitor::visit(IfStatement* stm) {
     if (!stm) return;
 
-    // Imprimir if
     printIndent();
 
     cout << "if (";
@@ -455,7 +451,7 @@ void PrintVisitor::visit(VarDec* vardec) {
     printIndent();
     for (size_t i = 0; i < vardec->vars.size(); ++i) {
         if (i < vardec->types.size() && vardec->types[i]) {
-            vardec->types[i]->accept(this); // <-- Esto imprime el tipo
+            vardec->types[i]->accept(this);
           
         } else {
             cout << "/*tipo?*/";
@@ -609,24 +605,21 @@ void PrintVisitor::visit(StructDeclarationList* struct_list) {
 
 void PrintVisitor::printIndent() {
     for (int i = 0; i < indent_level; ++i) {
-        cout << "    ";  // 4 spaces per indent level
+        cout << "    "; 
     }
 }
 
 void PrintVisitor::imprimir(Program* program) {
-    // Print includes
     if (program->includes) {
         program->includes->accept(this);
         cout << endl;
     }
 
-    // Print global declarations
     if (program->global_declarations) {
         program->global_declarations->accept(this);
         cout << endl;
     }
 
-    // Print struct declarations
     if (program->struct_declarations) {
         program->struct_declarations->accept(this);
     }
