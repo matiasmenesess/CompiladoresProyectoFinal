@@ -9,7 +9,6 @@
 #include "environment.h"
 using namespace std;
 
-// Forward declarations
 class Body;
 class Exp;
 class Stm;
@@ -60,7 +59,6 @@ public:
 
     virtual ~Visitor() = default;
 
-    // Expressions
     virtual void visit(Include* inc) = 0;
     virtual void visit(IncludeList* incList) = 0;
     virtual void visit(Type* type) = 0;
@@ -79,7 +77,6 @@ public:
     virtual int visit(ParenExp* exp) = 0;
     virtual int visit(ArrayInitializerExp* exp) = 0;
     virtual int visit(StructInitializerExp* exp) = 0;
-    // Statements
     virtual void visit(PrintfStatement* stm) = 0;
     virtual void visit(IfStatement* stm) = 0;
     virtual void visit(ElseIfStatement* stm) = 0;
@@ -87,7 +84,6 @@ public:
     virtual void visit(ForStatement* stm) = 0;
     virtual void visit(ExpressionStatement* stm) = 0;
     virtual void visit(ReturnStatement* stm) = 0;
-    // Declarations
     virtual void visit(VarDec* stm) = 0;
     virtual void visit(VarDecList* stm) = 0;
     virtual void visit(GlobalVarDec* dec) = 0;
@@ -95,7 +91,6 @@ public:
     virtual void visit(Parameter* param) = 0;
     virtual void visit(ParameterList* paramList) = 0;
 
-    // Structure
     virtual void visit(StatementList* stm) = 0;
     virtual void visit(Body* b) = 0;
     virtual void visit(Function* func) = 0;
@@ -111,7 +106,6 @@ public:
     int indent_level = 0;
 
     void printIndent();
-    // Implement all pure virtual functions from Visitor
     void visit(Include* inc) ;
     void visit(IncludeList* incList) ;
     void visit(Type* type) ;
