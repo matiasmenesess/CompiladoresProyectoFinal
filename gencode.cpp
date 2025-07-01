@@ -440,80 +440,80 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
             break;
         case MULT_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    imull %edx, %eax" << endl;
+            out << "    imulq %rdx, %rax" << endl;
             break;
         case DIV_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    movl %eax, %ecx" << endl;
-            out << "    movl %edx, %eax" << endl;
-            out << "    cltd" << endl;
-            out << "    idivl %ecx" << endl;
+            out << "    movq %rax, %rcx" << endl;
+            out << "    movq %rdx, %rax" << endl;
+            out << "    cqo" << endl;
+            out << "    idivq %rcx" << endl;
             break;
         case MOD_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    movl %eax, %ecx" << endl;
-            out << "    movl %edx, %eax" << endl;
-            out << "    cltd" << endl;
-            out << "    idivl %ecx" << endl;
-            out << "    movl %edx, %eax" << endl;
+            out << "    movq %rax, %rcx" << endl;
+            out << "    movq %rdx, %rax" << endl;
+            out << "    cqo" << endl;
+            out << "    idivq %rcx" << endl;
+            out << "    movq %rdx, %rax" << endl;
             break;
         case EQUAL_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    cmpl %eax, %edx" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    cmp %rax, %rdx" << endl;
+            out << "    movq $0, %rax" << endl;
             out << "    sete %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case NOT_EQUAL_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    cmpl %eax, %edx" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    cmpq %rax, %rdx" << endl;
+            out << "    movq $0, %rax" << endl;
             out << "    setne %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case LESS_THAN_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    cmpl %eax, %edx" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    cmpq %rax, %rdx" << endl;
+            out << "    movq $0, %rax" << endl;
             out << "    setl %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case GREATER_THAN_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    cmpl %eax, %edx" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    cmpq %rax, %rdx" << endl;
+            out << "    movq $0, %rax" << endl;
             out << "    setg %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case LESS_EQUAL_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    cmpl %eax, %edx" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    cmpq %rax, %rdx" << endl;
+            out << "    movq $0, %rax" << endl;
             out << "    setle %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case GREATER_EQUAL_OP:
             exp->left->accept(this);
-            out << "    movl %eax, %edx" << endl;
+            out << "    movq %rax, %rdx" << endl;
             exp->right->accept(this);
-            out << "    cmpl %eax, %edx" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    cmpq %rax, %rdx" << endl;
+            out << "    movq $0, %rax" << endl;
             out << "    setge %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
@@ -526,10 +526,10 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
             out << "    jz .Lfalse" << label_false << endl;
             exp->right->accept(this);
             out << "    testq %rax, %rax" << endl;
-            out << "    movl $1, %eax" << endl;
+            out << "    movq $1, %rax" << endl;
             out << "    jnz .Lend" << label_end << endl;
             out << ".Lfalse" << label_false << ":" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    movq $0, %rax" << endl;
             out << ".Lend" << label_end << ":" << endl;
             break;
         }
@@ -541,10 +541,10 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
             out << "    jnz .Ltrue" << label_true << endl;
             exp->right->accept(this);
             out << "    testq %rax, %rax" << endl;
-            out << "    movl $0, %eax" << endl;
+            out << "    movq $0, %rax" << endl;
             out << "    jz .Lend" << label_end << endl;
             out << ".Ltrue" << label_true << ":" << endl;
-            out << "    movl $1, %eax" << endl;
+            out << "    movq $1, %rax" << endl;
             out << ".Lend" << label_end << ":" << endl;
             break;
         }
@@ -560,7 +560,7 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
                     if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
                 exp->right->accept(this);
                 int offset = env->lookup(id->name).offset;
-                out << "    movl %eax, " << offset << "(%rbp)  # " << id->name << " = valor" << endl;
+                out << "    movq %rax, " << offset << "(%rbp)  # " << id->name << " = valor" << endl;
             }
             break;
         }
@@ -838,7 +838,9 @@ void GenCodeVisitor::visit(VarDec* stm) {
             var_size = 1;
             mov_inst = "movb";
             reg = "%al";
-        } else if (is_int && !is_ptr) {
+        } 
+        
+        else if (is_int && !is_ptr) {
             var_size = 4;
             cout<<"#hola 444"<<endl;
             mov_inst = "movl";
@@ -887,13 +889,19 @@ void GenCodeVisitor::visit(VarDec* stm) {
             if (is_bool) {
                 out << "    andb $1, " << current_offset << "(%rbp)  # Asegurar 0/1\n";
             }
-        } else {
+        }else if(stm->types[i]->type_name == "int") {
+            // Asignación de cadena
+            out << "    movq $0, " << current_offset << "(%rbp)  # Inicializar a 0\n";  
+        }
+        
+        else {
             if (is_ptr) {
                 out << "    movq $0, " << current_offset << "(%rbp)  # NULL para puntero\n";
             } else {
                 out << "    " << mov_inst << " $0, " << current_offset << "(%rbp)  # Inicializar a 0\n";
             }
         }
+
 
         current_offset -= var_size;
         if (var_size < 8) {

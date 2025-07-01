@@ -7,7 +7,7 @@ main:
     movq %rsp, %rbp
     subq $16, %rsp
 #offset calculado de -8 para la variable x
-    movl $0, -8(%rbp)  # Inicializar a 0
+    movq $0, -8(%rbp)  # Inicializar a 0
     movq $10, %rax
     pushq %rax
     popq %rax
@@ -17,10 +17,10 @@ main:
 .Lfor1:
 # Cargando valor de i 0 -1
     movq -4(%rbp), %rax  # i
-    movl %eax, %edx
+    movq %rax, %rdx
     movq $10, %rax
-    cmpl %eax, %edx
-    movl $0, %eax
+    cmpq %rax, %rdx
+    movq $0, %rax
     setl %al
     movzbq %al, %rax
     testq %rax, %rax
@@ -28,8 +28,7 @@ main:
 # Cargando valor de x 0 -1
     movq -8(%rbp), %rax  # x
     movq %rax, %rdx
-# Cargando valor de i 0 -1
-    movq -4(%rbp), %rax  # i
+    movq $1, %rax
     addq %rdx, %rax
     pushq %rax
     popq %rax
