@@ -187,7 +187,7 @@ public:
     void visit(IfStatement* stm) ;
     void visit(ElseIfStatement* stm) ;
     void visit(WhileStatement* stm) ;
-    void visit(ForStatement* stm) ;
+    void visit(ForStatement*  stm);
     void visit(ExpressionStatement* stm) ;
     void visit(ReturnStatement* stm) ;
     void visit(VarDec* stm) ;

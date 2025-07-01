@@ -303,12 +303,13 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
             break;
         case UNARY_PLUS_OP:
             break;
+        
         case PLUS_PLUS_OP: {
             if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
                  VarInfo info = env->lookup(id->name);
                 const char* regs[] = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
 
-                if (info.is_reference && info.reg_index >= 0) {
+            if (info.is_reference && info.reg_index >= 0) {
                 if (exp->is_prefix) {
                     out << "    incq %rax" << endl;
                     out << "    movq %rax, (" << regs[info.reg_index] << ")  # ++*ref" << endl;
@@ -328,15 +329,26 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
                 }
             } else if (!info.is_global) {
                 int offset = info.offset;
-                if (exp->is_prefix) {
-                    out << "    incq %rax" << endl;
-                    out << "    movq %rax, " << offset << "(%rbp)" << endl;
+                if (info.type == "int" && !info.is_pointer) {
+                    if (exp->is_prefix) {
+                        out << "    incl %eax" << endl;
+                        out << "    movl %eax, " << offset << "(%rbp)" << endl;
+                    } else {
+                        out << "    movl %eax, %ecx" << endl;
+                        out << "    incl %ecx" << endl;
+                        out << "    movl %ecx, " << offset << "(%rbp)" << endl;
+                    }
                 } else {
-                    out << "    movq %rax, %rcx" << endl;
-                    out << "    incq %rcx" << endl;
-                    out << "    movq %rcx, " << offset << "(%rbp)" << endl;
+                    if (exp->is_prefix) {
+                        out << "    incq %rax" << endl;
+                        out << "    movq %rax, " << offset << "(%rbp)" << endl;
+                    } else {
+                        out << "    movq %rax, %rcx" << endl;
+                        out << "    incq %rcx" << endl;
+                        out << "    movq %rcx, " << offset << "(%rbp)" << endl;
+                    }
                 }
-            } else {
+            }else {
                 // global
                 if (exp->is_prefix) {
                     out << "    incq %rax" << endl;
@@ -353,6 +365,7 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
             }
             break;
         }
+        
         case MINUS_MINUS_OP: {
             if (auto id = dynamic_cast<IdentifierExp*>(exp->uexp)) {
                 VarInfo info = env->lookup(id->name);
@@ -426,76 +439,108 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
 }
 
 int GenCodeVisitor::visit(BinaryExp* exp) {
-    // Evaluar operando izquierdo
-    exp->left->accept(this);
-    out << "    pushq %rax" << endl;
-
-    // Evaluar operando derecho
-    exp->right->accept(this);
-    out << "    movq %rax, %rcx" << endl;
-    out << "    popq %rax" << endl;
-    out << "    # Operación binaria: " << Exp::binopToChar(exp->op) << endl;
     switch (exp->op) {
         case PLUS_OP:
-            out << "    addq %rcx, %rax" << endl;
+            exp->left->accept(this);    // %rax = left
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);   // %rax = right
+            out << "    addl %edx, %eax" << endl;
             break;
         case MINUS_OP:
-            out << "    subq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    subl %eax, %edx" << endl;
+            out << "    movl %edx, %eax" << endl;
             break;
         case MULT_OP:
-            out << "    imulq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    imull %edx, %eax" << endl;
             break;
         case DIV_OP:
-            out << "    cqo" << endl;
-            out << "    idivq %rcx" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    movl %eax, %ecx" << endl;
+            out << "    movl %edx, %eax" << endl;
+            out << "    cltd" << endl;
+            out << "    idivl %ecx" << endl;
             break;
         case MOD_OP:
-            out << "    cqo" << endl;
-            out << "    idivq %rcx" << endl;
-            out << "    movq %rdx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    movl %eax, %ecx" << endl;
+            out << "    movl %edx, %eax" << endl;
+            out << "    cltd" << endl;
+            out << "    idivl %ecx" << endl;
+            out << "    movl %edx, %eax" << endl;
             break;
         case EQUAL_OP:
-            out << "    cmpq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    cmpl %eax, %edx" << endl;
             out << "    movl $0, %eax" << endl;
             out << "    sete %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case NOT_EQUAL_OP:
-            out << "    cmpq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    cmpl %eax, %edx" << endl;
             out << "    movl $0, %eax" << endl;
             out << "    setne %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case LESS_THAN_OP:
-            out << "    cmpq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    cmpl %eax, %edx" << endl;
             out << "    movl $0, %eax" << endl;
             out << "    setl %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case GREATER_THAN_OP:
-            out << "    cmpq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    cmpl %eax, %edx" << endl;
             out << "    movl $0, %eax" << endl;
             out << "    setg %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case LESS_EQUAL_OP:
-            out << "    cmpq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    cmpl %eax, %edx" << endl;
             out << "    movl $0, %eax" << endl;
             out << "    setle %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
         case GREATER_EQUAL_OP:
-            out << "    cmpq %rcx, %rax" << endl;
+            exp->left->accept(this);
+            out << "    movl %eax, %edx" << endl;
+            exp->right->accept(this);
+            out << "    cmpl %eax, %edx" << endl;
             out << "    movl $0, %eax" << endl;
             out << "    setge %al" << endl;
             out << "    movzbq %al, %rax" << endl;
             break;
+        // Lógicos y asignaciones igual que antes...
         case LOGICAL_AND_OP: {
             int label_false = cantidad++;
             int label_end = cantidad++;
+            exp->left->accept(this);
             out << "    testq %rax, %rax" << endl;
             out << "    jz .Lfalse" << label_false << endl;
-            out << "    testq %rcx, %rcx" << endl;
+            exp->right->accept(this);
+            out << "    testq %rax, %rax" << endl;
             out << "    movl $1, %eax" << endl;
             out << "    jnz .Lend" << label_end << endl;
             out << ".Lfalse" << label_false << ":" << endl;
@@ -506,9 +551,11 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
         case LOGICAL_OR_OP: {
             int label_true = cantidad++;
             int label_end = cantidad++;
+            exp->left->accept(this);
             out << "    testq %rax, %rax" << endl;
             out << "    jnz .Ltrue" << label_true << endl;
-            out << "    testq %rcx, %rcx" << endl;
+            exp->right->accept(this);
+            out << "    testq %rax, %rax" << endl;
             out << "    movl $0, %eax" << endl;
             out << "    jz .Lend" << label_end << endl;
             out << ".Ltrue" << label_true << ":" << endl;
@@ -517,39 +564,36 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
             break;
         }
         case ASSIGN_OP: {
-            // Para asignación, necesitamos obtener la dirección del operando izquierdo
-            if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
-                if (!env->check(id->name)) {
-                    cerr << "Error: Variable no declarada: " << id->name << endl;
-                    exit(1);
-                }
+            exp->left->accept(this);
+            out << "    pushq %rax" << endl;
+
+            // Evaluar operando derecho
+            exp->right->accept(this);
+            out << "    movq %rax, %rcx" << endl;
+            out << "    popq %rax" << endl;
+            out << "    # Operación binaria: " << Exp::binopToChar(exp->op) << endl;
+                    if (auto id = dynamic_cast<IdentifierExp*>(exp->left)) {
+                exp->right->accept(this);
                 int offset = env->lookup(id->name).offset;
-                out << "    movq %rcx, " << offset << "(%rbp)  # " << id->name << " = valor" << endl;
-                out << "    movq %rcx, %rax" << endl;
+                out << "    movl %eax, " << offset << "(%rbp)  # " << id->name << " = valor" << endl;
             }
             break;
         }
-        case PLUS_EQUAL_OP:
-        case MINUS_EQUAL_OP:
-        case MULTIPLY_EQUAL_OP:
-        case DIVIDE_EQUAL_OP:
-        case MODULO_EQUAL_OP: 
-        
         default:
             out << "    # Operador binario no implementado: " << exp->op << endl;
             break;
     }
-
     return 0;
 }
-
 
 int GenCodeVisitor::visit(ArrayAccessExp* exp) {
     // Evaluar índice
     exp->index->accept(this);
     out << "    pushq %rax" << endl;
 
-    // Evaluar array base
+    // Evaluar array base ESTE ES MI EJEMPLO EN C#include <stdio.h
+
+
     exp->array->accept(this);
     out << "    popq %rcx" << endl;
 
@@ -743,40 +787,43 @@ void GenCodeVisitor::visit(ForStatement* stm) {
     int label_start = cantidad++;
     int label_end = cantidad++;
 
+    // Declaración de variables en el entorno
+    if (auto vardec = dynamic_cast<VarDec*>(stm->init)) {
+        int current_offset = env->get_current_offset();
+        for (size_t i = 0; i < vardec->vars.size(); ++i) {
+            std::string var_name = vardec->vars[i];
+            Type* var_type = vardec->types[i];
+            int size = (var_type->type_name == "int") ? 4 : 8;
+            current_offset -= size;
+            env->add_var(var_name, current_offset, var_type->type_name,
+                       var_type->is_pointer, var_type->is_array,
+                       var_type->is_reference, -1, false);
+            env->set_current_offset(current_offset);
+        }
+    }
+
     // Inicialización
     if (stm->init) {
-        out << " # debug de init" << endl;
-        if (auto vardec = dynamic_cast<VarDec*>(stm->init)) {
-            int current_offset = env->get_current_offset();
-            for (size_t i = 0; i < vardec->vars.size(); ++i) {
-                std::string var_name = vardec->vars[i];
-                Type* var_type = vardec->types[i];
-                int size = 8;
-                current_offset -= size;
-                env->add_var(var_name, current_offset, var_type->type_name, var_type->is_pointer, var_type->is_array, var_type->is_reference, -1, false);
-                env->set_current_offset(current_offset);
-            }
-        }
         stm->init->accept(this);
     }
+
+    // Bucle principal
     out << ".Lfor" << label_start << ":" << endl;
 
     // Condición
     if (stm->condition) {
-        stm->condition->accept(this);
-        out << "    testq %rax, %rax" << endl;
-        out << "    jz .Lendfor" << label_end << endl;
+        stm->condition->accept(this); // deja 0/1 en %rax
+        out << "    testq %rax, %rax\n";
+        out << "    jz .Lendfor" << label_end << "\n";
     }
 
     // Cuerpo
-    if (stm->b)
-        stm->b->accept(this);
+    if (stm->b) stm->b->accept(this);
 
     // Actualización
-    if (stm->update)
-        stm->update->accept(this);
+    if (stm->update) stm->update->accept(this);
 
-    out << "    jmp .Lfor" << label_start << endl;
+    out << "    jmp .Lfor" << label_start << "\n";
     out << ".Lendfor" << label_end << ":" << endl;
 }
 
@@ -808,10 +855,12 @@ void GenCodeVisitor::visit(VarDec* stm) {
             reg = "%al";
         } else if (is_int && !is_ptr) {
             var_size = 4;
+            cout<<"#hola 444"<<endl;
             mov_inst = "movl";
             reg = "%eax";
         } else {
             var_size = 4;
+            cout<<"#hola"<<endl;
             mov_inst = "movq";
             reg = "%rax";
         };
