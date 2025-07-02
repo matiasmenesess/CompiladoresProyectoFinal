@@ -5,10 +5,14 @@ struct Punto {
     int y;
 };
 
+void duplica_y(struct Punto* pt) {
+    pt->y = pt->x * 2;
+}
+
 int main() {
     struct Punto p;
     p.x = 5;
-    p.y = p.x * 2;
+    duplica_y(&p);
     printf("p.y deberia ser 10: %d\n", p.y);
     return 0;
 }

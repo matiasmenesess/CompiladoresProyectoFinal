@@ -1,16 +1,14 @@
-#include <stdio.h>
+int add(int a, int b) {
+    return a + b;
+}
+
+int multiply(int x, int y) {
+    return x * y;
+}
 
 int main() {
-    int x = 42;
-    int *ptr = &x;
-    int *pptr = ptr;
-
-    printf("Valor de x: %d\n", x);
-    printf("Valor usando *ptr: %d\n", *ptr);
-    printf("Valor usando **pptr: %d\n", *pptr);
-
-    **pptr = 99;
-    printf("Nuevo valor de x: %d\n", x);
-
-    return 0;
+    int result1 = add(15, 25);
+    int result2 = multiply(4, 7);
+    printf("hello");
+    return 0
 }

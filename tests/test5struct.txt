@@ -5,10 +5,39 @@ struct Punto {
     int y;
 };
 
+struct Recta {
+    int pendiente;
+    int interseccion;
+};
+
+struct Circulo {
+    int radio;
+    int centro_x;
+    int centro_y;
+};
+
 int main() {
-    struct Punto p1;
+    struct Punto p1, p2;
+    struct Recta r1;
+    struct Circulo c1;
+
     p1.x = 10;
     p1.y = 20;
-    printf("Punto: (%d, %d)\n", p1.x, p1.y);
+
+    p2.x = -5;
+    p2.y = 15;
+
+    r1.pendiente = 2;
+    r1.interseccion = 3;
+
+    c1.radio = 7;
+    c1.centro_x = 0;
+    c1.centro_y = 0;
+
+    printf("Punto 1: (%d, %d)\n", p1.x, p1.y);
+    printf("Punto 2: (%d, %d)\n", p2.x, p2.y);
+    printf("Recta: pendiente=%d, interseccion=%d\n", r1.pendiente, r1.interseccion);
+    printf("Circulo: radio=%d, centro=(%d, %d)\n", c1.radio, c1.centro_x, c1.centro_y);
+
     return 0;
 }

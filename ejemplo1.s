@@ -5,73 +5,109 @@ print_fmt: .string "%ld\n"
 main:
  pushq %rbp
  movq %rsp, %rbp
- subq $32, %rsp
-# Declarando variable: x en offset -8
-# Declarando variable: ptr en offset -16
-# Declarando variable: pptr en offset -24
- movq $42, %rax
-    movq %rax, -8(%rbp) # x
-# Cargando valor de x 0 -1
- movq -8(%rbp), %rax # x
-    leaq -8(%rbp), %rax  # &x
-    movq %rax, -16(%rbp) # ptr
-# Cargando valor de ptr 0 -1
- movq -16(%rbp), %rax # ptr
-    movq %rax, -24(%rbp) # pptr
+ subq $16, %rsp
+# Declarando variable de for: i en offset -8
 .section .rodata
-printf_fmt_0: .string "Valor de x: %d\n"
+printf_fmt_0: .string "Iniciando bucles anidados:\n"
 .text
-    pushq %rbp # salvar frame pointer para alineación
     leaq printf_fmt_0(%rip), %rdi
-# Cargando valor de x 0 -1
- movq -8(%rbp), %rax # x
-    movq %rax, %rsi
     xorq %rax, %rax # 0 registros vectoriales usados
     call printf@PLT
-    popq %rbp # restaurar frame pointer
+ movq $1, %rax
+    movq %rax, -8(%rbp) # i
+.Lfor1:
+# Cargando valor de i 0 -1
+ movq -8(%rbp), %rax # i
+    movq %rax, %rdx
+ movq $3, %rax
+    cmpq %rax, %rdx
+    movq $0, %rax
+    setle %al
+    movzbq %al, %rax
+    testq %rax, %rax
+    jz .Lendfor2
+# Declarando variable: j en offset -16
+ movq $1, %rax
+    movq %rax, -16(%rbp) # j
+.Lwhile3:
+# Cargando valor de j 0 -1
+ movq -16(%rbp), %rax # j
+    movq %rax, %rdx
+ movq $2, %rax
+    cmpq %rax, %rdx
+    movq $0, %rax
+    setle %al
+    movzbq %al, %rax
+    testq %rax, %rax
+    jz .Lendwhile4
+# Cargando valor de i 0 -1
+ movq -8(%rbp), %rax # i
+    movq %rax, %rdx
+# Cargando valor de j 0 -1
+ movq -16(%rbp), %rax # j
+    addq %rdx, %rax
+    movq %rax, %rdx
+ movq $2, %rax
+    movq %rax, %rcx
+    movq %rdx, %rax
+    cqo
+    idivq %rcx
+    movq %rdx, %rax
+    movq %rax, %rdx
+ movq $0, %rax
+    cmpq %rax, %rdx
+    movq $0, %rax
+    sete %al
+    movzbq %al, %rax
+    testq %rax, %rax
+    jz .Lelse5
 .section .rodata
-printf_fmt_1: .string "Valor usando *ptr: %d\n"
+printf_fmt_1: .string "i=%d, j=%d -> suma par\n"
 .text
-    pushq %rbp # salvar frame pointer para alineación
     leaq printf_fmt_1(%rip), %rdi
-# Cargando valor de ptr 0 -1
- movq -16(%rbp), %rax # ptr
-    movq (%rax), %rax  # *ptr
+# Cargando valor de i 0 -1
+ movq -8(%rbp), %rax # i
     movq %rax, %rsi
+# Cargando valor de j 0 -1
+ movq -16(%rbp), %rax # j
+    movq %rax, %rdx
     xorq %rax, %rax # 0 registros vectoriales usados
     call printf@PLT
-    popq %rbp # restaurar frame pointer
+    jmp .Lendif6
+.Lelse5:
 .section .rodata
-printf_fmt_2: .string "Valor usando **pptr: %d\n"
+printf_fmt_2: .string "i=%d, j=%d -> suma impar\n"
 .text
-    pushq %rbp # salvar frame pointer para alineación
     leaq printf_fmt_2(%rip), %rdi
-# Cargando valor de pptr 0 -1
- movq -24(%rbp), %rax # pptr
-    movq (%rax), %rax  # *ptr
+# Cargando valor de i 0 -1
+ movq -8(%rbp), %rax # i
     movq %rax, %rsi
+# Cargando valor de j 0 -1
+ movq -16(%rbp), %rax # j
+    movq %rax, %rdx
     xorq %rax, %rax # 0 registros vectoriales usados
     call printf@PLT
-    popq %rbp # restaurar frame pointer
- movq $99, %rax
- pushq %rax
-# Cargando valor de pptr 0 -1
- movq -24(%rbp), %rax # pptr
-    movq (%rax), %rax  # *ptr
- movq %rax, %rbx # guardar dirección
- popq %rax # recuperar valor a asignar
- movq %rax, (%rbx) # *ptr = valor
+.Lendif6:
+# Cargando valor de j 0 -1
+ movq -16(%rbp), %rax # j
+    movq %rax, %rcx
+    incq %rcx
+    movq %rcx, -16(%rbp)
+    jmp .Lwhile3
+.Lendwhile4:
+# Cargando valor de i 0 -1
+ movq -8(%rbp), %rax # i
+    movq %rax, %rcx
+    incq %rcx
+    movq %rcx, -8(%rbp)
+    jmp .Lfor1
+.Lendfor2:
 .section .rodata
-printf_fmt_3: .string "Nuevo valor de x: %d\n"
+printf_fmt_3: .string "Bucles anidados finalizados.\n"
 .text
-    pushq %rbp # salvar frame pointer para alineación
     leaq printf_fmt_3(%rip), %rdi
-# Cargando valor de x 0 -1
- movq -8(%rbp), %rax # x
-    movq %rax, %rsi
     xorq %rax, %rax # 0 registros vectoriales usados
     call printf@PLT
-    popq %rbp # restaurar frame pointer
  movq $0, %rax
     leave
     ret

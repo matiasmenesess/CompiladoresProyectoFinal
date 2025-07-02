@@ -622,3 +622,208 @@ Esta implementación proporciona soporte completo para structs y punteros en un 
 - **Generación de código x86-64**
 
 El diseño modular permite fácil extensión para características adicionales como arrays dinámicos, herencia, o optimizaciones más avanzadas.
+
+# Proyecto Compilador C- Instrucciones de uso
+
+## Requisitos previos
+
+- Tener instalado **g++** (para compilar el compilador)
+- Tener instalado **gcc** (para ejecutar los archivos `.s` generados)
+- Tener **Python 3** instalado
+
+---
+
+## Estructura del proyecto
+
+- `make.py`: Script que compila el compilador y ejecuta todos los tests (`.txt`) en la carpeta `tests/`, generando archivos `.s` en el mismo directorio de cada test.
+- `ejecutador.py`: Script que toma un archivo `.s` generado y lo compila/ejecuta usando `gcc`, mostrando la salida del programa ensamblado.
+- Carpeta `tests/`: Contiene los archivos de prueba `.txt` que serán procesados por el compilador.
+
+---
+# Manual de Usuario
+
+## 📋 Prerrequisitos del Sistema
+
+### 🖥️ **Requerimientos Mínimos**
+- **RAM**: 2GB mínimo, 4GB recomendado
+- **Espacio en disco**: 500MB libres
+- **Procesador**: Compatible con x86-64
+- **Sistema operativo**: Linux, macOS, o Windows
+
+### 🛠️ **Dependencias por Plataforma**
+
+#### 🐧 **Linux (Ubuntu/Debian)**
+```bash
+# Actualizar sistema
+sudo apt update && sudo apt upgrade
+
+# Instalar dependencias
+sudo apt install -y build-essential gcc g++ python3 python3-pip python3-venv
+
+# Verificar instalaciones
+gcc --version
+g++ --version
+python3 --version
+```
+
+#### 🍎 **macOS**
+```bash
+# Instalar Xcode Command Line Tools
+xcode-select --install
+
+# Instalar Homebrew (si no está instalado)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Instalar dependencias
+brew install python3
+brew install gcc
+
+# Verificar instalaciones
+gcc --version
+python3 --version
+```
+
+#### 🪟 **Windows**
+```powershell
+# Opción 1: Usar WSL2 (Recomendado)
+# 1. Instalar WSL2 desde Microsoft Store
+# 2. Instalar Ubuntu desde Microsoft Store
+# 3. Seguir instrucciones de Linux dentro de WSL
+
+# Opción 2: Instalación nativa
+# 1. Instalar Python desde https://python.org
+# 2. Instalar MinGW-w64 o Visual Studio Build Tools
+# 3. Agregar al PATH las rutas de instalación
+
+# Verificar desde Command Prompt o PowerShell
+python --version
+gcc --version
+```
+
+## 📋 Cómo levantar y usar el proyecto
+
+### 1. Compilar el compilador y generar archivos `.s` desde tests
+
+#### 🐧 **Linux / 🍎 macOS**
+poner el archivo en la carpetaa tests o si no modfique el make.py de acuerdo a su conveniencia.
+```bash
+# Compilar el compilador 
+python3 make.py
+
+# Ejecutar tests del codigo assembly generado
+python3 ejecutador.py
+```
+
+#### 🪟 **Windows**
+```cmd
+# En Command Prompt o PowerShell
+python make.py
+
+# Ejecutar tests
+python ejecutador.py ruta\al\archivo.txt
+```
+
+### 2. Ejecutar el frontend con Streamlit
+
+#### 📥 **Instalación de dependencias**
+
+##### 🐧 **Linux / 🍎 macOS**
+```bash
+# Crear entorno virtual
+python3 -m venv venv
+
+# Activar entorno virtual
+source venv/bin/activate
+
+# Instalar Streamlit
+pip install streamlit
+```
+
+##### 🪟 **Windows**
+```cmd
+# Crear entorno virtual
+python -m venv venv
+
+# Activar entorno virtual
+venv\Scripts\activate
+
+# Instalar Streamlit
+pip install streamlit
+```
+
+#### 🚀 **Ejecución del frontend**
+
+##### 🐧 **Linux / 🍎 macOS**
+```bash
+# Ejecutar la aplicación
+streamlit run main.py
+```
+
+##### 🪟 **Windows**
+```cmd
+# Ejecutar la aplicación
+streamlit run main.py
+```
+
+#### 🌐 **Acceso a la aplicación**
+
+Una vez ejecutado, la aplicación estará disponible en:
+- **URL**: http://localhost:8501
+- **Interfaz**: Navegador web con editor de código integrado
+
+### 3. Uso del compilador
+
+#### ✅ **Mediante frontend (recomendado)**
+1. Abrir http://localhost:8501 en el navegador
+2. Escribir código C en el editor
+3. Hacer clic en "🚀 Compilar y Ejecutar"
+4. Ver resultados en las pestañas de Assembly y Ejecución
+
+#### ⚙️ **Mediante línea de comandos**
+
+##### 🐧 **Linux / 🍎 macOS**
+```bash
+# Compilar archivo específico
+./main archivo_entrada.txt
+
+# El archivo .s se genera automáticamente
+# Ejemplo: archivo_entrada.txt → archivo_entrada.s
+```
+
+##### 🪟 **Windows**
+```cmd
+# Compilar archivo específico
+main.exe archivo_entrada.txt
+
+# El archivo .s se genera automáticamente
+# Ejemplo: archivo_entrada.txt → archivo_entrada.s
+```
+
+## 🔧 **Solución de Problemas Comunes**
+
+### 🐧 **Linux**
+```bash
+# Si gcc no se encuentra
+sudo apt install build-essential
+
+# Si python3 no se encuentra
+sudo apt install python3 python3-pip
+```
+
+### 🍎 **macOS**
+```bash
+# Si gcc no se encuentra
+xcode-select --install
+
+# Si hay problemas de permisos
+sudo chown -R $(whoami) /usr/local
+```
+
+### 🪟 **Windows**
+```cmd
+# Si python no se encuentra
+# Reinstalar Python y marcar "Add to PATH"
+
+# Si gcc no se encuentra
+# Instalar MinGW-w64 y agregar al PATH
+```

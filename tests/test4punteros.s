@@ -6,27 +6,34 @@ print_fmt: .string "%ld\n"
 cambiar_valor:
     pushq %rbp
     movq %rsp, %rbp
-# Registrando variable: num reg_index: 0 offset: 0 is_global: false is_reference: false
-    movq $100, %rax
-    pushq %rax
+# Parámetro: num reg_index: 0 is_reference: false
+ movq $100, %rax
+ pushq %rax
+# Cargando valor de num 0 0
+ movq %rdi, %rax # Valor de num
+ movq %rax, %rbx # guardar dirección
+ popq %rax # recuperar valor a asignar
+ movq %rax, (%rbx) # *ptr = valor
+    leave
+    ret
 main:
-    pushq %rbp
-    movq %rsp, %rbp
-    subq $16, %rsp
-#offset calculado de -8 para la variable mi_numero
-    movq $10, %rax
-    movq %rax, -8(%rbp)  # mi_numero
+ pushq %rbp
+ movq %rsp, %rbp
+ subq $16, %rsp
+# Declarando variable: mi_numero en offset -8
+ movq $10, %rax
+    movq %rax, -8(%rbp) # mi_numero
 .section .rodata
 printf_fmt_0: .string "Valor antes de la funcion: %d\n"
 .text
     leaq printf_fmt_0(%rip), %rdi
 # Cargando valor de mi_numero 0 -1
-    movq -8(%rbp), %rax  # mi_numero
+ movq -8(%rbp), %rax # mi_numero
     movq %rax, %rsi
-    movl $0, %eax
-    call printf
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
 # Cargando valor de mi_numero 0 -1
-    movq -8(%rbp), %rax  # mi_numero
+ movq -8(%rbp), %rax # mi_numero
     leaq -8(%rbp), %rax  # &mi_numero
     movq %rax, %rdi
     call cambiar_valor
@@ -35,11 +42,11 @@ printf_fmt_1: .string "Valor despues de la funcion: %d\n"
 .text
     leaq printf_fmt_1(%rip), %rdi
 # Cargando valor de mi_numero 0 -1
-    movq -8(%rbp), %rax  # mi_numero
+ movq -8(%rbp), %rax # mi_numero
     movq %rax, %rsi
-    movl $0, %eax
-    call printf
-    movq $0, %rax
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
+ movq $0, %rax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

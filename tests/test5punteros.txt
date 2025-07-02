@@ -1,10 +1,23 @@
 #include <stdio.h>
 
+void suma10(int* n) {
+    *n = *n + 10;
+}
+
 int main() {
+    int x = 5;
     int y = 20;
     int* p = &y;
+    int* q = &x;
+
+    printf("Valor original de x: %d\n", x);
     printf("Valor original de y: %d\n", y);
-    *p = 30;
+
+    *p = *q + 15;
+    suma10(q);
+
+    printf("Nuevo valor de x: %d\n", x);
     printf("Nuevo valor de y: %d\n", y);
+
     return 0;
 }

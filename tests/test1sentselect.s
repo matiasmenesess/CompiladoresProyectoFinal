@@ -3,59 +3,49 @@ print_fmt: .string "%ld\n"
 .text
 .globl main
 main:
-    pushq %rbp
-    movq %rsp, %rbp
-    subq $16, %rsp
-#offset calculado de -8 para la variable a
-#offset calculado de -16 para la variable b
-    movq $1, %rax
-    movq %rax, -8(%rbp)  # a
-    movq $0, %rax
-    movq %rax, -16(%rbp)  # b
+ pushq %rbp
+ movq %rsp, %rbp
+ subq $16, %rsp
+# Declarando variable: a en offset -8
+# Declarando variable: b en offset -16
+ movq $1, %rax
+    movq %rax, -8(%rbp) # a
+ movq $0, %rax
+    movq %rax, -16(%rbp) # b
 # Cargando valor de a 0 -1
-    movq -8(%rbp), %rax  # a
-    pushq %rax
-    movq $1, %rax
-    movq %rax, %rcx
-    popq %rax
-    # Operación binaria: ==
-    cmpq %rcx, %rax
-    movl $0, %eax
+ movq -8(%rbp), %rax # a
+    movq %rax, %rdx
+ movq $1, %rax
+    cmpq %rax, %rdx
+    movq $0, %rax
     sete %al
     movzbq %al, %rax
-    pushq %rax
+    testq %rax, %rax
+    jnz .Ltrue3
 # Cargando valor de b 0 -1
-    movq -16(%rbp), %rax  # b
-    pushq %rax
-    movq $1, %rax
-    movq %rax, %rcx
-    popq %rax
-    # Operación binaria: ==
-    cmpq %rcx, %rax
-    movl $0, %eax
+ movq -16(%rbp), %rax # b
+    movq %rax, %rdx
+ movq $1, %rax
+    cmpq %rax, %rdx
+    movq $0, %rax
     sete %al
     movzbq %al, %rax
-    movq %rax, %rcx
-    popq %rax
-    # Operación binaria: ||
     testq %rax, %rax
-    jnz .Ltrue1
-    testq %rcx, %rcx
-    movl $0, %eax
-    jz .Lend2
-.Ltrue1:
-    movl $1, %eax
-.Lend2:
+    movq $0, %rax
+    jz .Lend4
+.Ltrue3:
+    movq $1, %rax
+.Lend4:
     testq %rax, %rax
-    jz .Lelse2
+    jz .Lelse1
 .section .rodata
 printf_fmt_0: .string "Al menos una condicion es verdadera\n"
 .text
     leaq printf_fmt_0(%rip), %rdi
-    movl $0, %eax
-    call printf
-.Lelse2:
-    movq $0, %rax
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
+.Lelse1:
+ movq $0, %rax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

@@ -3,145 +3,130 @@ print_fmt: .string "%ld\n"
 .text
 .globl main
 main:
-    pushq %rbp
-    movq %rsp, %rbp
-    subq $32, %rsp
-#offset calculado de -8 para la variable y
-#offset calculado de -16 para la variable z
-#offset calculado de -24 para la variable f
-#offset calculado de -32 para la variable g
-    movq $5, %rax
-    movq %rax, -8(%rbp)  # y
+ pushq %rbp
+ movq %rsp, %rbp
+ subq $32, %rsp
+# Declarando variable: y en offset -8
+# Declarando variable: z en offset -16
+# Declarando variable: f en offset -24
+# Declarando variable: g en offset -32
+ movq $5, %rax
+    movq %rax, -8(%rbp) # y
 # Cargando valor de y 0 -1
-    movq -8(%rbp), %rax  # y
+ movq -8(%rbp), %rax # y
     incq %rax
     movq %rax, -8(%rbp)
-    movq %rax, -16(%rbp)  # z
-    movq $1, %rax
-    movb %al, -24(%rbp)  # f
-    andb $1, -24(%rbp)  # Asegurar 0/1
-    # Padding de 7 bytes para alineación
-    movq $0, %rax
-    movb %al, -32(%rbp)  # g
-    andb $1, -32(%rbp)  # Asegurar 0/1
-    # Padding de 7 bytes para alineación
+    movq %rax, -16(%rbp) # z
+ movq $1, %rax
+    movq %rax, -24(%rbp) # f
+    andq $1, -24(%rbp) # asegurar 0/1 para bool
+ movq $0, %rax
+    movq %rax, -32(%rbp) # g
+    andq $1, -32(%rbp) # asegurar 0/1 para bool
 # Cargando valor de f 0 -1
-    movq -24(%rbp), %rax  # f
-    pushq %rax
+ movq -24(%rbp), %rax # f
+    testq %rax, %rax
+    jz .Lfalse3
 # Cargando valor de g 0 -1
-    movq -32(%rbp), %rax  # g
-    movq %rax, %rcx
-    popq %rax
-    # Operación binaria: &&
+ movq -32(%rbp), %rax # g
     testq %rax, %rax
-    jz .Lfalse1
-    testq %rcx, %rcx
-    movl $1, %eax
-    jnz .Lend2
-.Lfalse1:
-    movl $0, %eax
-.Lend2:
-    testq %rax, %rax
-    jz .Lelse6
     movq $1, %rax
-    pushq %rax
-    movq $8, %rax
-    movq %rax, %rcx
-    popq %rax
-    # Operación binaria: >
-    cmpq %rcx, %rax
-    movl $0, %eax
+    jnz .Lend4
+.Lfalse3:
+    movq $0, %rax
+.Lend4:
+    testq %rax, %rax
+    jz .Lelse1
+ movq $1, %rax
+    movq %rax, %rdx
+ movq $8, %rax
+    cmpq %rax, %rdx
+    movq $0, %rax
     setg %al
     movzbq %al, %rax
     testq %rax, %rax
-    jz .Lelse2
+    jz .Lelse5
 .section .rodata
 printf_fmt_0: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_0(%rip), %rdi
 # Cargando valor de z 0 -1
-    movq -16(%rbp), %rax  # z
+ movq -16(%rbp), %rax # z
     movq %rax, %rsi
-    movl $0, %eax
-    call printf
-    jmp .Lendif3
-.Lelse2:
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
+    jmp .Lendif6
+.Lelse5:
 .section .rodata
 printf_fmt_1: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_1(%rip), %rdi
 # Cargando valor de z 0 -1
-    movq -16(%rbp), %rax  # z
+ movq -16(%rbp), %rax # z
     movq %rax, %rsi
-    movl $0, %eax
-    call printf
-.Lendif3:
-    jmp .Lendif7
-.Lelse6:
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
+.Lendif6:
+    jmp .Lendif2
+.Lelse1:
 # Cargando valor de f 0 -1
-    movq -24(%rbp), %rax  # f
-    pushq %rax
+ movq -24(%rbp), %rax # f
+    testq %rax, %rax
+    jnz .Ltrue9
 # Cargando valor de g 0 -1
-    movq -32(%rbp), %rax  # g
-    movq %rax, %rcx
-    popq %rax
-    # Operación binaria: ||
+ movq -32(%rbp), %rax # g
     testq %rax, %rax
-    jnz .Ltrue3
-    testq %rcx, %rcx
-    movl $0, %eax
-    jz .Lend4
-.Ltrue3:
-    movl $1, %eax
-.Lend4:
-    testq %rax, %rax
-    jz .Lelse6
+    movq $0, %rax
+    jz .Lend10
+.Ltrue9:
     movq $1, %rax
-    pushq %rax
-    movq $8, %rax
-    movq %rax, %rcx
-    popq %rax
-    # Operación binaria: >
-    cmpq %rcx, %rax
-    movl $0, %eax
+.Lend10:
+    testq %rax, %rax
+    jz .Lelse7
+ movq $1, %rax
+    movq %rax, %rdx
+ movq $8, %rax
+    cmpq %rax, %rdx
+    movq $0, %rax
     setg %al
     movzbq %al, %rax
     testq %rax, %rax
-    jz .Lelse4
+    jz .Lelse11
 .section .rodata
 printf_fmt_2: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_2(%rip), %rdi
 # Cargando valor de z 0 -1
-    movq -16(%rbp), %rax  # z
+ movq -16(%rbp), %rax # z
     movq %rax, %rsi
-    movl $0, %eax
-    call printf
-    jmp .Lendif5
-.Lelse4:
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
+    jmp .Lendif12
+.Lelse11:
 .section .rodata
 printf_fmt_3: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_3(%rip), %rdi
 # Cargando valor de z 0 -1
-    movq -16(%rbp), %rax  # z
+ movq -16(%rbp), %rax # z
     movq %rax, %rsi
-    movl $0, %eax
-    call printf
-.Lendif5:
-    jmp .Lendif7
-.Lelse6:
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
+.Lendif12:
+    jmp .Lendif8
+.Lelse7:
 .section .rodata
 printf_fmt_4: .string "Resultado: %d\n"
 .text
     leaq printf_fmt_4(%rip), %rdi
 # Cargando valor de z 0 -1
-    movq -16(%rbp), %rax  # z
+ movq -16(%rbp), %rax # z
     movq %rax, %rsi
-    movl $0, %eax
-    call printf
-.Lendif7:
-    movq $0, %rax
+    xorq %rax, %rax # 0 registros vectoriales usados
+    call printf@PLT
+.Lendif8:
+.Lendif2:
+ movq $0, %rax
     leave
     ret
 .section .note.GNU-stack,"",@progbits

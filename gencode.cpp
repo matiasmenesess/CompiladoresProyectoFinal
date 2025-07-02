@@ -1023,7 +1023,6 @@ void GenCodeVisitor::visit(PrintfStatement* stm) {
     out << fmt_label << ": .string " << stm->format_string << endl;
     out << ".text" << endl;
     
-    out << "    pushq %rbp # salvar frame pointer para alineación" << endl;
     
     out << "    leaq " << fmt_label << "(%rip), %rdi" << endl;
     
@@ -1058,7 +1057,6 @@ void GenCodeVisitor::visit(PrintfStatement* stm) {
         out << "    addq $" << (stack_args * 8) << ", %rsp" << endl;
     }
     
-    out << "    popq %rbp # restaurar frame pointer" << endl;
 }
 
 
@@ -1430,6 +1428,8 @@ void GenCodeVisitor::visit(MainFunction* mainFunc) {
     }
   
 }
+
+
 
 void GenCodeVisitor::visit(StructDeclaration* structDecl) {
     StructInfo info;

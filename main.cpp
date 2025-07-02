@@ -25,19 +25,12 @@ int main(int argc, const char *argv[]){
         input += line + '\n';
     }
     infile.close();
-    cout << "Archivo leído correctamente" << endl;
     Scanner scanner(input.c_str());
-    cout << "Scanner completado exitosamente\n" << endl;
     Parser parser(&scanner);
 
     try
     {
-        cout << "Parseando..." << endl;
         Program *program = parser.parseProgram();
-        cout << "Parseo exitoso" << endl;
-        PrintVisitor printVisitor;
-        cout << "Imprimiendo el AST..." << endl;
-        printVisitor.imprimir(program);
         string inputFile(argv[1]);
         size_t dotPos = inputFile.find_last_of('.');
         string baseName = (dotPos == string::npos) ? inputFile : inputFile.substr(0, dotPos);
@@ -49,10 +42,8 @@ int main(int argc, const char *argv[]){
             delete program;
             return 1;
         }
-        cout << "Generando código..." << endl;
         GenCodeVisitor codigo(outfile);
         codigo.gencode(program);
-        cout << "Generando codigo ensamblador en " << outputFilename << endl;
         outfile.close();
         delete program;
     }
