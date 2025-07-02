@@ -163,7 +163,7 @@ def load_css():
 def create_header():
     st.markdown("""
     <div class="main-header">
-        <h1>🚀 Compilador C Avanzado</h1>
+        <h1>🚀 Compilador C </h1>
         <p>Compilador moderno con soporte para structs, punteros y generación de código x86-64
             Hecho por Zamir Lizardo y Matias Meneses
             para el curso de Compiladores de la UTEC.
