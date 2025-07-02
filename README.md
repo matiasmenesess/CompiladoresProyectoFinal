@@ -648,8 +648,7 @@ El diseño modular permite fácil extensión para características adicionales c
 - **RAM**: 2GB mínimo, 4GB recomendado
 - **Espacio en disco**: 500MB libres
 - **Procesador**: Compatible con x86-64
-- **Sistema operativo**: Linux, macOS, o Windows
-
+- **Sistema operativo**: Linux, macOS, o Windows tener en cuenta que si o si se necesita un entorno linux para ejecutar los archivos .s
 ### 🛠️ **Dependencias por Plataforma**
 
 #### 🐧 **Linux (Ubuntu/Debian)**
